@@ -1,0 +1,32 @@
+{
+    "name": "isotope/shopboss",
+    "type": "library",
+    "description": "",
+    "keywords": [
+        "Laravel"
+    ],
+    "authors": [
+        {
+            "name"    : "IsotopeIT",
+            "email"   : "info@isotopeit.com",
+            "homepage": "https://isotopeit.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Isotope\\ShopBoss\\": "src/"
+        }
+    },
+    "autoload-dev": {},
+    "extra": {
+        "copyright": "www.isotopeit.com",
+        "laravel": {
+            "providers": [
+                "Isotope\\ShopBoss\\ShopBossServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "version": "1.0.0",
+    "license": "MIT"
+}
