@@ -33,11 +33,6 @@
                     placeholder="{{ __('Enter Status') }}">
             </div>
             <div class="col-md">
-                <input type="text" value="{{ Request::input('search')['payment_status'] ?? '' }}"
-                    class="form-control form-control-sm" name="search[payment_status]"
-                    placeholder="{{ __('Enter Payment Status') }}">
-            </div>
-            <div class="col-md">
                 <button type="submit" class="btn btn-sm bg-isotope text-white"><i
                         class="fa-solid fa-search text-white"></i> {{ __('Search') }}</button>
             </div>
@@ -49,7 +44,6 @@
                         <td>{{ __('#SL') }}</td>
                         <td>{{ __('Reference') }}</td>
                         <td>{{ __('Customer') }}</td>
-                        <td>{{ __('Status') }}</td>
                         <td>{{ __('Total Amount') }}</td>
                         <td>{{ __('Paid Amount') }}</td>
                         <td>{{ __('Due Amount') }}</td>
@@ -64,7 +58,6 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $sale->reference }}</td>
                         <td>{{ $sale->customer_name }}</td>
-                        <td>{{ $sale->status }}</td>
                         <td>{{ $sale->total_amount }}</td>
                         <td>{{ $sale->paid_amount }}</td>
                         <td>{{ $sale->due_amount }}</td>
@@ -76,7 +69,7 @@
                     </tr>
                     @empty
                         <tr>
-                            <th class="text-center text-danger" colspan="10">{{ __('No Data Found!') }}</th>
+                            <th class="text-center text-danger" colspan="9">{{ __('No Data Found!') }}</th>
                         </tr>
                     @endforelse
                 </tbody>

@@ -72,6 +72,8 @@ Route::group(['middleware' => ['web', 'auth','authorization']], function () {
     Route::get('/purchases-report', [ReportsController::class, 'purchasesReport'])->name('purchases-report.index');
     Route::get('/sales-return-report', [ReportsController::class, 'salesReturnReport'])->name('sales-return-report.index');
     Route::get('/purchases-return-report', [ReportsController::class, 'purchasesReturnReport'])->name('purchases-return-report.index');
+    Route::get('/product-wise-sele-report', [ReportsController::class, 'productWiseSeleReport'])->name('product_wise_sele_report');
+    Route::get('/product-wise-purchase-report', [ReportsController::class, 'productWisePurchaseReport'])->name('product_wise_purchase_report');
 
     Route::get('/sales/pdf/{id}', [SaleController::class, 'pdf'])->name('sales.pdf');
     Route::get('/sales/pos/pdf/{id}', [SaleController::class, 'posPdf'])->name('sales.pos.pdf');

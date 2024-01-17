@@ -39,7 +39,7 @@
                                 <td>{{ __('Price') }}</td>
                                 <td>{{ __('Unit') }}</td>
                                 <td>{{ __('Stock Alert') }}</td>
-                                <td>{{ __('Actions') }}</td>
+                                <td class="text-center">{{ __('Actions') }}</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,7 +51,7 @@
                                 <td>{{ $product->product_code }}</td>
                                 <td>{{ $product->product_cost }}</td>
                                 <td>{{ $product->product_price }}</td>
-                                <td>{{ $product->product_unit }}</td>
+                                <td>{{ $product->uom }}</td>
                                 <td>{{ $product->product_stock_alert }}</td>
                                 <td class="d-flex justify-content-center">
                                     <a title="Show"

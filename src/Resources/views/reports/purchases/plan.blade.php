@@ -30,4 +30,13 @@
             </tr>
         @endforeach
     </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="4" class="text-end">Total :</th>
+            <th>{{ $data->sum('total_amount') }}</th>
+            <th>{{ $data->sum('paid_amount') }}</th>
+            <th>{{ $data->sum('due_amount') }}</th>
+            <th></th>
+        </tr>
+    </tfoot>
 </table>

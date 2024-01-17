@@ -123,7 +123,7 @@ class SaleController extends Controller
             }
 
             $customer = Customer::find($req['customer_id']);
-            if(is_null($customer)) throw new Exception(__('Supplier not found'), 404);
+            if(is_null($customer)) throw new Exception(__('Customre not found'), 404);
 
             $totalSubTotal = collect($products)->sum('sub_total');
             $payload = [

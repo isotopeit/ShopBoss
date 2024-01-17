@@ -11,6 +11,17 @@
     @csrf
     <div class="row">
         <div class="col-md-7">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="mb-2 text-center">
+                            <label class="form-label scan-label">
+                                <i class="bi bi-upc-scan text-dark"></i>
+                                {{ __('Scan Product') }}
+                             </label>
+                            <input type="text" class="form-control text-center" placeholder="{{ __('Scan Product Barcode') }}" id="product">
+                        </div>
+                    </div>
+            </div>
             <div class="card">
                 <div class="card-body">
                     <table class="table table-sm table-bordered table-striped mt-2" id="product-table">
@@ -18,6 +29,7 @@
                             <tr class="bg-isotope text-center">
                                 <th>{{ __('Product') }}</th>
                                 <th>{{ __('Price') }}</th>
+                                <th>{{ __('Stock') }}</th>
                                 <th>{{ __('Quantity') }}</th>
                                 <th>{{ __('Sub Total') }}</th>
                                 <th>{{ __('Action') }}</th>
@@ -25,7 +37,7 @@
                         </thead>
                         <tbody>
                             <tr class="removeable-tr text-center fw-bold text-isotope">
-                                <td colspan="5">{{ __('Please Scan products') }}!</td>
+                                <td colspan="6" class="text-danger">{{ __('Please Scan products') }}!</td>
                             </tr>
                         </tbody>
                     </table>
@@ -37,27 +49,14 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="mb-2 text-center">
-                                <label class="form-label scan-label">
-                                    <i class="bi bi-upc-scan text-dark"></i>
-                                    {{ __('Scan Product') }}
-                                 </label>
-                                <input type="text" class="form-control text-center" placeholder="{{ __('Scan Product Barcode') }}" id="product">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="card mt-3">
-                        <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6 col-12">
+                                <div class="col-md-12 col-12">
                                     <div class="mb-2">
                                         <label class="form-label">{{ __('Customer') }} <span class="text-danger">*</span></label>
                                         <select class="form-select form-select-sm" id="customer" name="customer" required></select>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-12">
+                                <div class="col-md-6 col-12 d-none" >
                                     <div class="mb-2">
                                         <label class="form-label">{{ __('Branch') }} <span class="text-danger">*</span></label>
                                         <select class="form-select form-select-sm"></select>
@@ -99,17 +98,11 @@
                                         <input type="number" class="form-control form-control-sm" value="0" name="discount_amount" onchange="grandTotalCalc()">
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-12">
+                                <div class="col-md-12 col-12">
                                     <div class="mb-2">
                                         <label class="form-label">{{ __('Cash on Hand') }} <span value="0"
                                                 class="text-danger">*</span></label>
                                         <input type="number" class="form-control form-control-sm" value="" name="cash_on_hand" onchange="cashCalc()">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12">
-                                    <div class="mb-2">
-                                        <label class="form-label">{{ __('Refundable Amount') }}</label>
-                                        <input type="number" class="form-control form-control-sm bg-light" value="" name="refundable_amount" onchange="cashCalc()" readonly>
                                     </div>
                                 </div>
                                 <div class="col-12 text-center mt-4">
@@ -137,6 +130,9 @@
 
 @push('js')
     <script>
+        $(document).ready(function(){
+            $("#kt_aside_toggle").click();
+        })
         let rowKey = 0;
 
         const cashCalc = ()=> {
@@ -153,14 +149,34 @@
             if(productId) {
                 axios.get('/api/products/'+productId)
                     .then((res)=>{
+                        if($(`#${productId}`).length > 0)
+                    {
+                        Swal.fire({
+                            title: "{{ __('This product already selected') }}",
+                            icon : "error",
+                            type : 'error'
+                        });   
+                        return fasle;
+                    }
+
+                    if(res.data.product_quantity < 1)
+                    {
+                        Swal.fire({
+                            title: "{{ __('This product stock not avaiable') }}",
+                            icon : "error",
+                            type : 'error'
+                        });   
+                        return fasle;
+                    }
                         $('.removeable-tr').remove();
                         $('#product-table tbody').append(`
-                            <tr class="align-middle text-end">
+                            <tr class="align-middle text-end" id="${productId}">
                                 <td class="text-start">
                                     <p class="p-0 m-0">${res.data.product_name}</p>
                                     <span class="badge badge-success">${res.data.product_code}</span>
                                 </td>
                                 <td class="unit-price">${res.data.product_price}</td>
+                                <td class="stock">${res.data.stock}</td>
                                 <td width="10%">
                                     <input type="hidden" value="${res.data.id}" name="products[${ rowKey }][product_id]" />
                                     <input type="number" step="0.01" class="form-control form-control-sm qty" value="1" onchange="subTotalCalc(this)" name="products[${ rowKey }][qty]" />
@@ -191,6 +207,7 @@
         const subTotalCalc = (event)=> {
             const tr         = event.closest('tr');
             const unitPrice  = parseFloat($(tr).find('.unit-price').text());
+            console.log(unitPrice);
             const qty        = $(tr).find('.qty').val();
             $(tr).find('.sub-total').text(unitPrice*qty);
             grandTotalCalc();
@@ -209,10 +226,13 @@
             $('#order-discount').text(parseFloat(discount).toFixed(2));
             const tax = (sum/100)*orderTex;
             $('#grand-total').text((tax + sum - discount).toFixed(2));
-            cashCalc();
+            // cashCalc();
         }
 
-        const removeRow = (element)=> $(element).closest('tr').remove();
+        const removeRow = (element)=> {
+            $(element).closest('tr').remove()
+            grandTotalCalc();
+        }
 
         $('#submit-btn').on('click', function(e) {
             $('#pos-form').submit();

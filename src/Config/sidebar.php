@@ -40,16 +40,16 @@ return [
             'icon'  => 'bi bi-arrow-return-right fs-3',
             'url'   => '/purchase-returns'
         ],
-        [
-            'title' => 'Adjustment',
-            'icon'  => 'bi bi-clipboard-check fs-3',
-            'url'   => '/'
-        ],
-        [
-            'title' => 'Quotations',
-            'icon'  => 'bi bi-cart-check fs-3',
-            'url'   => '/'
-        ],
+        // [
+        //     'title' => 'Adjustment',
+        //     'icon'  => 'bi bi-clipboard-check fs-3',
+        //     'url'   => '/'
+        // ],
+        // [
+        //     'title' => 'Quotations',
+        //     'icon'  => 'bi bi-cart-check fs-3',
+        //     'url'   => '/'
+        // ],
         [
             'title'    => 'Reports',
             'icon'     => 'bi bi-pie-chart fs-3',
@@ -60,14 +60,24 @@ return [
                     'url'   => '/sales-report'
                 ],
                 [
+                    'title' => 'Product Wise Sele Report',
+                    'icon'  => 'bi bi-tag fs-3',
+                    'url'   => '/product-wise-sele-report'
+                ],
+                [
                     'title' => 'Purchase Report',
                     'icon'  => 'bi bi-tag fs-3',
                     'url'   => '/purchases-report'
                 ],
+                [
+                    'title' => 'Product Wise Purchase Report',
+                    'icon'  => 'bi bi-tag fs-3',
+                    'url'   => '/product-wise-purchase-report'
+                ],
             ]
         ],
         [
-            'title'    => 'Settings',
+            'title'    => 'Master Data',
             'icon'     => 'bi bi-gear fs-3',
             'children' => [
                 [
