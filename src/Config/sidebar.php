@@ -11,6 +11,17 @@ return [
             'url'   => '/'
         ],
         [
+            'header' => 'Finance'
+        ],
+        [
+            'title' => 'Finance',
+            'icon'  => 'bi bi-umbrella fs-3',
+            'url'   => '/finance/records'
+        ],
+        [
+            'header' => 'MENUS'
+        ],
+        [
             'title' => 'POS',
             'icon'  => 'bi bi-upc-scan fs-3',
             'url'   => '/app/pos'
