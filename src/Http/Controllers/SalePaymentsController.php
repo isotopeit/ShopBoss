@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use Isotope\ShopBoss\Models\Sale;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Isotope\ShopBoss\Models\SalePayment;
+use Isotope\ShopBoss\Observers\SalePaymentObserver;
+
 class SalePaymentsController extends Controller
 {
     public static $permissions = [
@@ -46,7 +47,7 @@ class SalePaymentsController extends Controller
         ]);
 
         try {
-            SalePayment::create([
+            $payment = SalePayment::create([
                 'date'           => $request->date,
                 'reference'      => $request->reference,
                 'amount'         => $request->amount,
@@ -54,7 +55,7 @@ class SalePaymentsController extends Controller
                 'sale_id'        => $request->sale_id,
                 'payment_method' => $request->payment_method
             ]);
-
+            (new SalePaymentObserver())->created($payment);
             $sale = Sale::findOrFail($request->sale_id);
 
             $due_amount = $sale->due_amount - $request->amount;
@@ -125,6 +126,7 @@ class SalePaymentsController extends Controller
                 'note'           => $request->note,
                 'payment_method' => $request->payment_method
             ]);
+            (new SalePaymentObserver())->updated($salePayment);
             DB::commit();
             return redirect()->route('sale-payments.index', 'sale_id='.$salePayment->sale_id)->withSuccess('Sale Payment Updated!');
         } 
@@ -145,6 +147,7 @@ class SalePaymentsController extends Controller
             'paid_amount'    => $payment->sale->paid_amount - $payment->amount,
             'due_amount'     => $payment->sale->due_amount + $payment->amount,
         ]);
+        (new SalePaymentObserver())->deleted($payment);
         $payment->delete();
 
         return redirect()->route('sale-payments.index', 'sale_id='.$id)->withSuccess('Sale Payment Deleted!');

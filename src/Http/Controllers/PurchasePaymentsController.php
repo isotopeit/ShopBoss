@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Isotope\ShopBoss\Models\Purchase;
 use Isotope\ShopBoss\Models\PurchasePayment;
+use Isotope\ShopBoss\Observers\PurchasePaymentObserver;
 
 class PurchasePaymentsController extends Controller
 {
@@ -45,7 +46,7 @@ class PurchasePaymentsController extends Controller
 
         try 
         {
-            PurchasePayment::create([
+            $payment = PurchasePayment::create([
                 'date'           => $request->date,
                 'reference'      => $request->reference,
                 'amount'         => $request->amount,
@@ -53,6 +54,7 @@ class PurchasePaymentsController extends Controller
                 'purchase_id'    => $request->purchase_id,
                 'payment_method' => $request->payment_method
             ]);
+            (new PurchasePaymentObserver())->created($payment);
 
             $purchase = Purchase::findOrFail($request->purchase_id);
             if($purchase->due_amount < $request->amount)
@@ -121,7 +123,7 @@ class PurchasePaymentsController extends Controller
                 'note'           => $request->note,
                 'payment_method' => $request->payment_method
             ]);
-
+            (new PurchasePaymentObserver())->updated($payment);
             DB::commit();
             return redirect()->route('purchase-payments.index', 'purchase_id='.$payment->purchase_id)->withSuccess('Purchase Payment Updated!');
         } 
@@ -140,7 +142,7 @@ class PurchasePaymentsController extends Controller
             'paid_amount'    => $payment->purchase->paid_amount - $payment->amount,
             'due_amount'     => $payment->purchase->due_amount + $payment->amount,
         ]);
-
+        (new PurchasePaymentObserver())->deleted($payment);
         $payment->delete();
 
         return redirect()->route('purchase-payments.index', 'purchase_id='.$id)->withSuccess('Purchase Payment Deleted!');
