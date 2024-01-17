@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Isotope\ShopBoss\Models\PurchaseReturn;
 use Isotope\ShopBoss\Models\PurchaseReturnPayment;
+use Isotope\ShopBoss\Observers\PurchaseReturnPaymentObserver;
 
 class PurchaseReturnPaymentsController extends Controller
 {
@@ -44,7 +45,7 @@ class PurchaseReturnPaymentsController extends Controller
         ]);
 
         try {
-            PurchaseReturnPayment::create([
+            $payment = PurchaseReturnPayment::create([
                 'date'               => $request->date,
                 'reference'          => $request->reference,
                 'amount'             => $request->amount,
@@ -52,7 +53,7 @@ class PurchaseReturnPaymentsController extends Controller
                 'purchase_return_id' => $request->purchase_return_id,
                 'payment_method'     => $request->payment_method
             ]);
-
+            (new PurchaseReturnPaymentObserver())->created($payment);
             $purchaseReturn = PurchaseReturn::findOrFail($request->purchase_return_id);
             if ($purchaseReturn->due_amount < $request->amount)
                 throw new Exception("over amount not acceptable", 400);
@@ -118,7 +119,7 @@ class PurchaseReturnPaymentsController extends Controller
                 'note'           => $request->note,
                 'payment_method' => $request->payment_method
             ]);
-
+            (new PurchaseReturnPaymentObserver())->updated($payment);
             DB::commit();
             return redirect()->route('purchase-returns.index', 'purchase_return_id=' . $payment->purchase_return_id)->withSuccess('Purchase Return Payment Updated!');
         } catch (Exception $e) {
@@ -136,7 +137,7 @@ class PurchaseReturnPaymentsController extends Controller
             'paid_amount'    => $payment->purchaseReturn->paid_amount - $payment->amount,
             'due_amount'     => $payment->purchaseReturn->due_amount + $payment->amount,
         ]);
-
+        (new PurchaseReturnPaymentObserver())->deleted($payment);
         $payment->delete();
 
         return redirect()->route('purchase-returns.index', 'purchase_return_id=' . $id)->withSuccess('Purchase Return Payment Deleted!');

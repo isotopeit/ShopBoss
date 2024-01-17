@@ -3,6 +3,7 @@
 namespace Isotope\ShopBoss\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Isotope\ShopBoss\Observers\PurchaseObserver;
 
 class Purchase extends BaseModel
 {
@@ -29,5 +30,9 @@ class Purchase extends BaseModel
             $number = Purchase::max('id') + 1;
             $model->reference = make_reference_id('PR', $number);
         });
+        static::created(fn($model) => (new PurchaseObserver())->created($model));
+        static::updated(fn($model) => (new PurchaseObserver())->updated($model));
+        static::deleted(fn($model) => (new PurchaseObserver())->deleted($model));
     }
+
 }

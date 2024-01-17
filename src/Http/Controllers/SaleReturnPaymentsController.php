@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Gate;
 use Isotope\ShopBoss\Models\SaleReturn;
 use Isotope\ShopBoss\Models\SaleReturnPayment;
 use Isotope\ShopBoss\Http\Services\DataTables\SaleReturnPaymentsDataTable;
+use Isotope\ShopBoss\Observers\SaleReturnPaymentObserver;
 
 class SaleReturnPaymentsController extends Controller
 {
@@ -45,7 +46,7 @@ class SaleReturnPaymentsController extends Controller
         ]);
 
         try {
-            SaleReturnPayment::create([
+            $payment = SaleReturnPayment::create([
                 'date'               => $request->date,
                 'reference'          => $request->reference,
                 'amount'             => $request->amount,
@@ -53,7 +54,7 @@ class SaleReturnPaymentsController extends Controller
                 'sale_return_id'     => $request->sale_return_id,
                 'payment_method'     => $request->payment_method
             ]);
-
+            (new SaleReturnPaymentObserver())->created($payment);
             $saleReturn = SaleReturn::findOrFail($request->sale_return_id);
             if ($saleReturn->due_amount < $request->amount)
                 throw new Exception("over amount not acceptable", 400);
@@ -119,7 +120,7 @@ class SaleReturnPaymentsController extends Controller
                 'note'           => $request->note,
                 'payment_method' => $request->payment_method
             ]);
-
+            (new SaleReturnPaymentObserver())->updated($payment);
             DB::commit();
             return redirect()->route('sale-return-payments.index', $payment->sale_return_id)->withSuccess('Sale Return Payment Updated!');
         } catch (Exception $e) {
@@ -137,7 +138,7 @@ class SaleReturnPaymentsController extends Controller
             'paid_amount'    => $payment->saleReturn->paid_amount - $payment->amount,
             'due_amount'     => $payment->saleReturn->due_amount + $payment->amount,
         ]);
-
+        (new SaleReturnPaymentObserver())->deleted($payment);
         $payment->delete();
 
         return redirect()->route('sale-returns.index',$id)->withSuccess('Sale Return Payment Deleted!');
