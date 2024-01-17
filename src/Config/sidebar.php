@@ -60,14 +60,24 @@ return [
                     'url'   => '/sales-report'
                 ],
                 [
-                    'title' => 'Product Wise Sele Report',
+                    'title' => 'Sales Return Report',
                     'icon'  => 'bi bi-tag fs-3',
-                    'url'   => '/product-wise-sele-report'
+                    'url'   => '/sales-return-report'
                 ],
                 [
                     'title' => 'Purchase Report',
                     'icon'  => 'bi bi-tag fs-3',
                     'url'   => '/purchases-report'
+                ],
+                [
+                    'title' => 'Purchase Return Report',
+                    'icon'  => 'bi bi-tag fs-3',
+                    'url'   => '/purchases-return-report'
+                ],
+                [
+                    'title' => 'Product Wise Sele Report',
+                    'icon'  => 'bi bi-tag fs-3',
+                    'url'   => '/product-wise-sele-report'
                 ],
                 [
                     'title' => 'Product Wise Purchase Report',

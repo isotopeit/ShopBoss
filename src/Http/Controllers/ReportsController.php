@@ -9,8 +9,10 @@ use Isotope\ShopBoss\Models\Customer;
 use Isotope\ShopBoss\Models\Product;
 use Isotope\ShopBoss\Models\Purchase;
 use Isotope\ShopBoss\Models\PurchaseDetail;
+use Isotope\ShopBoss\Models\PurchaseReturn;
 use Isotope\ShopBoss\Models\Sale;
 use Isotope\ShopBoss\Models\SaleDetails;
+use Isotope\ShopBoss\Models\SaleReturn;
 use Isotope\ShopBoss\Models\Supplier;
 
 class ReportsController extends Controller
@@ -158,15 +160,46 @@ class ReportsController extends Controller
         }
     }
 
-    public function salesReturnReport() {
-        abort_if(Gate::denies('access_reports'), 403);
-        $customers = Customer::all();
-        return view('pos::reports.sales-return.index',compact('customers'));
+    public function salesReturnReport() 
+    {
+        $from        = request()->from;
+        $to          = request()->to;
+        $data = [];
+        if (!is_null($from) && !is_null($to)) {
+            $data = SaleReturn::query()
+                    ->whereDate('date', '>=', request()->from)
+                    ->whereDate('date', '<=', request()->to)
+                    ->get();
+        }
+
+        if (request()->submit == 'print') 
+        {
+            return view('shopboss::reports.sales-return.print',compact('data','from','to'));
+        }
+        else
+        {
+            return view('shopboss::reports.sales-return.index',compact('data','from','to'));
+        }
     }
 
     public function purchasesReturnReport() {
-        abort_if(Gate::denies('access_reports'), 403);
+        $from        = request()->from;
+        $to          = request()->to;
+        $data = [];
+        if (!is_null($from) && !is_null($to)) {
+            $data = PurchaseReturn::query()
+                    ->whereDate('date', '>=', request()->from)
+                    ->whereDate('date', '<=', request()->to)
+                    ->get();
+        }
 
-        return view('pos::reports.purchases-return.index');
+        if (request()->submit == 'print') 
+        {
+            return view('shopboss::reports.purchases-return.print',compact('data','from','to'));
+        }
+        else
+        {
+            return view('shopboss::reports.purchases-return.index',compact('data','from','to'));
+        }
     }
 }

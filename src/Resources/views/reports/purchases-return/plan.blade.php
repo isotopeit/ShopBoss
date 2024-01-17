@@ -1,6 +1,6 @@
 
 <h2 class="text-center">{{ settings()->company_name }}</h2>
-<h4 class="text-center">Purchase Report</h4>
+<h4 class="text-center">Purchase Return Report</h4>
 <p class="text-center">For Period <span class="fw-bold">{{ $from }}</span> To <span class="fw-bold">{{ $to }}</span></p>
 
 <table class="table table-bordered table-striped table-sm mt-2">
