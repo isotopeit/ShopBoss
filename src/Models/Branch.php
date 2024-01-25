@@ -3,9 +3,8 @@
 namespace Isotope\ShopBoss\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class Branch extends Model
+class Branch extends BaseModel
 {
     use HasFactory;
 

@@ -1,6 +1,6 @@
 @extends('isotope::master')
 
-@section('title', 'Branch Edit')
+@section('title', 'Branch Create')
 
 @push('buttons')
 <a class="btn btn-sm btn-isotope fw-bold" href="{{ route('branches.index') }}">List</a>
@@ -13,20 +13,20 @@
             <div class="card-body">
                 <form action="{{ route('branches.store') }}" method="POST">
                     @csrf
-                    <div class="form-group">
-                        <label>{{ __('Branch No') }} <span class="text-danger">*</span></label>
+                    <div class="mb-2">
+                        <label>{{ __('Branch No') }}</label>
                         <input type="text" class="form-control" name="branch_no" required>
                     </div>
-                    <div class="form-group">
-                        <label>{{ __('Branch Name') }} <span class="text-danger">*</span></label>
+                    <div class="mb-2">
+                        <label>{{ __('Branch Name') }}</label>
                         <input type="text" class="form-control" name="branch_name" required>
                     </div>
-                    <div class="form-group">
-                        <label>{{ __('Branch Location') }} <span class="text-danger">*</span></label>
+                    <div class="mb-2">
+                        <label>{{ __('Branch Location') }}</label>
                         <input type="text" class="form-control" name="branch_location" required>
                     </div>
-                    <div class="form-group">
-                        <label>{{ __('Branch Desciption') }} <span class="text-danger">*</span></label>
+                    <div class="mb-2">
+                        <label>{{ __('Branch Desciption') }}</label>
                         <input type="text" class="form-control" name="branch_description">
                     </div>
                     <div class="mt-3 float-end">

@@ -145,7 +145,7 @@
                 </div>
                 <div class="col-12">
                     <div class="my-5 text-center">
-                        <button type="submit" class="btn btn-sm bg-isotope text-white">{{ __('Create Purchase') }}
+                        <button type="submit" class="btn btn-sm bg-isotope text-white">{{ __('Create Sale') }}
                             <i class="fa-solid fa-paper-plane ms-2 text-white"></i></button>
                     </div>
                 </div>

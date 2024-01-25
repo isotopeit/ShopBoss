@@ -110,6 +110,21 @@ return [
                     'title' => 'Product',
                     'icon'  => 'bi bi-upc fs-3',
                     'url'   => '/products'
+                ],
+                [
+                    'title' => 'Customer',
+                    'icon'  => 'fa-solid fa-user fs-3',
+                    'url'   => '/customers'
+                ],
+                [
+                    'title' => 'Supplier',
+                    'icon'  => 'fa-solid fa-industry fs-3',
+                    'url'   => '/suppliers'
+                ],
+                [
+                    'title' => 'Branch',
+                    'icon'  => 'fa-solid fa-code-branch fs-3',
+                    'url'   => '/branches'
                 ]
             ]
         ],
