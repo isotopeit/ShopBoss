@@ -36,12 +36,7 @@ class ShopBossServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/Resources/views', 'shopboss');
 
         $this->publishes([
-            __DIR__ . '/../stubs/build'                        => public_path('build'),
-            __DIR__ . '/../stubs/assets'                       => public_path(''),
-            __DIR__ . '/../stubs/misc/User.php'                => app_path('Models/User.php'),
-            __DIR__ . '/../stubs/misc/AuthServiceProvider.php' => app_path('Providers/AuthServiceProvider.php'),
-            __DIR__ . '/../stubs/misc/livewire.php'            => config_path('livewire.php'),
-            __DIR__ . '/Database/Seeders' => database_path('seeders')
+            __DIR__ . '/../stubs/assets' => public_path('isotope/shopboss'),
         ]);
     }
 

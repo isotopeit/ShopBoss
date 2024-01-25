@@ -86,7 +86,7 @@ class PurchaseObserver
                 'reference_no'    => '',
                 'recordable_type' => Purchase::class,
                 'recordable_id'   => $purchase->id,
-            ], $purchase, 'increment');
+            ], $expense, 'increment');
             
             if($purchase->paid_amount > 0) {
                 FinanceRecord::entry([
