@@ -3,7 +3,7 @@
 @section('title', 'Create Sale')
 
 @push('buttons')
-<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchases.index') }}">{{ __('List') }}</a>
+<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('sales.index') }}">{{ __('List') }}</a>
 @endpush
 
 @section('content')
