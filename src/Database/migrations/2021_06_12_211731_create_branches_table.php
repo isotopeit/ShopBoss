@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('branch_location', 128)->nullable();
             $table->timestamps();
             $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by');
+            $table->foreignId('updated_by')->nullable();
         });
     }
 
