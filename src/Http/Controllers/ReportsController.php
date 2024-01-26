@@ -87,7 +87,7 @@ class ReportsController extends Controller
         $from        = $request->from;
         $to          = $request->to;
         $product_id = $request->product_id ?? ['0'];
-        if(!is_array($request->product_id) && !is_null($product_id))
+        if(!is_array($request->product_id) && !is_null($request->product_id))
         {
             $product_id = explode(',',$product_id);
         }

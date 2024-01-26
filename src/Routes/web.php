@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Isotope\ShopBoss\Http\Controllers\PosController;
 use Isotope\ShopBoss\Http\Controllers\HomeController;
 use Isotope\ShopBoss\Http\Controllers\SaleController;
+use Isotope\ShopBoss\Http\Controllers\StockController;
 use Isotope\ShopBoss\Http\Controllers\BranchController;
 use Isotope\ShopBoss\Http\Controllers\UploadController;
 use Isotope\ShopBoss\Http\Controllers\BarcodeController;
@@ -84,7 +85,9 @@ Route::group(['middleware' => ['web', 'auth','authorization']], function () {
     Route::get('/sale-returns/pdf/{id}', [SalesReturnController::class, 'pdf'])->name('sale-returns.pdf');
     
     Route::resource('sale-returns', SalesReturnController::class);
-
+    
+    Route::get('/stock', [StockController::class, 'stock'])->name('stock');
+    
     Route::get('/sale-return-payments/{sale_return_id}', [SaleReturnPaymentsController::class, 'index'])->name('sale-return-payments.index');
     Route::get('/sale-return-payments/{sale_return_id}/create', [SaleReturnPaymentsController::class, 'create'])->name('sale-return-payments.create');
     Route::post('/sale-return-payments/store', [SaleReturnPaymentsController::class, 'store'])->name('sale-return-payments.store');

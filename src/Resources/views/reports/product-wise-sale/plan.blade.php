@@ -27,15 +27,15 @@
                 <td>{{ $item->product_name }}</td>
                 <td>{{ $item->date }}</td>
                 <td>{{ $item->reference }}</td>
-                <td>{{ $item->supplier_name }}</td>
+                <td>{{ $item->customer_name }}</td>
                 <td>{{ $item->unit_price }}</td>
-                <td>{{ $item->purchase_qty }}</td>
+                <td>{{ $item->quantity }}</td>
                 <td>{{ $item->sub_total }}</td>
             </tr>
             @endforeach
             <tr>
                 <th colspan="6" class="text-end">Total :</th>
-                <th>{{ $items->sum('purchase_qty') }}</th>
+                <th>{{ $items->sum('quantity') }}</th>
                 <th>{{ $items->sum('sub_total') }}</th>
             </tr>
         @endforeach
