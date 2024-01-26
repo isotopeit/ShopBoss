@@ -24,10 +24,10 @@
                         <div class="row mb-4">
                             <div class="col-sm-4 mb-3 mb-md-0">
                                 <h5 class="mb-2 border-bottom pb-2">{{ __('Company Info') }}:</h5>
-                                <div><strong>{{ 'settings()->company_name' }}</strong></div>
-                                <div>{{ 'settings()->company_address' }}</div>
-                                <div>{{ __('Email') }}: {{ 'settings()->company_email' }}</div>
-                                <div>{{ __('Phone') }}: {{ 'settings()->company_phone' }}</div>
+                                <div><strong>{{ settings()->company_name }}</strong></div>
+                                <div>{{ settings()->company_address }}</div>
+                                <div>{{ __('Email') }}: {{ settings()->company_email }}</div>
+                                <div>{{ __('Phone') }}: {{ settings()->company_phone }}</div>
                             </div>
 
                             <div class="col-sm-4 mb-3 mb-md-0">
