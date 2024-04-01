@@ -60,6 +60,7 @@ class ProductController extends Controller
             ]);
             $req      = $request->all();
             $category = Category::findOrFail($req['category_id']);
+
             $product  = Product::create([
                 "category_id"         => $category->id,
                 "category_name"       => $category->category_name,
