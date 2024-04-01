@@ -3,7 +3,7 @@
 @section('title', 'Branch List')
 
 @push('buttons')
-<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('branches.create') }}">Create</a>
+<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('shopboss-branches.create') }}">Create</a>
 @endpush
 
 @section('content')
@@ -31,7 +31,7 @@
                                 <td>{{ $branch->branch_description }}</td>
                                 <td class="d-flex justify-content-center">
                                     <a title="Edit" class="btn btn-outline btn-outline-dashed btn-outline-info p-0 me-1"
-                                        href="{{ route('branches.edit', $branch->id) }}">
+                                        href="{{ route('shopboss-branches.edit', $branch->id) }}">
                                         <i class="fas fa-edit ms-1"></i>
                                     </a>
                                 </td>

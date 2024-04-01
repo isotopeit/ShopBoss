@@ -41,7 +41,7 @@ Route::group(['middleware' => ['web', 'auth','authorization']], function () {
     Route::get('/payment-flow/chart-data', [HomeController::class, 'paymentChart'])->name('payment-flow.chart');
     
     Route::resource('adjustments', AdjustmentController::class);
-    Route::resource('branches', BranchController::class)->except('show');
+    Route::resource('shopboss-branches', BranchController::class)->except('show');
     Route::resource('currencies', CurrencyController::class)->except('show');
     Route::resource('expense-categories', ExpenseCategoriesController::class)->except('show', 'create');
     Route::resource('expenses', ExpenseController::class)->except('show');

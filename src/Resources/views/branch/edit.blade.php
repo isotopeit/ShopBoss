@@ -3,7 +3,7 @@
 @section('title', 'Branch Edit')
 
 @push('buttons')
-<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('branches.index') }}">List</a>
+<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('shopboss-branches.index') }}">List</a>
 @endpush
 
 @section('content')
@@ -11,7 +11,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('branches.update', $branch->id) }}" method="POST">
+                <form action="{{ route('shopboss-branches.update', $branch->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="mb-2">
