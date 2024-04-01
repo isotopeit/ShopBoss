@@ -18,7 +18,7 @@ return new class extends Migration
             $table->uuid('uuid');
             $table->date('date');
             $table->string('reference', 32);
-            $table->foreignId('branch_id')->constrained('branches');
+            $table->foreignId('branch_id')->constrained('shopboss_branches');
             $table->foreignId('purchase_id')->constrained('purchases');
             $table->foreignId('supplier_id')->constrained('suppliers');
             $table->string('supplier_name', 64);

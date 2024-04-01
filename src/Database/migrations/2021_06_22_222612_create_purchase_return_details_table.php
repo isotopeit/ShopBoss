@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('purchase_return_details', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid');
-            $table->foreignId('branch_id')->constrained('branches');
+            $table->foreignId('branch_id')->constrained('shopboss_branches');
             $table->foreignId('purchase_return_id')->constrained('purchase_returns');
             $table->foreignId('product_id')->constrained('products');
             $table->foreignId('purchase_id')->constrained('purchases');

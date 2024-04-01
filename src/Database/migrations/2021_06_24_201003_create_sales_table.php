@@ -18,7 +18,7 @@ return new class extends Migration
             $table->uuid('uuid');
             $table->date('date');
             $table->string('reference', 32);
-            $table->foreignId('branch_id')->constrained('branches');
+            $table->foreignId('branch_id')->constrained('shopboss_branches');
             $table->foreignId('customer_id')->constrained('customers');
             $table->string('customer_name', 128);
             $table->float('tax_percentage')->default(0);
