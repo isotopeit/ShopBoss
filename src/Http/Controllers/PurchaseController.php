@@ -51,7 +51,7 @@ class PurchaseController extends Controller
 
             foreach ($req['products'] as $item) {
                 $product  = Product::find($item['product_id']);
-                $discount = array_key_exists('percentage', $item) ? ($product->product_price / 100) * floatval($item['discount']) : $item['discount'];
+                $discount = array_key_exists('percentage', $item) ? ($product->product_cost / 100) * floatval($item['discount']) : $item['discount'];
                 array_push($products, [
                     'branch_id'               => 1,
                     'product_id'              => $product->id,
@@ -59,8 +59,8 @@ class PurchaseController extends Controller
                     'product_code'            => $product->product_code,
                     'purchase_qty'            => $item['qty'],
                     'available_qty'           => $item['qty'],
-                    'unit_price'              => $product->product_price,
-                    'sub_total'               => ($product->product_price - $discount) * floatval($item['qty']),
+                    'unit_price'              => $product->product_cost,
+                    'sub_total'               => ($product->product_cost - $discount) * floatval($item['qty']),
                     'product_discount_amount' => $discount,
                     'product_tax_amount'      => 0,
                 ]);
@@ -152,15 +152,15 @@ class PurchaseController extends Controller
 
             foreach ($req['products'] as $item) {
                 $product  = Product::find($item['product_id']);
-                $discount = array_key_exists('percentage', $item) ? ($product->product_price / 100) * floatval($item['discount']) : $item['discount'];
+                $discount = array_key_exists('percentage', $item) ? ($product->product_cost / 100) * floatval($item['discount']) : $item['discount'];
                 $payload  = [
                     'product_id'              => $product->id,
                     'product_name'            => $product->product_name,
                     'product_code'            => $product->product_code,
                     'purchase_qty'            => $item['qty'],
                     'available_qty'           => $item['qty'],
-                    'unit_price'              => $product->product_price,
-                    'sub_total'               => ($product->product_price - $discount) * floatval($item['qty']),
+                    'unit_price'              => $product->product_cost,
+                    'sub_total'               => ($product->product_cost - $discount) * floatval($item['qty']),
                     'product_discount_amount' => $discount,
                     'product_tax_amount'      => 0,
                 ];

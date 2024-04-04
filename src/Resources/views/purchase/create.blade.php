@@ -242,7 +242,7 @@
                                 <p class="p-0 m-0">${res.data.product_name}</p>
                                 <span class="badge badge-success">${res.data.product_code}</span>
                             </td>
-                            <td class="unit-price">${res.data.product_price}</td>
+                            <td class="unit-price">${res.data.product_cost}</td>
                             <td>${res.data.stock} ${res.data.uom}</td>
                             <td width="10%">
                                 <input type="hidden" value="${res.data.id}" name="products[${ rowKey }][product_id]" />
@@ -255,7 +255,7 @@
                                     <label class="form-check-label mt-3 text-dark">%</label>
                                 </div>
                             </td>
-                            <td class="sub-total">${res.data.product_price}</td>
+                            <td class="sub-total">${res.data.product_cost}</td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm p-0 me-1">
                                     <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>    

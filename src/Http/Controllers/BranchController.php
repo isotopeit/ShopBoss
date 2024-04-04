@@ -24,7 +24,7 @@ class BranchController extends Controller
 
     public function store(Request $request) {
         $request->validate([
-            'branch_no'   => 'required|unique:branches,branch_no',
+            'branch_no'   => 'required|unique:shopboss_branches,branch_no',
             'branch_name' => 'required'
         ]);
 
@@ -36,7 +36,7 @@ class BranchController extends Controller
             'branch_location'    => $request->branch_location,
         ]);
 
-        return redirect()->route('branches.index')->withSuccess("Branch Created");
+        return redirect()->route('shopboss-branches.index')->withSuccess("Branch Created");
     }
 
     public function create() {
@@ -50,7 +50,7 @@ class BranchController extends Controller
 
     public function update(Request $request, $id) {
         $request->validate([
-            'branch_no'   => 'required|unique:branches,branch_no,'. $id,
+            'branch_no'   => 'required|unique:shopboss_branches,branch_no,'. $id,
             'branch_name' => 'required'
         ]);
 
@@ -61,12 +61,12 @@ class BranchController extends Controller
             'branch_location'    => $request->branch_location,
         ]);
 
-        return redirect()->route('branches.index')->withSuccess("Branch Updated");
+        return redirect()->route('shopboss-branches.index')->withSuccess("Branch Updated");
     }
 
     public function destroy($id) {
         Branch::findOrFail($id)->delete();
         toast('Branch Deleted!', 'warning');
-        return redirect()->route('branches.index')->withSuccess("Branch deleted");
+        return redirect()->route('shopboss-branches.index')->withSuccess("Branch deleted");
     }
 }

@@ -124,7 +124,7 @@ return [
                 [
                     'title' => 'Branch',
                     'icon'  => 'fa-solid fa-code-branch fs-3',
-                    'url'   => '/branches'
+                    'url'   => '/shopboss-branches'
                 ]
             ]
         ],
