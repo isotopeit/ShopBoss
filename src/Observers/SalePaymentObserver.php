@@ -59,8 +59,8 @@ class SalePaymentObserver
     public function updated(SalePayment $salePayment)
     {
         if (class_exists(FinanceRecord::class)) {
-            $receivables = $salePayment->financeRecordFilter('receivable');
-            $payments    = $salePayment->financeRecordFilter(Str::snake($salePayment->payment_method));
+            $receivables = $salePayment->financeRecord->where('particular_alias', 'receivable');
+            $payments    = $salePayment->financeRecord->where('particular_alias', Str::snake($salePayment->payment_method));
 
             $paymentAmount = 0;
             foreach ($payments as $payment) {

@@ -113,8 +113,8 @@ class PurchaseObserver
     public function updated(Purchase $purchase)
     {
         if (class_exists(FinanceRecord::class)) {
-            $payables = $purchase->financeRecordFilter('payable');
-            $expenses = $purchase->financeRecordFilter('purchase');
+            $payables = $purchase->financeRecord->where('particular_alias', 'payable');
+            $expenses = $purchase->financeRecord->where('particular_alias', 'purchase');
 
             $expenseAmount = 0;
             foreach ($expenses as $expense) {

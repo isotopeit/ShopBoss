@@ -7,8 +7,8 @@ use Isotope\Finance\Models\FinanceRecord;
 
 class BaseModel extends MasterModel
 {
-    public function financeRecordFilter($alias)
+    public function financeRecord()
     {
-        return $this->morphMany(FinanceRecord::class, 'recordable')->where('particular_alias', $alias);
+        return $this->morphMany(FinanceRecord::class, 'recordable');
     }
 }

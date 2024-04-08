@@ -113,8 +113,8 @@ class SaleObserver
     public function updated(Sale $sale)
     {
         if (class_exists(FinanceRecord::class)) {
-            $receivables = $sale->financeRecordFilter('receivable');
-            $revenues    = $sale->financeRecordFilter('sale_revenue');
+            $receivables = $sale->financeRecord->where('particular_alias', 'receivable');
+            $revenues    = $sale->financeRecord->where('particular_alias', 'sale_revenue');
 
             $receivableAmount = 0;
             foreach ($receivables as $receivable) {

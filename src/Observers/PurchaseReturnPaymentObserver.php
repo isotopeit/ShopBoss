@@ -59,8 +59,8 @@ class PurchaseReturnPaymentObserver
     public function updated(PurchaseReturnPayment $purchaseReturnPayment)
     {
         if (class_exists(FinanceRecord::class)) {
-            $receivables = $purchaseReturnPayment->financeRecordFilter('receivable');
-            $payments    = $purchaseReturnPayment->financeRecordFilter(Str::snake($purchaseReturnPayment->payment_method));
+            $receivables = $purchaseReturnPayment->financeRecord->where('particular_alias', 'receivable');
+            $payments    = $purchaseReturnPayment->financeRecord->where('particular_alias', Str::snake($purchaseReturnPayment->payment_method));
 
             $paymentAmount = 0;
             foreach ($payments as $payment) {
