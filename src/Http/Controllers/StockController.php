@@ -7,6 +7,10 @@ use Isotope\ShopBoss\Models\PurchaseDetail;
 
 class StockController extends Controller
 {
+    public static $permissions = [
+        'stock'   => ['stock_access', 'Stock'],
+    ];
+
     public function stock()
     {
         $req = request()->all();
