@@ -113,8 +113,8 @@ class SaleReturnObserver
     public function updated(SaleReturn $saleReturn)
     {
         if (class_exists(FinanceRecord::class)) {
-            $payables = $saleReturn->financeRecordFilter('payable');
-            $revenues = $saleReturn->financeRecordFilter('sale_return');
+            $payables = $saleReturn->financeRecord->where('particular_alias', 'payable');
+            $revenues = $saleReturn->financeRecord->where('particular_alias', 'sale_return');
 
             $revenueAmount = 0;
             foreach ($revenues as $revenue) {

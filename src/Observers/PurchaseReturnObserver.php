@@ -113,7 +113,7 @@ class PurchaseReturnObserver
     public function updated(PurchaseReturn $purchaseReturn)
     {
         if (class_exists(FinanceRecord::class)) {
-            $receivables = $purchaseReturn->financeRecordFilter('receivable');
+            $receivables = $purchaseReturn->financeRecord->where('particular_alias', 'receivable');
             $expenses    = FinanceParticular::firstWhere('alias', 'purchase_return');
 
             $receivableAmount = 0;

@@ -59,8 +59,8 @@ class PurchasePaymentObserver
     public function updated(PurchasePayment $purchasePayment)
     {
         if (class_exists(FinanceRecord::class)) {
-            $payables = $purchasePayment->financeRecordFilter('payable');
-            $payments = $purchasePayment->financeRecordFilter(Str::snake($purchasePayment->payment_method));
+            $payables = $purchasePayment->financeRecord->where('particular_alias', 'payable');
+            $payments = $purchasePayment->financeRecord->where('particular_alias', Str::snake($purchasePayment->payment_method));
 
             $paymentAmount = 0;
             foreach ($payments as $payment) {
