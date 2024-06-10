@@ -32,14 +32,14 @@ use Isotope\ShopBoss\Http\Controllers\PurchaseReturnPaymentsController;
 Route::group(['middleware' => ['web', 'auth','authorization']], function () {
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    
+
     Route::post('/app/pos', [PosController::class, 'store'])->name('app.pos.store');
     Route::get('/app/pos', [PosController::class, 'index'])->name('app.pos.index');
 
     Route::get('/sales-purchases/chart-data', [HomeController::class, 'salesPurchasesChart'])->name('sales-purchases.chart');
     Route::get('/current-month/chart-data', [HomeController::class, 'currentMonthChart'])->name('current-month.chart');
     Route::get('/payment-flow/chart-data', [HomeController::class, 'paymentChart'])->name('payment-flow.chart');
-    
+
     Route::resource('adjustments', AdjustmentController::class);
     Route::resource('shopboss-branches', BranchController::class)->except('show');
     Route::resource('currencies', CurrencyController::class)->except('show');
@@ -75,19 +75,21 @@ Route::group(['middleware' => ['web', 'auth','authorization']], function () {
     Route::get('/purchases-return-report', [ReportsController::class, 'purchasesReturnReport'])->name('purchases-return-report.index');
     Route::get('/product-wise-sele-report', [ReportsController::class, 'productWiseSeleReport'])->name('product_wise_sele_report');
     Route::get('/product-wise-purchase-report', [ReportsController::class, 'productWisePurchaseReport'])->name('product_wise_purchase_report');
+    Route::get('/product-wise-sele-return-report', [ReportsController::class, 'productWiseSeleReturnReport'])->name('product_wise_sele_return_report');
+    Route::get('/product-wise-purchase-return-report', [ReportsController::class, 'productWisePurchaseReturnReport'])->name('product_wise_purchase_return_report');
 
     Route::get('/sales/pdf/{id}', [SaleController::class, 'pdf'])->name('sales.pdf');
     Route::get('/sales/pos/pdf/{id}', [SaleController::class, 'posPdf'])->name('sales.pos.pdf');
-   
+
     Route::resource('sales', SaleController::class);
     Route::resource('sale-payments', SalePaymentsController::class);
 
     Route::get('/sale-returns/pdf/{id}', [SalesReturnController::class, 'pdf'])->name('sale-returns.pdf');
-    
+
     Route::resource('sale-returns', SalesReturnController::class);
-    
+
     Route::get('/stock', [StockController::class, 'stock'])->name('stock');
-    
+
     Route::get('/sale-return-payments/{sale_return_id}', [SaleReturnPaymentsController::class, 'index'])->name('sale-return-payments.index');
     Route::get('/sale-return-payments/{sale_return_id}/create', [SaleReturnPaymentsController::class, 'create'])->name('sale-return-payments.create');
     Route::post('/sale-return-payments/store', [SaleReturnPaymentsController::class, 'store'])->name('sale-return-payments.store');

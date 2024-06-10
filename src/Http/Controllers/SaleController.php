@@ -2,6 +2,7 @@
 
 namespace Isotope\ShopBoss\Http\Controllers;
 
+use PDF;
 use Exception;
 use Illuminate\Http\Request;
 use Isotope\ShopBoss\Models\Sale;
@@ -35,7 +36,7 @@ class SaleController extends Controller
         //     'sale'     => $sale,
         //     'customer' => $customer,
         // ]);
-        $pdf = \PDF::loadview('shopboss::sale.print', [
+        $pdf = PDF::loadview('shopboss::sale.print', [
             'sale'     => $sale,
             'customer' => $customer,
         ])->setPaper('a4');
@@ -47,7 +48,7 @@ class SaleController extends Controller
     {
         $sale = Sale::findOrFail($id);
         return view('shopboss::sale.print-pos-plan', compact('sale'));
-        
+
         // $mpdf = new Mpdf([
         //     // 'mode'              => 'utf-8',
         //     'format'            => 'A5',
@@ -59,7 +60,7 @@ class SaleController extends Controller
 
     }
 
-    public function index() 
+    public function index()
     {
         $sales = Sale::search()->orderBydesc('id')->paginate(15);
         return view('shopboss::sale.index',compact('sales'));
@@ -82,7 +83,7 @@ class SaleController extends Controller
 
             if(count($req['products']) < 1)
                 throw new Exception(__('Select Product'), 403);
-                
+
             DB::beginTransaction();
 
             $products = [];
@@ -100,7 +101,7 @@ class SaleController extends Controller
 
                 if(is_null($purchase_detail))
                     throw new Exception("Stock Problem, Please Call Development Team", 403);
-                    
+
 
                 array_push($products, [
                     'branch_id'               => 1,
@@ -140,7 +141,7 @@ class SaleController extends Controller
                 'paid_amount'         => $req['paid_amount'],
                 'payment_method'      => $req['payment_method'],
             ];
-            
+
             $payload['total_amount'] = $totalSubTotal + $req['shipping_amount'] + $payload['tax_amount'] - $req['discount_amount'];
             $payload['due_amount']   = $payload['total_amount'] - $payload['paid_amount'];
 
@@ -200,11 +201,11 @@ class SaleController extends Controller
 
     public function update(Request $request, $id)
     {
-        try 
+        try
         {
             $req = $request->all();
             $sale = Sale::with('saleDetails.product')->find($id);
-            
+
             DB::beginTransaction();
 
             foreach ($req['products'] as $item) {
@@ -222,10 +223,10 @@ class SaleController extends Controller
                     'product_tax_amount'      => 0,
                 ];
 
-                if (array_key_exists('detail_id', $item)) 
+                if (array_key_exists('detail_id', $item))
                 {
                     $detail = SaleDetails::find($item['detail_id']);
-                    
+
                     $purchase_detail = PurchaseDetail::find($detail->purchase_detail_id);
 
                     $purchase_detail->update([
@@ -235,7 +236,7 @@ class SaleController extends Controller
 
                     $detail->update($payload);
                 } else {
-                    
+
                     $purchase_detail = PurchaseDetail::query()
                             ->where('product_id',$product->id)
                             ->where('available_qty','>',0.0001)
@@ -251,7 +252,7 @@ class SaleController extends Controller
                         'available_qty' => $purchase_detail->available_qty - $item['qty'],
                     ]);
                     $sale->saleDetails()->create($payload);
-                    
+
                 }
 
             }
@@ -288,7 +289,7 @@ class SaleController extends Controller
 
             DB::commit();
             return redirect()->route('sales.index')->withSuccess(__('Sale Updated'));
-        } 
+        }
         catch (Exception $e) {
             DB::rollBack();
             return back()->withErrors($e->getMessage() .'||' . $e->getLine());

@@ -21,7 +21,7 @@ class SalePaymentsController extends Controller
         'destroy' => ['delete_sale_payments', 'Sale Payment Delete'],
     ];
 
-    public function index() 
+    public function index()
     {
         $sale = Sale::findOrFail(request()->sale_id);
         return view('shopboss::sale.payments.index', compact('sale'));
@@ -75,7 +75,7 @@ class SalePaymentsController extends Controller
             ]);
             DB::commit();
             return redirect()->route('sale-payments.index', 'sale_id='.$request->sale_id)->withSuccess('Sale Payment Created!');
-        } 
+        }
         catch (Exception $e) {
             DB::commit();
             return redirect()->route('sale-payments.index', 'sale_id='.$request->sale_id)->withErrors($e->getMessage());
@@ -89,7 +89,7 @@ class SalePaymentsController extends Controller
     }
 
 
-    public function update(Request $request, $payment_id) 
+    public function update(Request $request, $payment_id)
     {
         $request->validate([
             'date'           => 'required|date',
@@ -100,7 +100,7 @@ class SalePaymentsController extends Controller
         ]);
 
         try {
-            $salePayment = SalePayment::find($payment_id); 
+            $salePayment = SalePayment::find($payment_id);
             $sale = $salePayment->sale;
 
             $due_amount = ($sale->due_amount + $salePayment->amount) - $request->amount;
@@ -129,7 +129,7 @@ class SalePaymentsController extends Controller
             (new SalePaymentObserver())->updated($salePayment);
             DB::commit();
             return redirect()->route('sale-payments.index', 'sale_id='.$salePayment->sale_id)->withSuccess('Sale Payment Updated!');
-        } 
+        }
         catch (Exception $e) {
             DB::rollBack();
             return redirect()->route('sale-payments.index', 'sale_id='.$salePayment->sale_id)->withErrors($e->getMessage());
@@ -138,18 +138,25 @@ class SalePaymentsController extends Controller
     }
 
 
-    public function destroy($uuid) 
+    public function destroy($uuid)
     {
-        $payment = SalePayment::firstWhere('uuid',$uuid);
-        $id = $payment->sale->id;
+        try{
+            DB::beginTransaction();
+            $payment = SalePayment::firstWhere('uuid',$uuid);
+            $id = $payment->sale->id;
 
-        $payment->sale->update([
-            'paid_amount'    => $payment->sale->paid_amount - $payment->amount,
-            'due_amount'     => $payment->sale->due_amount + $payment->amount,
-        ]);
-        (new SalePaymentObserver())->deleted($payment);
-        $payment->delete();
-
-        return redirect()->route('sale-payments.index', 'sale_id='.$id)->withSuccess('Sale Payment Deleted!');
+            $payment->sale->update([
+                'paid_amount'    => $payment->sale->paid_amount - $payment->amount,
+                'due_amount'     => $payment->sale->due_amount + $payment->amount,
+            ]);
+            (new SalePaymentObserver())->deleted($payment);
+            $payment->delete();
+            DB::commit();
+            return redirect()->route('sale-payments.index', 'sale_id='.$id)->withSuccess('Sale Payment Deleted!');
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('sale-payments.index', 'sale_id='.$salePayment->sale_id)->withErrors($e->getMessage());
+        }
     }
 }

@@ -1,6 +1,6 @@
 @extends('isotope::master')
 
-@section('title', 'Product Wise Sale Report')
+@section('title', 'Product Wise Sale Return Report')
 
 @section('content')
     <div class="card">
@@ -30,7 +30,7 @@
                             Load
                         </button>
                         @if (count($data) > 0)
-                            <a href="/product-wise-sele-report?from={{ $from }}&to={{ $to }}&product_id={{ implode(',',$product_id) }}&submit=print" title="Print Data" class="btn btn-primary fw-bold mt-3"
+                            <a href="/product-wise-sele-return-report?from={{ $from }}&to={{ $to }}&product_id={{ implode(',',$product_id) }}&submit=print" title="Print Data" class="btn btn-primary fw-bold mt-3"
                                 target="_blanck">
                                 <i class="fa-solid fa-print fs-4 me-2"></i>
                                 Print
@@ -41,7 +41,7 @@
             </form>
 
             @if (count($data) > 0)
-                @include('shopboss::reports.product-wise-sale.plan')
+                @include('shopboss::reports.product-wise-sale-return.plan')
             @else
                 <table class="table table-border mt-5">
                     <tr class="bg-secondary">

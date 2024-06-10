@@ -3,17 +3,19 @@
 namespace Isotope\ShopBoss\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Isotope\ShopBoss\Models\Sale;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
-use Isotope\ShopBoss\Models\Customer;
 use Isotope\ShopBoss\Models\Product;
+use Isotope\ShopBoss\Models\Customer;
 use Isotope\ShopBoss\Models\Purchase;
+use Isotope\ShopBoss\Models\Supplier;
+use Isotope\ShopBoss\Models\SaleReturn;
+use Isotope\ShopBoss\Models\SaleDetails;
 use Isotope\ShopBoss\Models\PurchaseDetail;
 use Isotope\ShopBoss\Models\PurchaseReturn;
-use Isotope\ShopBoss\Models\Sale;
-use Isotope\ShopBoss\Models\SaleDetails;
-use Isotope\ShopBoss\Models\SaleReturn;
-use Isotope\ShopBoss\Models\Supplier;
+use Isotope\ShopBoss\Models\SaleReturnDetail;
+use Isotope\ShopBoss\Models\PurchaseReturnDetail;
 
 class ReportsController extends Controller
 {
@@ -40,7 +42,7 @@ class ReportsController extends Controller
         return view('pos::reports.payments.index');
     }
 
-    public function salesReport() 
+    public function salesReport()
     {
         $from        = request()->from;
         $to          = request()->to;
@@ -52,7 +54,7 @@ class ReportsController extends Controller
                     ->get();
         }
 
-        if (request()->submit == 'print') 
+        if (request()->submit == 'print')
         {
             return view('shopboss::reports.sales.print',compact('data','from','to'));
         }
@@ -73,7 +75,7 @@ class ReportsController extends Controller
                     ->get();
         }
 
-        if (request()->submit == 'print') 
+        if (request()->submit == 'print')
         {
             return view('shopboss::reports.purchases.print',compact('data','from','to'));
         }
@@ -82,7 +84,8 @@ class ReportsController extends Controller
             return view('shopboss::reports.purchases.index',compact('data','from','to'));
         }
     }
-    public function productWiseSeleReport(Request $request) 
+
+    public function productWiseSeleReport(Request $request)
     {
         $from        = $request->from;
         $to          = $request->to;
@@ -94,7 +97,7 @@ class ReportsController extends Controller
 
         $products = Product::selectRaw('id,product_name as text')->get();
         $data = [];
-        if (!is_null($from) && !is_null($to) && !is_null($request->product_id)) 
+        if (!is_null($from) && !is_null($to) && !is_null($request->product_id))
         {
             $data = SaleDetails::query()
                         ->join('sales','sales.id','sale_details.sale_id')
@@ -111,7 +114,7 @@ class ReportsController extends Controller
                         ->groupBy('product_code');
         }
 
-        if (request()->submit == 'print') 
+        if (request()->submit == 'print')
         {
             return view('shopboss::reports.product-wise-sale.print',compact('data','from','to','products','product_id'));
         }
@@ -121,7 +124,7 @@ class ReportsController extends Controller
         }
     }
 
-    public function productWisePurchaseReport(Request $request) 
+    public function productWisePurchaseReport(Request $request)
     {
         $from        = $request->from;
         $to          = $request->to;
@@ -133,7 +136,7 @@ class ReportsController extends Controller
 
         $products = Product::selectRaw('id,product_name as text')->get();
         $data = [];
-        if (!is_null($from) && !is_null($to) && !is_null($product_id)) 
+        if (!is_null($from) && !is_null($to) && !is_null($product_id))
         {
             $data = PurchaseDetail::query()
                         ->join('purchases','purchases.id','purchase_details.purchase_id')
@@ -150,7 +153,7 @@ class ReportsController extends Controller
                         ->groupBy('product_code');
         }
 
-        if (request()->submit == 'print') 
+        if (request()->submit == 'print')
         {
             return view('shopboss::reports.product-wise-purchase.print',compact('data','from','to','products','product_id'));
         }
@@ -160,7 +163,7 @@ class ReportsController extends Controller
         }
     }
 
-    public function salesReturnReport() 
+    public function salesReturnReport()
     {
         $from        = request()->from;
         $to          = request()->to;
@@ -172,7 +175,7 @@ class ReportsController extends Controller
                     ->get();
         }
 
-        if (request()->submit == 'print') 
+        if (request()->submit == 'print')
         {
             return view('shopboss::reports.sales-return.print',compact('data','from','to'));
         }
@@ -193,13 +196,93 @@ class ReportsController extends Controller
                     ->get();
         }
 
-        if (request()->submit == 'print') 
+        if (request()->submit == 'print')
         {
             return view('shopboss::reports.purchases-return.print',compact('data','from','to'));
         }
         else
         {
             return view('shopboss::reports.purchases-return.index',compact('data','from','to'));
+        }
+    }
+
+    public function productWiseSeleReturnReport(Request $request)
+    {
+        $from        = $request->from;
+        $to          = $request->to;
+        $product_id = $request->product_id ?? ['0'];
+        if(!is_array($request->product_id) && !is_null($request->product_id))
+        {
+            $product_id = explode(',',$product_id);
+        }
+
+        $products = Product::selectRaw('id,product_name as text')->get();
+        $data = [];
+        if (!is_null($from) && !is_null($to) && !is_null($request->product_id))
+        {
+            $data = SaleReturnDetail::query()
+                        ->join('sale_returns','sale_returns.id','sale_return_details.sale_return_id')
+                        ->selectRaw('
+                            sale_returns.date,
+                            sale_returns.reference,
+                            sale_returns.customer_name,
+                            sale_return_details.*
+                        ')
+                        ->whereDate('sale_returns.date', '>=', request()->from)
+                        ->whereDate('sale_returns.date', '<=', request()->to)
+                        ->whereIn('sale_return_details.product_id',$product_id)
+                        ->get()
+                        ->groupBy('product_code');
+        }
+
+        if (request()->submit == 'print')
+        {
+            return view('shopboss::reports.product-wise-sale-return.print',compact('data','from','to','products','product_id'));
+        }
+        else
+        {
+            return view('shopboss::reports.product-wise-sale-return.index',compact('data','from','to','products','product_id'));
+        }
+    }
+
+    public function productWisePurchaseReturnReport(Request $request)
+    {
+        $from        = $request->from;
+        $to          = $request->to;
+        $product_id = $request->product_id ?? ['0'];
+        if(!is_array($request->product_id) && !is_null($request->product_id))
+        {
+            $product_id = explode(',',$product_id);
+        }
+
+        $products = Product::selectRaw('id,product_name as text')->get();
+        $data = [];
+        if (!is_null($from) && !is_null($to) && !is_null($product_id))
+        {
+            $data = PurchaseReturnDetail::query()
+                        ->join('purchase_returns','purchase_returns.id','purchase_return_details.purchase_return_id')
+                        ->join('purchase_details','purchase_details.id','purchase_return_details.purchase_detail_id')
+                        ->selectRaw('
+                            purchase_returns.date,
+                            purchase_returns.reference,
+                            purchase_returns.supplier_name,
+                            purchase_return_details.*,
+                            purchase_details.product_name
+                        ')
+                        ->whereDate('purchase_returns.date', '>=', request()->from)
+                        ->whereDate('purchase_returns.date', '<=', request()->to)
+                        ->whereIn('purchase_return_details.product_id',$product_id)
+                        ->get()
+                        ->groupBy('product_code');
+        }
+
+        if (request()->submit == 'print')
+        {
+            return view('shopboss::reports.product-wise-purchase-return.print',compact('data','from','to','products','product_id'));
+        }
+        else
+        {
+            return view('shopboss::reports.product-wise-purchase-return.index',compact('data','from','to','products','product_id'));
         }
     }
 }

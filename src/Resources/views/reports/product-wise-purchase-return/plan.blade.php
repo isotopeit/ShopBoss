@@ -1,6 +1,6 @@
 
 <h2 class="text-center">{{ settings()->company_name }}</h2>
-<h4 class="text-center">Product Wise Purchase Report</h4>
+<h4 class="text-center">Product Wise Purchase Return Report</h4>
 <p class="text-center">For Period <span class="fw-bold">{{ $from }}</span> To <span class="fw-bold">{{ $to }}</span></p>
 
 <table class="table table-bordered table-striped table-sm mt-2">
@@ -29,7 +29,7 @@
                 <td>{{ $item->reference }}</td>
                 <td>{{ $item->supplier_name }}</td>
                 <td>{{ $item->unit_price }}</td>
-                <td>{{ $item->purchase_qty }}</td>
+                <td>{{ $item->quantity }}</td>
                 <td>{{ $item->sub_total }}</td>
             </tr>
             @endforeach

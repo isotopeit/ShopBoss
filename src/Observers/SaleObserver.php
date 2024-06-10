@@ -15,7 +15,7 @@ class SaleObserver
     {
         $root = FinanceRoot::firstWhere('title', 'asset');
         if(is_null($root)) throw new Exception("Finance Root asset is not found", 404);
-        
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
@@ -35,7 +35,7 @@ class SaleObserver
         if(is_null($method)) {
             $root = FinanceRoot::firstWhere('title', 'asset');
             if(is_null($root)) throw new Exception("Finance Root asset is not found", 404);
-            
+
             $method = FinanceParticular::create([
                 'root_id'         => $root->id,
                 'root_title'      => $root->title,
@@ -54,7 +54,7 @@ class SaleObserver
     {
         $root = FinanceRoot::firstWhere('title', 'revenue');
         if(is_null($root)) throw new Exception("Finance Root revenue is not found", 404);
-        
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
@@ -87,7 +87,7 @@ class SaleObserver
                 'recordable_type' => Sale::class,
                 'recordable_id'   => $sale->id,
             ], $revenue, 'increment');
-            
+
             if($sale->paid_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Create Sale : {$sale->reference}",
@@ -97,7 +97,7 @@ class SaleObserver
                     'recordable_id'   => $sale->id,
                 ], $paymentMethod, 'increment');
             }
-            
+
             if($sale->due_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Create Sale : {$sale->reference}",
@@ -121,13 +121,12 @@ class SaleObserver
                 $receivableAmount += ($receivable->debit - $receivable->credit);
             }
             $revenueAmount = 0;
-            foreach ($revenues as $revenueAmount) {
-                $receivableAmount += ($revenueAmount->credit - $revenueAmount->debit);
+            foreach ($revenues as $revenue) {
+                $revenueAmount += ($revenue->credit - $revenue->debit);
             }
 
             $revenue    = FinanceParticular::firstWhere('alias', 'sale_revenue');
             $receivable = FinanceParticular::firstWhere('alias', 'receivable');
-
             if ($revenueAmount != $sale->total_amount) {
                 FinanceRecord::entry([
                     'description'     => "Revenue of Update Sale : {$sale->reference}",
@@ -137,7 +136,7 @@ class SaleObserver
                     'recordable_id'   => $sale->id,
                 ], $revenue, $revenueAmount < $sale->total_amount ? 'increment' : 'decrement');
             }
-            
+
             if($receivableAmount != $sale->due_amount) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Update Sale : {$sale->reference}",
@@ -157,7 +156,7 @@ class SaleObserver
             $revenue       = FinanceParticular::firstWhere('alias', 'sale_revenue');
             $paymentMethod = $this->paymentMethod($sale->payment_method);
             $receivable    = FinanceParticular::firstWhere('alias', 'receivable');
-    
+
             FinanceRecord::entry([
                 'description'     => "Revenue of Delete Sale : {$sale->reference}",
                 'amount'          => $sale->total_amount,
@@ -165,7 +164,7 @@ class SaleObserver
                 'recordable_type' => Sale::class,
                 'recordable_id'   => $sale->id,
             ], $revenue, 'decrement');
-            
+
             if($sale->paid_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Delete Sale : {$sale->reference}",
@@ -175,7 +174,7 @@ class SaleObserver
                     'recordable_id'   => $sale->id,
                 ], $paymentMethod, 'decrement');
             }
-            
+
             if($sale->due_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Delete Invoice : {$sale->reference}",

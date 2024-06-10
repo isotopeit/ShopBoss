@@ -37,7 +37,7 @@
                         class="fa-solid fa-search text-white"></i> {{ __('Search') }}</button>
             </div>
         </form>
-        <div class="table-responsive">
+        <div class="table-responsive"  style="min-height: 40vh">
             <table class="table table-sm table-bordered table-striped h-100">
                 <thead class="bg-isotope">
                     <tr>

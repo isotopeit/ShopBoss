@@ -80,12 +80,12 @@ class SaleReturnPaymentsController extends Controller
         }
     }
 
-    public function edit($sale_return_payment_id) 
+    public function edit($sale_return_id, $saleReturnPayment)
     {
-        $payment = SaleReturnPayment::findOrFail($sale_return_payment_id);
-
+        $payment = SaleReturnPayment::findOrFail($saleReturnPayment);
         return view('shopboss::salesreturn.payments.edit', compact('payment'));
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([

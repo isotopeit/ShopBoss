@@ -35,7 +35,7 @@
                                         <td class="d-flex justify-content-center">
                                             <a title="Edit"
                                                 class="btn btn-outline btn-outline-dashed btn-outline-info p-0 me-1"
-                                                href="{{ route('sale-return-payments.edit', [$payment->id]) }}">
+                                                href="{{ route('sale-return-payments.edit', ['sale_return_id' => $payment->sale_return_id, 'saleReturnPayment' => $payment->id]) }}">
                                                 <i class="fas fa-edit ms-1"></i>
                                             </a>
                                             <form action="{{ route('sale-return-payments.destroy', $payment->id) }}"
@@ -49,7 +49,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    
+
                                 @endforelse
                             </tbody>
                         </table>

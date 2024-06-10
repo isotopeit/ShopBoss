@@ -45,7 +45,7 @@ class CategoriesController extends Controller
 
     public function update(Request $request, $id) {
         $request->validate([
-            'category_code' => 'required|unique:categories,category_code|max:32,' . $id,
+            'category_code' => 'required|unique:categories,category_code,' . $id . ',id|max:32',
             'category_name' => 'required|max:32'
         ]);
 

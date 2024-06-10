@@ -23,7 +23,7 @@ class PurchasesReturnController extends Controller
         'update'  => ['update_purchase_returns', 'Purchase Returns Update'],
         'destroy' => ['delete_purchase_returns', 'Purchase Returns Delete'],
     ];
-    
+
     public function pdf($id)
     {
         $purchaseReturn = PurchaseReturn::findOrFail($id);
@@ -91,7 +91,7 @@ class PurchasesReturnController extends Controller
                 'payment_method'     => $req['payment_method'],
                 'note'               => $req['note'],
             ];
-            
+
             $payload['total_amount'] = $totalSubTotal - $req['damaged_price'];
             $payload['due_amount']   = $payload['total_amount'] - $payload['paid_amount'];
 
@@ -168,7 +168,7 @@ class PurchasesReturnController extends Controller
                 'damaged_amount'     => $req['damaged_price'],
                 'note'               => $req['note'],
             ];
-            
+
             $payload['total_amount'] = $totalSubTotal - $req['damaged_price'];
             $payload['due_amount']   = $payload['total_amount'] - $purchaseReturn->paid_amount;
 

@@ -84,7 +84,7 @@ class PurchaseController extends Controller
                 'paid_amount'         => $req['paid_amount'],
                 'payment_method'      => $req['payment_method'],
             ];
-            
+
             $payload['total_amount'] = $totalSubTotal + $req['shipping_amount'] + $payload['tax_amount'] - $req['discount_amount'];
             $payload['due_amount']   = $payload['total_amount'] - $payload['paid_amount'];
 
@@ -143,11 +143,11 @@ class PurchaseController extends Controller
 
     public function update(Request $request, $id)
     {
-        try 
+        try
         {
             $req = $request->all();
             $purchase = Purchase::with('purchaseDetails.product')->find($id);
-            
+
             DB::beginTransaction();
 
             foreach ($req['products'] as $item) {
@@ -175,8 +175,8 @@ class PurchaseController extends Controller
 
             $supplier = Supplier::findOrFail($request->supplier_id);
             if(is_null($supplier)) throw new Exception("Supplier not found", 404);
-
             $purchase->refresh();
+
             $totalSubTotal = $purchase->purchaseDetails->sum('sub_total');
             $payload = [
                 'supplier_id'         => $supplier->id,
@@ -205,7 +205,7 @@ class PurchaseController extends Controller
 
             DB::commit();
             return redirect()->route('purchases.index')->withSuccess("Purchase Updated");
-        } 
+        }
         catch (Exception $e) {
             DB::rollBack();
             return redirect()->route('purchases.index')->withErrors($e->getMessage());
@@ -215,7 +215,7 @@ class PurchaseController extends Controller
 
     public function destroy($id)
     {
-        $purchase = Purchase::with('purchaseDetails', 'purchasePayments')->findOrFail($id);
+        $purchase = Purchase::with('purchaseDetails', 'purchasePayments', 'purchaseReturns')->findOrFail($id);
         $purchase->purchaseDetails()->delete();
         $purchase->purchasePayments()->delete();
         $purchase->delete();

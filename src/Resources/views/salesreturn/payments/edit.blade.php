@@ -13,7 +13,7 @@
         <div class="row">
             <form action="{{ route('sale-return-payments.update', $payment->id) }}" method="post" class="row">
                 @csrf
-                @method('PUT')
+                @method('PATCH')
                 <div class="col-md-6">
                     <div class="mb-4">
                         <label class="form-label">Reference:</label>

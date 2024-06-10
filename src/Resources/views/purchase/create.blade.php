@@ -118,7 +118,7 @@
                         <input type="number" class="form-control form-control-sm" name="shipping_amount" step="0.01" value="0" onchange="grandTotalCalc()">
                     </div>
                 </div>
-                
+
                 <div class="col-md-6 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('Payment Method') }}:</label>
@@ -173,7 +173,7 @@
     );
 
     const matcher = (params, data)=> {
-        if ($.trim(params.term) === '') return data; 
+        if ($.trim(params.term) === '') return data;
         if (typeof data.text === 'undefined') return null;
         if (
             data.text?.toLowerCase().indexOf(params.term.toLowerCase()) > -1 ||
@@ -258,7 +258,7 @@
                             <td class="sub-total">${res.data.product_cost}</td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm p-0 me-1">
-                                    <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>    
+                                    <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>
                                 </button>
                             </td>
                         </tr>
@@ -284,6 +284,15 @@
         const percentage = $(tr).find('.percentage').is(':checked');
         let   discount   = $(tr).find('.discount').val();
         if(percentage) {
+            if (discount > 100) {
+                discount = 100;
+                $(tr).find('.discount').val(discount);
+                Swal.fire({
+                    title: "{{ __('Discount cannot exceed 100%') }}",
+                    icon: "warning",
+                    // type: 'warning'
+                });
+            }
             discount = (unitPrice/100)*discount;
         }
         $(tr).find('.sub-total').text((unitPrice-discount)*qty);

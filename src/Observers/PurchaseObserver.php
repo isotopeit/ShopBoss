@@ -15,7 +15,7 @@ class PurchaseObserver
     {
         $root = FinanceRoot::firstWhere('title', 'liability');
         if(is_null($root)) throw new Exception("Finance Root liability is not found", 404);
-        
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
@@ -35,7 +35,7 @@ class PurchaseObserver
         if(is_null($method)) {
             $root = FinanceRoot::firstWhere('title', 'asset');
             if(is_null($root)) throw new Exception("Finance Root asset is not found", 404);
-            
+
             $method = FinanceParticular::create([
                 'root_id'         => $root->id,
                 'root_title'      => $root->title,
@@ -54,7 +54,7 @@ class PurchaseObserver
     {
         $root = FinanceRoot::firstWhere('title', 'expense');
         if(is_null($root)) throw new Exception("Finance Root expense is not found", 404);
-        
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
@@ -87,7 +87,7 @@ class PurchaseObserver
                 'recordable_type' => Purchase::class,
                 'recordable_id'   => $purchase->id,
             ], $expense, 'increment');
-            
+
             if($purchase->paid_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Create Purchase : {$purchase->reference}",
@@ -97,7 +97,7 @@ class PurchaseObserver
                     'recordable_id'   => $purchase->id,
                 ], $paymentMethod, 'decrement');
             }
-            
+
             if($purchase->due_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Create Purchase : {$purchase->reference}",
@@ -127,7 +127,6 @@ class PurchaseObserver
 
             $payable = FinanceParticular::firstWhere('alias', 'payable');
             $expense = FinanceParticular::firstWhere('alias', 'expense');
-
             if ($expenseAmount != $purchase->total_amount) {
                 FinanceRecord::entry([
                     'description'     => "Expense of Update Purchase : {$purchase->reference}",
@@ -137,7 +136,7 @@ class PurchaseObserver
                     'recordable_id'   => $purchase->id,
                 ], $expense, $expenseAmount < $purchase->total_amount ? 'increment' : 'decrement');
             }
-            
+
             if($payableAmount != $purchase->due_amount) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Update Purchase : {$purchase->reference}",
@@ -157,7 +156,7 @@ class PurchaseObserver
             $payable       = FinanceParticular::firstWhere('alias', 'payable');
             $paymentMethod = $this->paymentMethod($purchase->payment_method);
             $expense       = FinanceParticular::firstWhere('alias', 'purchase');
-            
+
             FinanceRecord::entry([
                 'description'     => "Expense of Delete Purchase : {$purchase->reference}",
                 'amount'          => $purchase->total_amount,
@@ -165,7 +164,7 @@ class PurchaseObserver
                 'recordable_type' => Purchase::class,
                 'recordable_id'   => $purchase->id,
             ], $expense, 'decrement');
-            
+
             if($purchase->paid_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Delete Purchase : {$purchase->reference}",
@@ -175,7 +174,7 @@ class PurchaseObserver
                     'recordable_id'   => $purchase->id,
                 ], $paymentMethod, 'increment');
             }
-            
+
             if($purchase->due_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Delete Purchase : {$purchase->reference}",

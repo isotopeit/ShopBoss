@@ -15,7 +15,7 @@ class PurchaseReturnObserver
     {
         $root = FinanceRoot::firstWhere('title', 'asset');
         if(is_null($root)) throw new Exception("Finance Root asset is not found", 404);
-        
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
@@ -35,7 +35,7 @@ class PurchaseReturnObserver
         if(is_null($method)) {
             $root = FinanceRoot::firstWhere('title', 'asset');
             if(is_null($root)) throw new Exception("Finance Root asset is not found", 404);
-            
+
             $method = FinanceParticular::create([
                 'root_id'         => $root->id,
                 'root_title'      => $root->title,
@@ -54,7 +54,7 @@ class PurchaseReturnObserver
     {
         $root = FinanceRoot::firstWhere('title', 'expense');
         if(is_null($root)) throw new Exception("Finance Root expense is not found", 404);
-        
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
@@ -87,7 +87,7 @@ class PurchaseReturnObserver
                 'recordable_type' => PurchaseReturn::class,
                 'recordable_id'   => $purchaseReturn->id,
             ], $expense, 'decrement');
-            
+
             if($purchaseReturn->paid_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Create Purchase Return : {$purchaseReturn->reference}",
@@ -97,7 +97,7 @@ class PurchaseReturnObserver
                     'recordable_id'   => $purchaseReturn->id,
                 ], $paymentMethod, 'increment');
             }
-            
+
             if($purchaseReturn->due_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Create Purchase Return : {$purchaseReturn->reference}",
@@ -114,7 +114,7 @@ class PurchaseReturnObserver
     {
         if (class_exists(FinanceRecord::class)) {
             $receivables = $purchaseReturn->financeRecord->where('particular_alias', 'receivable');
-            $expenses    = FinanceParticular::firstWhere('alias', 'purchase_return');
+            $expenses    = $purchaseReturn->financeRecord->where('particular_alias', 'purchase_return');
 
             $receivableAmount = 0;
             foreach ($receivables as $receivable) {
@@ -137,7 +137,7 @@ class PurchaseReturnObserver
                     'recordable_id'   => $purchaseReturn->id,
                 ], $expense, $expenseAmount < $purchaseReturn->total_amount ? 'decrement' : 'increment');
             }
-            
+
             if($receivableAmount != $purchaseReturn->due_amount) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Update Purchase Return : {$purchaseReturn->reference}",
@@ -157,7 +157,7 @@ class PurchaseReturnObserver
             $expense    = FinanceParticular::firstWhere('alias', 'purchase_return');
             $paymentMethod = $this->paymentMethod($purchaseReturn->payment_method);
             $receivable = FinanceParticular::firstWhere('alias', 'receivable');
-    
+
             FinanceRecord::entry([
                 'description'     => "Expense of Delete Purchase Return : {$purchaseReturn->reference}",
                 'amount'          => $purchaseReturn->total_amount,
@@ -165,7 +165,7 @@ class PurchaseReturnObserver
                 'recordable_type' => PurchaseReturn::class,
                 'recordable_id'   => $purchaseReturn->id,
             ], $expense, 'increment');
-            
+
             if($purchaseReturn->paid_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Delete Purchase Return : {$purchaseReturn->reference}",
@@ -175,7 +175,7 @@ class PurchaseReturnObserver
                     'recordable_id'   => $purchaseReturn->id,
                 ], $paymentMethod, 'decrement');
             }
-            
+
             if($purchaseReturn->due_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Delete Purchase Return : {$purchaseReturn->reference}",

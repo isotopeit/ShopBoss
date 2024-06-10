@@ -89,7 +89,7 @@
                                     <td class="sub-total text-end">{{ $purchaseDetail->sub_total }}</td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-sm p-0 me-1">
-                                            <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>    
+                                            <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -197,7 +197,7 @@
     );
 
     const matcher = (params, data)=> {
-        if ($.trim(params.term) === '') return data; 
+        if ($.trim(params.term) === '') return data;
         if (typeof data.text === 'undefined') return null;
         if (
             data.text?.toLowerCase().indexOf(params.term.toLowerCase()) > -1 ||
@@ -265,7 +265,7 @@
                             title: "{{ __('This product already selected') }}",
                             icon : "error",
                             type : 'error'
-                        });   
+                        });
                         return fasle;
                     }
 
@@ -275,7 +275,7 @@
                             title: "{{ __('This product stock not avaiable') }}",
                             icon : "error",
                             type : 'error'
-                        });   
+                        });
                         return fasle;
                     }
                     $('.removeable-tr').remove();
@@ -302,7 +302,7 @@
                             <td class="sub-total">${res.data.product_price}</td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm p-0 me-1">
-                                    <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>    
+                                    <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>
                                 </button>
                             </td>
                         </tr>
@@ -328,8 +328,18 @@
         const percentage = $(tr).find('.percentage').is(':checked');
         let   discount   = $(tr).find('.discount').val();
         if(percentage) {
+            if (discount > 100) {
+                discount = 100;
+                $(tr).find('.discount').val(discount);
+                Swal.fire({
+                    title: "{{ __('Discount cannot exceed 100%') }}",
+                    icon: "warning",
+                    // type: 'warning'
+                });
+            }
             discount = (unitPrice/100)*discount;
         }
+        console.log(discount);
         $(tr).find('.sub-total').text((unitPrice-discount)*qty);
         grandTotalCalc();
     }

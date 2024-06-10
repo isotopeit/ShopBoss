@@ -23,6 +23,10 @@ class Purchase extends BaseModel
         return $this->hasMany(PurchasePayment::class, 'purchase_id', 'id');
     }
 
+    public function purchaseReturns() {
+        return $this->hasMany(PurchaseReturn::class, 'purchase_id', 'id');
+    }
+
     public static function boot() {
         parent::boot();
 

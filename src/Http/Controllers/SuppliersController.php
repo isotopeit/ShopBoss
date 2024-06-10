@@ -49,12 +49,12 @@ class SuppliersController extends Controller
         return redirect()->route('suppliers.index')->withSuccess('Supplier Created!');
     }
 
-    public function show(Supplier $supplier) 
+    public function show(Supplier $supplier)
     {
         return view('shopboss::people.suppliers.show', compact('supplier'));
     }
 
-    public function edit(Supplier $supplier) 
+    public function edit(Supplier $supplier)
     {
         return view('shopboss::people.suppliers.edit', compact('supplier'));
     }
@@ -82,9 +82,10 @@ class SuppliersController extends Controller
             'address'        => $request->address
         ]);
 
-        toast('Supplier Updated!', 'info');
+        // toast('Supplier Updated!', 'info');
 
-        return redirect()->route('suppliers.index');
+        return redirect()->route('suppliers.index')->withSuccess('Supplier Updated!');
+
     }
 
     public function destroy(Supplier $supplier) {
@@ -92,9 +93,9 @@ class SuppliersController extends Controller
 
         $supplier->delete();
 
-        toast('Supplier Deleted!', 'warning');
+        // toast('Supplier Deleted!', 'warning');
 
-        return redirect()->route('suppliers.index');
+        return redirect()->route('suppliers.index')->withSuccess('Supplier Deleted!');
     }
 
     public function supplierSelecr2()
@@ -103,16 +104,16 @@ class SuppliersController extends Controller
 
         $data = [];
 
-        foreach ($suppliers as $supplier) 
+        foreach ($suppliers as $supplier)
         {
-            if (is_null($supplier->company_name)) 
+            if (is_null($supplier->company_name))
             {
                 $data[] = [
                     'id'      => $supplier->id,
                     'text'    => $supplier->supplier_name,
                     'subText' => $supplier->supplier_phone
                 ];
-            } else 
+            } else
             {
                 $data[] = [
                     'id'      => $supplier->id,
@@ -120,7 +121,7 @@ class SuppliersController extends Controller
                     'subText' => $supplier->supplier_name . '-' . $supplier->supplier_phone
                 ];
             }
-            
+
         }
 
                                 // company_name as text,
@@ -128,5 +129,5 @@ class SuppliersController extends Controller
 
         return response()->json($data);
     }
-    
+
 }
