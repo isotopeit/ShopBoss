@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products');
             $table->foreignId('purchase_id')->constrained('purchases');
             $table->foreignId('purchase_detail_id')->constrained('purchase_details');
+            $table->string('product_name')->nullable();
+            $table->string('product_code')->nullable();
             $table->float('unit_price');
             $table->float('quantity');
             $table->float('sub_total');

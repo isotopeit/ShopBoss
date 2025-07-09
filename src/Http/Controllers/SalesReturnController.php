@@ -95,7 +95,6 @@ class SalesReturnController extends Controller
     public function store(Request $request) {
         try {
             $req = $request->all();
-
             $products = [];
             DB::beginTransaction();
             
@@ -200,9 +199,9 @@ class SalesReturnController extends Controller
             DB::commit();
             return redirect()->route('sale-returns.index')->withSuccess(__('Sale Return Successfull'));
 
-        } catch (Exception $th) {
-            DB::rollBack();
-            return redirect()->route('sale-returns.index')->withSuccess(__($th->getMessage()));
+        } catch (Exception $e) {
+            // DB::rollBack();
+            return redirect()->route('sale-returns.index')->withSuccess(__($e->getMessage()));
         }
     }
 

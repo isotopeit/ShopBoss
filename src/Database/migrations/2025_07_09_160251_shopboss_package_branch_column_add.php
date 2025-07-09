@@ -34,6 +34,24 @@ return new class extends Migration
                 $table->foreign('branch_id')->references('id')->on('branches')->onDelete('restrict');
             }
         });
+        Schema::table('purchase_payments', function (Blueprint $table) {
+            if (!Schema::hasColumn('purchase_payments', 'branch_id')) {
+                $table->unsignedBigInteger('branch_id')->nullable()->after('id');
+                $table->foreign('branch_id')->references('id')->on('branches')->onDelete('restrict');
+            }
+        });
+        Schema::table('sale_return_payments', function (Blueprint $table) {
+            if (!Schema::hasColumn('sale_return_payments', 'branch_id')) {
+                $table->unsignedBigInteger('branch_id')->nullable()->after('id');
+                $table->foreign('branch_id')->references('id')->on('branches')->onDelete('restrict');
+            }
+        });
+        Schema::table('purchase_return_payments', function (Blueprint $table) {
+            if (!Schema::hasColumn('purchase_return_payments', 'branch_id')) {
+                $table->unsignedBigInteger('branch_id')->nullable()->after('id');
+                $table->foreign('branch_id')->references('id')->on('branches')->onDelete('restrict');
+            }
+        });
 
        
     }
@@ -64,6 +82,24 @@ return new class extends Migration
         });
         Schema::table('suppliers', function (Blueprint $table) {
             if (Schema::hasColumn('suppliers', 'branch_id')) {
+                $table->dropForeign(['branch_id']);
+                $table->dropColumn('branch_id');
+            }
+        });
+        Schema::table('purchase_payments', function (Blueprint $table) {
+            if (Schema::hasColumn('purchase_payments', 'branch_id')) {
+                $table->dropForeign(['branch_id']);
+                $table->dropColumn('branch_id');
+            }
+        });
+        Schema::table('sale_return_payments', function (Blueprint $table) {
+            if (Schema::hasColumn('sale_return_payments', 'branch_id')) {
+                $table->dropForeign(['branch_id']);
+                $table->dropColumn('branch_id');
+            }
+        });
+        Schema::table('purchase_return_payments', function (Blueprint $table) {
+            if (Schema::hasColumn('purchase_return_payments', 'branch_id')) {
                 $table->dropForeign(['branch_id']);
                 $table->dropColumn('branch_id');
             }

@@ -3,9 +3,9 @@
 @section('title', 'Sale Details')
 
 @push('buttons')
-<a target="_blank" class="btn btn-sm btn-info mfe-1 d-print-none" href="{{ route('sales.pdf', $sale->id) }}">
+{{-- <a target="_blank" class="btn btn-sm btn-info mfe-1 d-print-none" href="{{ route('sales.pdf', $sale->id) }}">
     <i class="bi bi-save"></i> {{ __('Save') }}
-</a>
+</a> --}}
 &nbsp;&nbsp;
 <a class="btn btn-sm btn-isotope fw-bold " href="{{ route('sales.index') }}">{{ __('List') }}</a>
 @endpush

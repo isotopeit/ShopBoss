@@ -176,33 +176,34 @@ class PurchasesReturnController extends Controller
             }
             foreach ($products as $product) {
                 PurchaseReturnDetail::create(array_merge([
-                    'purchase_return_id' => $purchaseReturn->id
+                    'purchase_return_id' => $purchaseReturn->id,
+                    'branch_id'=> settings()->enable_branch == 1 ? Auth::user()->branch->id : null,
                 ], $product));
             }
             DB::commit();
             return redirect()->route('purchase-returns.index')->withSuccess(__('Purchase Return Successfull'));
 
         } catch (Exception $th) {
-            DB::rollBack();
+            // DB::rollBack();
             return redirect()->route('purchase-returns.index')->withSuccess(__($th->getMessage()));
         }
     }
 
     public function show($id) 
     {
-        $purchase_return = PurchaseReturn::find($id);
+        $purchaseReturn = PurchaseReturn::find($id);
         
         // Check branch access if enabled
         if (settings()->enable_branch == 1) {
-            if (Auth::user()->branch && $purchase_return->branch_id != Auth::user()->branch->id) {
+            if (Auth::user()->branch && $purchaseReturn->branch_id != Auth::user()->branch->id) {
                 return redirect()->route('purchase-returns.index')
                     ->withErrors('You do not have access to view this purchase return.');
             }
         }
         
-        $supplier = Supplier::findOrFail($purchase_return->supplier_id);
+        $supplier = Supplier::findOrFail($purchaseReturn->supplier_id);
 
-        return view('shopboss::purchases-return.show', compact('purchase_return', 'supplier'));
+        return view('shopboss::purchases-return.show', compact('purchaseReturn', 'supplier'));
     }
 
     public function edit($id) 
@@ -337,5 +338,33 @@ class PurchasesReturnController extends Controller
         $purchaseReturn->purchaseReturnPayments()->delete();
         $purchaseReturn->delete();
         return redirect()->route('purchase-returns.index')->withSuccess("Purchase Return deleted");
+    }
+
+    public function purchaseData($id)
+    {
+        $purchase = Purchase::with(['purchaseDetails.product'])->find($id);
+
+        if (!$purchase) {
+            return response()->json([
+                'msg' => 'Purchase not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'purchase_details' => $purchase->purchaseDetails->map(function ($detail) {
+                return [
+                    'id'            => $detail->product_id,
+                    'product_name'  => $detail->product_name ?? $detail->product->name ?? '',
+                    'product_code'  => $detail->product_code ?? $detail->product->code ?? '',
+                    'unit_price'    => $detail->unit_price,
+                    'purchase_qty'  => $detail->purchase_qty,
+                    'quantity'      => $detail->available_qty ?? $detail->purchase_qty,
+                    'sub_total'     => $detail->unit_price * $detail->purchase_qty,
+                    'product' => [
+                        'uom' => $detail->product->uom ?? '',
+                    ]
+                ];
+            })
+        ]);
     }
 }

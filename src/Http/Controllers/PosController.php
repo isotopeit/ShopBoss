@@ -94,6 +94,7 @@ class PosController extends Controller
             $payload = [
                 'customer_id'         => $customer->id,
                 'customer_name'       => $customer->customer_name,
+                'branch_id' => settings()->enable_branch == 1 ? Auth::user()->branch->id:null,
                 'date'                => now(),
                 'tax_percentage'      => $req['tax_percentage'],
                 'tax_amount'          => ($totalSubTotal / 100) * $req['tax_percentage'],
@@ -123,13 +124,13 @@ class PosController extends Controller
             foreach ($products as $product) {
                 SaleDetails::create(array_merge([
                     'sale_id' => $sale->id,
+                    'branch_id' => settings()->enable_branch == 1 ? Auth::user()->branch->id:null,
                 ], $product));
             }
 
             DB::commit();
             return redirect()->to('/app/pos')->withSuccess("POS Sale Created!");
         } catch (Exception $e) {
-            dd($e);
             return redirect()->to('/app/pos')->withErrors($e->getMessage());
         }
     }

@@ -32,27 +32,34 @@ class SaleController extends Controller
 
     public function pdf($id)
     {
-        $sale = Sale::findOrFail($id);
+        try {
         
-        // Check branch access if enabled
-        if (settings()->enable_branch == 1) {
-            if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
-                return redirect()->route('sales.index')
-                    ->withErrors('You do not have access to view this sale PDF.');
+            $sale = Sale::findOrFail($id);
+            
+            // Check branch access if enabled
+            if (settings()->enable_branch == 1) {
+                if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
+                    return redirect()->route('sales.index')
+                        ->withErrors('You do not have access to view this sale PDF.');
+                }
             }
-        }
-        
-        $customer = Customer::findOrFail($sale->customer_id);
-        // return view('shopboss::sale.print', [
-        //     'sale'     => $sale,
-        //     'customer' => $customer,
-        // ]);
-        $pdf = PDF::loadview('shopboss::sale.print', [
-            'sale'     => $sale,
-            'customer' => $customer,
-        ])->setPaper('a4');
+            
+            $customer = Customer::findOrFail($sale->customer_id);
+            // return view('shopboss::sale.print', [
+            //     'sale'     => $sale,
+            //     'customer' => $customer,
+            // ]);
+            $pdf = PDF::loadview('shopboss::sale.print', [
+                'sale'     => $sale,
+                'customer' => $customer,
+            ])->setPaper('a4');
 
-        return $pdf->stream('sale-'. $sale->reference .'.pdf');
+            return $pdf->stream('sale-'. $sale->reference .'.pdf');
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('sales.index')
+                ->withErrors('Sale not found or invalid ID.');
+        }
     }
 
     public function posPdf($id)
@@ -293,7 +300,7 @@ class SaleController extends Controller
             DB::beginTransaction();
             
             // Use branch_id from request if branch system is enabled, otherwise use current
-            $branch_id = settings()->enable_branch == 1 ? $req['branch_id'] : $sale->branch_id;
+            $branch_id = settings()->enable_branch == 1 ? Auth::user()->branch->id :null;
 
             foreach ($req['products'] as $item) {
                 $product  = Product::find($item['product_id']);
@@ -390,7 +397,6 @@ class SaleController extends Controller
 
     public function destroy($id) {
         $sale = Sale::find($id);
-        
         // Check branch access if enabled
         if (settings()->enable_branch == 1) {
             if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {

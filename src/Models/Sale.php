@@ -19,6 +19,12 @@ class Sale extends BaseModel
     public function salePayments() {
         return $this->hasMany(SalePayment::class, 'sale_id', 'id');
     }
+    public function saleReturn() {
+        return $this->hasOne(SaleReturn::class, 'sale_id', 'id');
+    }
+    public function salesReturnDetails() {
+        return $this->hasMany(SaleReturnDetail::class, 'sale_id', 'id');
+    }
     
     /**
      * Get the branch that owns the sale.

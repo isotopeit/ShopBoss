@@ -7,10 +7,10 @@
     <i class="bi bi-list fs-3"></i>
     List
 </a>
-<a target="_blank" class="btn btn-sm btn-info"
+{{-- <a target="_blank" class="btn btn-sm btn-info"
     href="{{ route('purchase-returns.pdf', $purchaseReturn->id) }}">
     <i class="bi bi-printer fs-3"></i> {{ __('Print') }}
-</a>
+</a> --}}
 @endpush
 
 @section('content')
