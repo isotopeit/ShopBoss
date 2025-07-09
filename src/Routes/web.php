@@ -18,6 +18,7 @@ use Isotope\ShopBoss\Http\Controllers\CustomersController;
 use Isotope\ShopBoss\Http\Controllers\QuotationController;
 use Isotope\ShopBoss\Http\Controllers\SuppliersController;
 use Isotope\ShopBoss\Http\Controllers\AdjustmentController;
+use Isotope\ShopBoss\Http\Controllers\BranchUserController;
 use Isotope\ShopBoss\Http\Controllers\CategoriesController;
 use Isotope\ShopBoss\Http\Controllers\SalesReturnController;
 use Isotope\ShopBoss\Http\Controllers\SalePaymentsController;
@@ -42,6 +43,7 @@ Route::group(['middleware' => ['web', 'auth','authorization']], function () {
 
     Route::resource('adjustments', AdjustmentController::class);
     Route::resource('shopboss-branches', BranchController::class)->except('show');
+    Route::resource('shop-branch-user', BranchUserController::class);
     Route::resource('currencies', CurrencyController::class)->except('show');
     Route::resource('expense-categories', ExpenseCategoriesController::class)->except('show', 'create');
     Route::resource('expenses', ExpenseController::class)->except('show');
@@ -106,8 +108,8 @@ Route::group(['middleware' => ['web', 'auth','authorization']], function () {
     Route::post('/filepond/upload', [UploadController::class, 'filepondUpload'])->name('filepond.upload');
     Route::delete('/filepond/delete', [UploadController::class, 'filepondDelete'])->name('filepond.delete');
 
-    Route::get('/user/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/user/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/user/profile', [ProfileController::class, 'edit'])->name('shop-profile.edit');
+    Route::patch('/user/profile', [ProfileController::class, 'update'])->name('shop-profile.update');
     Route::patch('/user/password', [ProfileController::class, 'updatePassword'])->name('profile.update.password');
     // Route::resource('users', UsersController::class)->except('show');
     // Route::resource('roles', RolesController::class)->except('show');

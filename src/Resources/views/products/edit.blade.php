@@ -16,6 +16,27 @@
             @csrf
             @method('PUT')
             <div class="row">
+                @if (settings()->enable_branch == 1)
+                <div class="mb-1 row">
+                    <label class="col-md-2" for="branch_id">{{ __('Branch') }}</label>
+                    <div class="col-md-10">
+                        @php $userBranch = Auth::user()->branch ?? null; @endphp
+                        <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
+                            data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                            <option value="" disabled>{{ __('Select Branch') }}</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}"
+                                    @if (($userBranch && $userBranch->id == $branch->id) || $product->branch_id == $branch->id) selected @endif>
+                                    {{ $branch->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @if ($userBranch)
+                            <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                        @endif
+                    </div>
+                </div>
+                @endif
                 <div class="mb-1 row">
                     <label class="col-md-2" for="category_id">{{ __('Category') }}</label>
                     <div class="col-md-10">
@@ -169,5 +190,58 @@
                 @endif
             }
         }
+        
+    @if (settings()->enable_branch == 1)
+    // Branch change handler to filter categories
+    $(document).ready(function() {
+        $('#branch_id').on('change', function() {
+            let branchId = $(this).val();
+            if (branchId) {
+                $('#category_id').prop('disabled', true);
+                
+                $.ajax({
+                    url: "{{ url('/') }}/products/branch/" + branchId + "/categories",
+                    type: "GET",
+                    success: function(response) {
+                        $('#category_id').empty();
+                        $('#category_id').append('<option value="" selected disabled>Select Category</option>');
+                        
+                        if (response.categories && response.categories.length > 0) {
+                            $.each(response.categories, function(index, category) {
+                                $('#category_id').append('<option value="' + category.id + '">' + category.category_name + '</option>');
+                            });
+                            $('#category_id').prop('disabled', false);
+                            
+                            // Try to select the original category if it belongs to this branch
+                            var originalCategoryId = @json($product->category_id);
+                            var categoryExists = false;
+                            $('#category_id option').each(function() {
+                                if ($(this).val() == originalCategoryId) {
+                                    categoryExists = true;
+                                    return false; // break the loop
+                                }
+                            });
+                            
+                            if (categoryExists) {
+                                $('#category_id').val(originalCategoryId);
+                            }
+                        } else {
+                            $('#category_id').append('<option value="" disabled>No categories available</option>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading categories: " + error);
+                        $('#category_id').prop('disabled', false);
+                    }
+                });
+            }
+        });
+        
+        // Trigger on page load to load correct categories
+        if ($('#branch_id').val()) {
+            $('#branch_id').trigger('change');
+        }
+    });
+    @endif
 </script>
 @endpush

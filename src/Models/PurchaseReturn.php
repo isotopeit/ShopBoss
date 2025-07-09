@@ -26,6 +26,14 @@ class PurchaseReturn extends BaseModel
     public function purchaseReturnPayments() {
         return $this->hasMany(PurchaseReturnPayment::class, 'purchase_return_id', 'id');
     }
+    
+    /**
+     * Get the branch that owns the purchase return.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public static function boot() {
         parent::boot();

@@ -13,12 +13,27 @@
         <div class="card mt-3">
             <div class="card-body">
                 <div class="row">
+                    @if (settings()->enable_branch == 1)
                     <div class="col-md-3 col-12">
-                        <div class="mb-2 d-none">
+                        <div class="mb-2">
                             <label class="form-label">{{ __('Branch') }}: </label>
-                            <select class="form-select form-select-sm" id="product"></select>
+                            @php $userBranch = Auth::user()->branch ?? null; @endphp
+                            <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
+                                data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                                <option value="" disabled>{{ __('Select Branch') }}</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}"
+                                        @if (($userBranch && $userBranch->id == $branch->id) || $sale_return->branch_id == $branch->id) selected @endif>
+                                        {{ $branch->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if ($userBranch)
+                                <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                            @endif
                         </div>
                     </div>
+                    @endif
                     <div class="col-md-3 col-12">
                         <div class="mb-2">
                             <label class="form-label">{{ __('Customer') }}</label>
@@ -162,6 +177,19 @@
                 $(tr).find('.sub-total').text(unitPrice * qty);
                 grandTotalCalc();
             }
+            
+            @if (settings()->enable_branch == 1)
+            // Disable branch change to prevent inconsistencies
+            $('#branch_id').on('change', function() {
+                // This is a confirmation dialog to warn about changing branch
+                if (confirm("Changing branch may affect product availability. Are you sure you want to continue?")) {
+                    // You could add additional logic here if needed
+                } else {
+                    // Revert to original value
+                    $(this).val(@json($sale_return->branch_id)).trigger('change');
+                }
+            });
+            @endif
         </script>
     @endpush
 

@@ -22,6 +22,16 @@
                             class="form-control form-control-sm" name="search[supplier_name]"
                             placeholder="{{ __('Enter Supplier Name') }}">
                     </div>
+                    @if (settings()->enable_branch == 1)
+                    <div class="col-md">
+                        <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
+                            <option value="">All Branches</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
                     <div class="col-md">
                         <button type="submit" class="btn btn-sm bg-isotope text-white"><i
                                 class="fa-solid fa-search text-white"></i> {{ __('Search') }}</button>
@@ -38,6 +48,9 @@
                                 <td>{{ __('Paid Amount') }}</td>
                                 <td>{{ __('Due Amount') }}</td>
                                 <td>{{ __('Payment Status') }}</td>
+                                @if (settings()->enable_branch == 1)
+                                <td>{{ __('Branch') }}</td>
+                                @endif
                                 <td class="text-center">{{ __('Actions') }}</td>
                             </tr>
                         </thead>
@@ -51,15 +64,17 @@
                                 <td>{{ $purchase->paid_amount }}</td>
                                 <td>{{ $purchase->due_amount }}</td>
                                 <td>{{ $purchase->payment_status }}</td>
+                                @if (settings()->enable_branch == 1)
+                                <td>{{ $purchase->branch->name ?? 'N/A' }}</td>
+                                @endif
                                 <td class="d-flex justify-content-center">
                                     @include('shopboss::purchase.partials.actions')
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <th class="text-danger text-center" colspan="10">No Data Found...</th>
+                                <th class="text-danger text-center" colspan="{{ settings()->enable_branch == 1 ? '10' : '9' }}">No Data Found...</th>
                             </tr>
-
                             @endforelse
                         </tbody>
                     </table>

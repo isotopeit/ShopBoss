@@ -20,12 +20,27 @@
                     </div>
                 </div>
             </div>
+            @if (settings()->enable_branch == 1)
             <div class="col-12 col-md-6">
-                <div class="mb-2 d-none">
+                <div class="mb-2">
                     <label class="form-label">{{ __('Branch') }}: </label>
-                    <select class="form-select form-select-sm" id="product"></select>
+                    @php $userBranch = Auth::user()->branch ?? null; @endphp
+                    <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
+                        data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                        <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                        @foreach ($branches as $branch)
+                            <option value="{{ $branch->id }}"
+                                @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
+                                {{ $branch->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if ($userBranch)
+                        <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                    @endif
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
@@ -52,6 +67,9 @@
                         <input type="date" class="form-control form-control-sm" value="{{ date('Y-m-d') }}"  name="date"required>
                     </div>
                 </div>
+                @if (settings()->enable_branch == 1)
+                <input type="hidden" name="branch_id" id="form_branch_id" value="{{ Auth::user()->branch ? Auth::user()->branch->id : '' }}">
+                @endif
                 <div class="col-12">
                     <table class="table table-sm table-bordered table-striped mt-2" id="product-table">
                         <thead>
@@ -66,7 +84,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="removeable-tr text-center fw-bold text-isotope">
+                            <tr class="removeable-tr text-center fw-bold">
                                 <td colspan="8">{{ __('Please search & select products') }}!</td>
                             </tr>
                         </tbody>
@@ -300,6 +318,70 @@
     }
 
     $('.select2').css('width', '92%')
+
+    @if (settings()->enable_branch == 1)
+    // Update the hidden branch field when the branch dropdown changes
+    $('#branch_id').on('change', function() {
+        $('#form_branch_id').val($(this).val());
+        
+        // Refresh suppliers based on branch
+        let branchId = $(this).val();
+        if (branchId) {
+            // Clear and disable supplier dropdown while loading
+            $('#supplier').empty().prop('disabled', true);
+            
+            $.ajax({
+                url: "{{ url('/') }}/purchases/branch/" + branchId + "/suppliers",
+                type: "GET",
+                success: function(response) {
+                    $('#supplier').empty();
+                    
+                    if (response.suppliers && response.suppliers.length > 0) {
+                        response.suppliers.forEach(function(supplier) {
+                            $('#supplier').append(new Option(supplier.text, supplier.id, false, false));
+                        });
+                    }
+                    
+                    $('#supplier').prop('disabled', false).trigger('change');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading suppliers: " + error);
+                    $('#supplier').prop('disabled', false);
+                }
+            });
+            
+            // Also update product dropdown to only show products from this branch
+            $('#product').select2('destroy');
+            loadProductSelect(branchId);
+        }
+    });
+    
+    function loadProductSelect(branchId) {
+        $('#product').select2({
+            placeholder: "{{ __('Select Product') }}",
+            templateResult,
+            templateSelection,
+            matcher,
+            ajax: {
+                url: '/api/select2/products',
+                dataType: 'json',
+                method: 'get',
+                delay: 250,
+                data: function (data) {
+                    return {
+                        product: data.term,
+                        branch_id: branchId
+                    };
+                },
+                processResults: function (response) {
+                    return {
+                        results: response
+                    };
+                }
+            }
+        }).val(null).trigger('change');
+    }
+    @endif
 </script>
 @endpush
 

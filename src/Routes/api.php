@@ -7,7 +7,7 @@ use Isotope\ShopBoss\Http\Controllers\Api\PurchaseApiController;
 use Isotope\ShopBoss\Http\Controllers\XlImportController;
 use Isotope\ShopBoss\Http\Controllers\CustomersController;
 
-Route::prefix('api')->middleware(['api'])->group(function () {
+Route::prefix('api')->middleware(['web', 'auth'])->group(function () {
 
     Route::prefix('select2')->group(function () {
         Route::get('/products', [ProductApiController::class, 'productSelect2']);

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Isotope\ShopBoss\Models\Sale;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Isotope\ShopBoss\Models\Product;
 use Isotope\ShopBoss\Models\Customer;
 use Isotope\ShopBoss\Models\SaleDetails;
@@ -24,7 +25,9 @@ class PosController extends Controller
         $customers = Customer::selectRaw("
                             id,
                             concat(customer_name, ' [', customer_phone, ']') as text
-                        ")->get();
+                        ")
+                        ->where('branch_id', Auth::user()->branch->id)
+                        ->get();
         return view('shopboss::pos.index', compact('customers'));
     }
 

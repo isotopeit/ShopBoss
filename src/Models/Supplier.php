@@ -10,6 +10,12 @@ class Supplier extends BaseModel
     use HasFactory;
 
     protected $guarded = [];
-
-
+    
+    /**
+     * Get the branch that owns the supplier.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }

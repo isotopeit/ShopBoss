@@ -19,6 +19,14 @@ class Sale extends BaseModel
     public function salePayments() {
         return $this->hasMany(SalePayment::class, 'sale_id', 'id');
     }
+    
+    /**
+     * Get the branch that owns the sale.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public static function boot() {
         parent::boot();

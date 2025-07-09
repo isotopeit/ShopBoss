@@ -27,6 +27,14 @@ class Purchase extends BaseModel
         return $this->hasMany(PurchaseReturn::class, 'purchase_id', 'id');
     }
 
+    /**
+     * Get the branch that owns the purchase.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public static function boot() {
         parent::boot();
 
@@ -39,4 +47,7 @@ class Purchase extends BaseModel
         static::deleted(fn($model) => (new PurchaseObserver())->deleted($model));
     }
 
+    public function scopeCompleted($query) {
+        return $query->where('status', 'Completed');
+    }
 }

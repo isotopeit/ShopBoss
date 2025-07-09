@@ -26,6 +26,16 @@
                         <div class="col-md">
                             <input type="text" value="{{ Request::input('search')['company_name'] ?? '' }}" class="form-control form-control-sm" name="search[company_name]" placeholder="{{ __('Enter Company Name') }}">
                         </div>
+                        @if (settings()->enable_branch == 1)
+                        <div class="col-md">
+                            <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
+                                <option value="">All Branches</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                         <div class="col-md">
                             <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> Search</button>
                         </div>
@@ -39,6 +49,9 @@
                                     <td>{{ __('Supplier Email') }}</td>
                                     <td>{{ __('Supplier Phone') }}</td>
                                     <td>{{ __('Company Name') }}</td>
+                                    @if (settings()->enable_branch == 1)
+                                    <td>{{ __('Branch') }}</td>
+                                    @endif
                                     <td>{{ __('Actions') }}</td>
                                 </tr>
                             </thead>
@@ -50,6 +63,9 @@
                                     <td>{{ $supplier->supplier_email }}</td>
                                     <td>{{ $supplier->supplier_phone }}</td>
                                     <td>{{ $supplier->company_name }}</td>
+                                    @if (settings()->enable_branch == 1)
+                                    <td>{{ $supplier->branch->name ?? 'N/A' }}</td>
+                                    @endif
                                     <td class="d-flex justify-content-center">
                                         <a title="Show"
                                             class="btn btn-outline btn-outline-dashed btn-outline-primary p-0 me-1"
@@ -72,9 +88,8 @@
                                     </td>
                                 </tr>
                                 @empty
-
                                     <tr>
-                                        <th class="font-weight-bold text-center text-danger" colspan="6">No Data Found!</th>
+                                        <th class="font-weight-bold text-center text-danger" colspan="{{ settings()->enable_branch == 1 ? '7' : '6' }}">No Data Found!</th>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -97,6 +112,25 @@
                 <form action="{{ route('suppliers.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
+                        @if (settings()->enable_branch == 1)
+                        <div class="mb-2">
+                            <label class="form-label">{{ __('Branch') }} <span class="text-danger">*</span></label>
+                            @php $userBranch = Auth::user()->branch ?? null; @endphp
+                            <select name="branch_id" class="form-select form-select-sm" data-control="select2" 
+                                data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                                <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}"
+                                        @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
+                                        {{ $branch->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if ($userBranch)
+                                <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                            @endif
+                        </div>
+                        @endif
                         <div class="mb-2">
                             <label class="form-label" for="supplier_name">{{ __('Supplier Name') }} <span class="text-danger">*</span></label>
                             <input class="form-control form-control-sm" type="text" name="supplier_name" required>

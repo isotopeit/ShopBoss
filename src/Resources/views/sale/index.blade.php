@@ -32,6 +32,7 @@
                     class="form-control form-control-sm" name="search[status]"
                     placeholder="{{ __('Enter Status') }}">
             </div>
+           
             <div class="col-md">
                 <button type="submit" class="btn btn-sm bg-isotope text-white"><i
                         class="fa-solid fa-search text-white"></i> {{ __('Search') }}</button>
@@ -48,6 +49,9 @@
                         <td>{{ __('Paid Amount') }}</td>
                         <td>{{ __('Due Amount') }}</td>
                         <td>{{ __('Payment Status') }}</td>
+                        @if (settings()->enable_branch == 1)
+                        <td>{{ __('Branch') }}</td>
+                        @endif
                         <td>{{ __('Date') }}</td>
                         <td>{{ __('Actions') }}</td>
                     </tr>
@@ -62,6 +66,9 @@
                         <td>{{ $sale->paid_amount }}</td>
                         <td>{{ $sale->due_amount }}</td>
                         <td>{{ $sale->payment_status }}</td>
+                        @if (settings()->enable_branch == 1)
+                        <td>{{ $sale->branch->name ?? 'N/A' }}</td>
+                        @endif
                         <td>{{ $sale->date }}</td>
                         <td class="d-flex justify-content-center">
                             @include('shopboss::sale.partials.actions')
@@ -69,7 +76,7 @@
                     </tr>
                     @empty
                         <tr>
-                            <th class="text-center text-danger" colspan="9">{{ __('No Data Found!') }}</th>
+                            <th class="text-center text-danger" colspan="{{ settings()->enable_branch == 1 ? '10' : '9' }}">{{ __('No Data Found!') }}</th>
                         </tr>
                     @endforelse
                 </tbody>

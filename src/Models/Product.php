@@ -23,4 +23,8 @@ class Product extends BaseModel
         return $this->morphMany(Upload::class, 'uploadable');
     }
 
+     public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 }

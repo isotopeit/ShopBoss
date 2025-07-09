@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Isotope\ShopBoss\Models\Sale;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Isotope\ShopBoss\Models\Branch;
+use Illuminate\Support\Facades\Auth;
 use Isotope\ShopBoss\Models\Product;
 use Isotope\ShopBoss\Models\Customer;
 use Isotope\ShopBoss\Models\SaleDetails;
@@ -31,6 +33,15 @@ class SaleController extends Controller
     public function pdf($id)
     {
         $sale = Sale::findOrFail($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('sales.index')
+                    ->withErrors('You do not have access to view this sale PDF.');
+            }
+        }
+        
         $customer = Customer::findOrFail($sale->customer_id);
         // return view('shopboss::sale.print', [
         //     'sale'     => $sale,
@@ -47,6 +58,15 @@ class SaleController extends Controller
     public function posPdf($id)
     {
         $sale = Sale::findOrFail($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('sales.index')
+                    ->withErrors('You do not have access to view this sale POS PDF.');
+            }
+        }
+        
         return view('shopboss::sale.print-pos-plan', compact('sale'));
 
         // $mpdf = new Mpdf([
@@ -57,30 +77,49 @@ class SaleController extends Controller
         // $view = view('shopboss::sale.print-shopboss', compact('sale'))->render();
         // $mpdf->WriteHTML($view);
         // $mpdf->Output('sale-'. $sale->reference . ".pdf", "I");
-
     }
 
     public function index()
     {
-        $sales = Sale::search()->orderBydesc('id')->paginate(15);
-        return view('shopboss::sale.index',compact('sales'));
+        $query = Sale::search();
+        
+        // Filter by branch if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch) {
+                $query->where('branch_id', Auth::user()->branch->id);
+            }
+        }
+        
+        $sales = $query->orderByDesc('id')->paginate(15);
+        
+        
+        return view('shopboss::sale.index', compact('sales',));
     }
 
     public function create() {
-        $customers = Customer::selectRaw("
-                                        id,
-                                        customer_name as text,
-                                        customer_phone as subText
-                                    ")
-                                    ->get();
-        return view('shopboss::sale.create',compact('customers'));
+        // Get customers
+        $query = Customer::selectRaw("id, customer_name as text, customer_phone as subText");
+        
+        // Filter customers by branch if enabled
+        if (settings()->enable_branch == 1 && Auth::user()->branch) {
+            $query->where('branch_id', Auth::user()->branch->id);
+        }
+        
+        $customers = $query->get();
+        
+        // Get branches for dropdown
+        $branches = [];
+        if (settings()->enable_branch == 1) {
+            $branches = Branch::all();
+        }
+        
+        return view('shopboss::sale.create', compact('customers', 'branches'));
     }
 
     public function store(Request $request)
     {
         try {
             $req = $request->all();
-
             if(count($req['products']) < 1)
                 throw new Exception(__('Select Product'), 403);
 
@@ -91,20 +130,27 @@ class SaleController extends Controller
             foreach ($req['products'] as $item) {
                 $product  = Product::find($item['product_id']);
                 $discount = array_key_exists('percentage', $item) ? ($product->product_price / 100) * floatval($item['discount']) : $item['discount'];
-
-                $purchase_detail = PurchaseDetail::query()
-                                    ->where('product_id',$product->id)
-                                    ->where('available_qty','>',0.0001)
-                                    ->where('available_qty','>=',$item['qty'])
-                                    ->orderBy('created_at')
-                                    ->first();
+                
+                // Use branch_id from request if branch system is enabled, otherwise use default
+                $branch_id = settings()->enable_branch == 1 ? $req['branch_id'] : null;
+                $purchase_detail_query = PurchaseDetail::query()
+                                    ->where('product_id', $product->id)
+                                    ->where('available_qty', '>', 0.0001)
+                                    ->where('available_qty', '>=', $item['qty'])
+                                    ->orderBy('created_at');
+                
+                // Filter purchase details by branch if branch system is enabled
+                if (settings()->enable_branch == 1) {
+                    $purchase_detail_query->where('branch_id', $branch_id);
+                }
+                
+                $purchase_detail = $purchase_detail_query->first();
 
                 if(is_null($purchase_detail))
                     throw new Exception("Stock Problem, Please Call Development Team", 403);
 
-
                 array_push($products, [
-                    'branch_id'               => 1,
+                    'branch_id'               => $branch_id,
                     'product_id'              => $product->id,
                     'purchase_detail_id'      => $purchase_detail->id,
                     'product_name'            => $product->product_name,
@@ -127,8 +173,12 @@ class SaleController extends Controller
             if(is_null($customer)) throw new Exception(__('Customre not found'), 404);
 
             $totalSubTotal = collect($products)->sum('sub_total');
+            
+            // Use branch_id from request if branch system is enabled, otherwise use default
+            $branch_id = settings()->enable_branch == 1 ? $req['branch_id'] : null;
+            
             $payload = [
-                'branch_id'           => 1,
+                'branch_id'           => $branch_id,
                 'date'                => $req['date'],
                 'customer_id'         => $customer->id,
                 'customer_name'       => $customer->customer_name,
@@ -161,7 +211,8 @@ class SaleController extends Controller
                     'reference'      => 'INV/' . $sale->reference,
                     'amount'         => $sale->paid_amount,
                     'sale_id'        => $sale->id,
-                    'payment_method' => $req['payment_method']
+                    'payment_method' => $req['payment_method'],
+                    'branch_id'      => $branch_id,
                 ]);
             }
             foreach ($products as $product) {
@@ -180,23 +231,48 @@ class SaleController extends Controller
 
     public function show($id) {
         $sale = Sale::find($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('sales.index')
+                    ->withErrors('You do not have access to view this sale.');
+            }
+        }
+        
         $customer = Customer::findOrFail($sale->customer_id);
 
         return view('shopboss::sale.show', compact('sale', 'customer'));
     }
 
     public function edit($id) {
-
-        $customers = Customer::selectRaw("
-                                    id,
-                                    customer_name as text,
-                                    customer_phone as subText
-                                ")
-                                ->get();
-
         $sale = Sale::with('saleDetails.product')->find($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('sales.index')
+                    ->withErrors('You do not have access to edit this sale.');
+            }
+        }
 
-        return view('shopboss::sale.edit', compact('sale','customers'));
+        // Get customers
+        $query = Customer::selectRaw("id, customer_name as text, customer_phone as subText");
+        
+        // Filter customers by branch if enabled
+        if (settings()->enable_branch == 1 && Auth::user()->branch) {
+            $query->where('branch_id', Auth::user()->branch->id);
+        }
+        
+        $customers = $query->get();
+        
+        // Get branches for dropdown
+        $branches = [];
+        if (settings()->enable_branch == 1) {
+            $branches = Branch::all();
+        }
+
+        return view('shopboss::sale.edit', compact('sale', 'customers', 'branches'));
     }
 
     public function update(Request $request, $id)
@@ -205,8 +281,19 @@ class SaleController extends Controller
         {
             $req = $request->all();
             $sale = Sale::with('saleDetails.product')->find($id);
+            
+            // Check branch access if enabled
+            if (settings()->enable_branch == 1) {
+                if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
+                    return redirect()->route('sales.index')
+                        ->withErrors('You do not have access to update this sale.');
+                }
+            }
 
             DB::beginTransaction();
+            
+            // Use branch_id from request if branch system is enabled, otherwise use current
+            $branch_id = settings()->enable_branch == 1 ? $req['branch_id'] : $sale->branch_id;
 
             foreach ($req['products'] as $item) {
                 $product  = Product::find($item['product_id']);
@@ -221,6 +308,7 @@ class SaleController extends Controller
                     'sub_total'               => ($product->product_price - $discount) * floatval($item['qty']),
                     'product_discount_amount' => $discount,
                     'product_tax_amount'      => 0,
+                    'branch_id'               => $branch_id,
                 ];
 
                 if (array_key_exists('detail_id', $item))
@@ -236,13 +324,18 @@ class SaleController extends Controller
 
                     $detail->update($payload);
                 } else {
-
-                    $purchase_detail = PurchaseDetail::query()
-                            ->where('product_id',$product->id)
-                            ->where('available_qty','>',0.0001)
-                            ->where('available_qty','>=',$item['qty'])
-                            ->orderBy('created_at')
-                            ->first();
+                    $purchase_detail_query = PurchaseDetail::query()
+                            ->where('product_id', $product->id)
+                            ->where('available_qty', '>', 0.0001)
+                            ->where('available_qty', '>=', $item['qty'])
+                            ->orderBy('created_at');
+                    
+                    // Filter purchase details by branch if branch system is enabled
+                    if (settings()->enable_branch == 1) {
+                        $purchase_detail_query->where('branch_id', $branch_id);
+                    }
+                    
+                    $purchase_detail = $purchase_detail_query->first();
 
                     if(is_null($purchase_detail))
                          throw new Exception("Stock Problem, Please Call Development Team", 403);
@@ -252,9 +345,7 @@ class SaleController extends Controller
                         'available_qty' => $purchase_detail->available_qty - $item['qty'],
                     ]);
                     $sale->saleDetails()->create($payload);
-
                 }
-
             }
 
             $customer = Customer::findOrFail($request->customer_id);
@@ -273,6 +364,7 @@ class SaleController extends Controller
                 'note'                => $req['note'],
                 'shipping_amount'     => $req['shipping_amount'],
                 'total_amount'        => $totalSubTotal + $req['shipping_amount'] + $sale->tax_amount - $req['discount_amount'],
+                'branch_id'           => $branch_id,
             ];
 
             $payload['due_amount'] = $payload['total_amount'] - $sale->paid_amount;
@@ -298,6 +390,15 @@ class SaleController extends Controller
 
     public function destroy($id) {
         $sale = Sale::find($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $sale->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('sales.index')
+                    ->withErrors('You do not have access to delete this sale.');
+            }
+        }
+        
         $sale->salePayments()->delete();
         $sale->saleDetails()->delete();
         $sale->delete();

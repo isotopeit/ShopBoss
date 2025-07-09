@@ -13,4 +13,8 @@ class Category extends BaseModel
     public function products() {
         return $this->hasMany(Product::class, 'category_id', 'id');
     }
+     public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 }

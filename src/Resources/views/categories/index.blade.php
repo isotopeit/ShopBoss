@@ -22,6 +22,16 @@
                         <div class="col-md">
                             <input type="text" value="{{ Request::input('search')['category_name'] ?? '' }}" class="form-control form-control-sm" name="search[category_name]" placeholder="Enter Category Name">
                         </div>
+                        @if (settings()->enable_branch == 1)
+                        <div class="col-md">
+                            <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
+                                <option value="">All Branches</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                         <div class="col-md">
                             <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> Search</button>
                         </div>
@@ -33,6 +43,9 @@
                                     <td>#SL</td>
                                     <td>Category Code</td>
                                     <td>Category Name</td>
+                                    @if (settings()->enable_branch == 1)
+                                    <td>Branch</td>
+                                    @endif
                                     <td>Actions</td>
                                 </tr>
                             </thead>
@@ -42,6 +55,9 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $category->category_code }}</td>
                                     <td>{{ $category->category_name }}</td>
+                                    @if (settings()->enable_branch == 1)
+                                    <td>{{ $category->branch->name ?? 'N/A' }}</td>
+                                    @endif
                                     <td class="d-flex justify-content-center">
                                         <a title="Edit"
                                             class="btn btn-outline btn-outline-dashed btn-outline-info p-0 me-1"
@@ -90,6 +106,25 @@
                         <label class="form-label" for="category_name">{{ __('Category Name') }}</label>
                         <input class="form-control form-control-sm" type="text" name="category_name" required>
                     </div>
+                    @if (settings()->enable_branch == 1)
+                    <div class="mb-2">
+                        <label class="form-label">{{ __('Branch') }}</label>
+                        @php $userBranch = Auth::user()->branch ?? null; @endphp
+                        <select name="branch_id" class="form-select form-select-sm" data-control="select2" 
+                            data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                            <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}"
+                                    @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
+                                    {{ $branch->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @if ($userBranch)
+                            <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                        @endif
+                    </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-sm btn-primary">{{ __('Create') }} <i

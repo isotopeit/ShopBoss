@@ -13,23 +13,30 @@ class StockController extends Controller
 
     public function stock()
     {
-        $req = request()->all();
-        $data = PurchaseDetail::query()
-                    ->when(array_key_exists('product_code',$req) && strlen($req['product_code']) > 0, function($q) use($req){
-                        $q->where('product_code', 'LIKE', '%'.$req['product_code'].'%');
-                    })
-                    ->when(array_key_exists('product_name',$req) && strlen($req['product_name']) > 0, function($q) use($req){
-                        $q->where('product_name', 'LIKE', '%'.$req['product_name'].'%');
-                    })
-                    ->where('available_qty','>',0.0001)
-                    ->selectRaw('
-                        product_name,
-                        product_code,
-                        unit_price,
-                        sum(available_qty) as stock_qty
-                    ')
-                    ->groupBy('product_id')
-                    ->paginate(20);
+       $req = request()->all();
+
+$data = PurchaseDetail::query()
+    ->when(!empty($req['product_code']), function ($q) use ($req) {
+        $q->where('product_code', 'LIKE', '%' . $req['product_code'] . '%');
+    })
+    ->when(!empty($req['product_name']), function ($q) use ($req) {
+        $q->where('product_name', 'LIKE', '%' . $req['product_name'] . '%');
+    })
+    ->when(!empty($req['branch_id']), function ($q) use ($req) {
+        $q->where('branch_id', $req['branch_id']);
+    })
+    ->where('available_qty', '>', 0.0001)
+    ->selectRaw('
+        product_id,
+        product_name,
+        product_code,
+        branch_id,
+        unit_price,
+        SUM(available_qty) as stock_qty
+    ')
+    ->groupBy('product_id', 'branch_id', 'product_name', 'product_code', 'unit_price')
+    ->paginate(20);
+
         return view('shopboss::stock.stock',compact('data'));
     }
 }

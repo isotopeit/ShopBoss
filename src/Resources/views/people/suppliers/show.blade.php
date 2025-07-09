@@ -35,6 +35,12 @@
                     <th>{{ __('Company Name') }}</th>
                     <td>{{ $supplier->company_name }}</td>
                 </tr>
+                @if (settings()->enable_branch == 1)
+                <tr>
+                    <th>{{ __('Branch') }}</th>
+                    <td>{{ $supplier->branch->name ?? 'N/A' }}</td>
+                </tr>
+                @endif
                 <tr>
                     <th>{{ __('City') }}</th>
                     <td>{{ $supplier->city }}</td>

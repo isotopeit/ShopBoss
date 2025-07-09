@@ -5,6 +5,7 @@ namespace Isotope\ShopBoss\Http\Controllers\Api;
 use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Isotope\ShopBoss\Models\Product;
 use Isotope\ShopBoss\Models\PurchaseDetail;
 
@@ -23,17 +24,19 @@ class ProductApiController extends Controller
     public function productSelect2(Request $request)
     {
         $req = $request->all();
-        $products =  Product::selectRaw("
-                            product_code as id,
-                            product_name as text,
-                            product_code as subText
-                        ")
-                        ->when(isset($req['product']), function($q) use($req) {
-                            $product = $req['product'];
-                            $q->whereRaw("product_name LIKE '%$product%' OR product_code LIKE '%$product%'");
-                        })
-                        ->limit(10)
-                        ->get();
+        $products = Product::selectRaw("
+                product_code as id,
+                product_name as text,
+                product_code as subText
+            ")
+            ->when(isset($req['product']), function($q) use($req) {
+                $product = $req['product'];
+                $q->whereRaw("product_name LIKE '%$product%' OR product_code LIKE '%$product%'");
+            })
+            ->where('branch_id', Auth::user()->branch->id)
+            ->limit(10)
+            ->get();
+
         return response()->json($products, 200);
     }
 

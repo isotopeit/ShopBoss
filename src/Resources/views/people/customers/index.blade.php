@@ -23,6 +23,16 @@
                         <div class="col-md">
                             <input type="text" value="{{ Request::input('search')['customer_phone'] ?? '' }}" class="form-control form-control-sm" name="search[customer_phone]" placeholder="{{ __('Enter Customer Phone') }}">
                         </div>
+                        @if (settings()->enable_branch == 1)
+                        <div class="col-md">
+                            <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
+                                <option value="">All Branches</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                         <div class="col-md">
                             <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> Search</button>
                         </div>
@@ -35,6 +45,9 @@
                                     <td>{{ __('Customer Name') }}</td>
                                     <td>{{ __('Customer Email') }}</td>
                                     <td>{{ __('Customer Phone') }}</td>
+                                    @if (settings()->enable_branch == 1)
+                                    <td>{{ __('Branch') }}</td>
+                                    @endif
                                     <td>{{ __('Actions') }}</td>
                                 </tr>
                             </thead>
@@ -45,6 +58,9 @@
                                     <td>{{ $customer->customer_name }}</td>
                                     <td>{{ $customer->customer_email }}</td>
                                     <td>{{ $customer->customer_phone }}</td>
+                                    @if (settings()->enable_branch == 1)
+                                    <td>{{ $customer->branch->name ?? 'N/A' }}</td>
+                                    @endif
                                     <td class="d-flex justify-content-center">
                                         <a title="Show"
                                             class="btn btn-outline btn-outline-dashed btn-outline-primary p-0 me-1"
@@ -68,7 +84,7 @@
                                 </tr>
                                 @empty
                                     <tr>
-                                        <th class="font-weight-bold text-center text-danger" colspan="5">No Data Found!</th>
+                                        <th class="font-weight-bold text-center text-danger" colspan="{{ settings()->enable_branch == 1 ? '6' : '5' }}">No Data Found!</th>
                                     </tr>
                                 @endforelse
                             </tbody>

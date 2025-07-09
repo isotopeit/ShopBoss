@@ -2,10 +2,13 @@
 
 namespace Isotope\ShopBoss\Http\Controllers;
 
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Isotope\ShopBoss\Models\Branch;
 use App\Http\Controllers\Controller;
+use Isotope\Metronic\Models\Setting;
+use Illuminate\Support\Facades\Artisan;
 
 class BranchController extends Controller
 {
@@ -19,7 +22,8 @@ class BranchController extends Controller
     ];
 
     public function index() {
-        return view('shopboss::branch.index', ['branches' => Branch::orderByDesc('id')->get()]);
+        $branches = Branch::search()->orderByDesc('id')->paginate(15);
+        return view('shopboss::branch.index', compact('branches'));
     }
 
     public function store(Request $request) {
@@ -65,8 +69,34 @@ class BranchController extends Controller
     }
 
     public function destroy($id) {
-        Branch::findOrFail($id)->delete();
-        toast('Branch Deleted!', 'warning');
-        return redirect()->route('shopboss-branches.index')->withSuccess("Branch deleted");
+           try {
+            $branch = Branch::firstWhere('id', $id);
+            if (is_null($branch)) throw new Exception("Branch Not Found", 400);
+            $branch->delete();
+            return redirect()->route('shopboss-branches.index')->withSuccess("Branch deleted");
+        } catch (Exception $e) {
+            return redirect()->route('shopboss-branches')->withErrors($e->getMessage() . ' / ' . $e->getLine());
+        }
+    }
+
+    public function branchEnable(Request $request)
+    {
+        try {
+            $isEnabled = $request->input('enabled') ? 1 : 0;
+
+            Setting::updateOrCreate(
+                ['option' => 'enable_branch'],
+                ['text' => $isEnabled, 'group' => 'therapy-branch']
+            );
+
+            Artisan::call('cache:clear');
+
+            $message = $isEnabled ? 'Branch Enabled successfully.' : 'Branch Disabled successfully.';
+
+            return redirect()->route('shopboss-branches.index')->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()->route('shopboss-branches.index')->withErrors($e->getMessage());
+        }
     }
 }

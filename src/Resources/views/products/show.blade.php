@@ -27,6 +27,12 @@
                             <th>{{ __('Category') }}</th>
                             <td>{{ $product->category->category_name }}</td>
                         </tr>
+                        @if (settings()->enable_branch == 1)
+                        <tr>
+                            <th>{{ __('Branch') }}</th>
+                            <td>{{ $product->branch->name ?? 'N/A' }}</td>
+                        </tr>
+                        @endif
                         <tr>
                             <th>{{ __('Cost') }}</th>
                             <td>{{ format_currency($product->product_cost) }}</td>

@@ -23,6 +23,16 @@
                     <div class="col-md">
                         <input type="text" value="{{ Request::input('search')['product_code'] ?? '' }}" class="form-control form-control-sm" name="search[product_code]" placeholder="{{ __('Enter Product Code') }}">
                     </div>
+                    @if (settings()->enable_branch == 1)
+                    <div class="col-md">
+                        <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
+                            <option value="">All Branches</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
                     <div class="col-md">
                         <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> Search</button>
                     </div>
@@ -39,6 +49,9 @@
                                 <td>{{ __('Price') }}</td>
                                 <td>{{ __('Unit') }}</td>
                                 <td>{{ __('Stock Alert') }}</td>
+                                @if (settings()->enable_branch == 1)
+                                <td>{{ __('Branch') }}</td>
+                                @endif
                                 <td class="text-center">{{ __('Actions') }}</td>
                             </tr>
                         </thead>
@@ -53,6 +66,9 @@
                                 <td>{{ $product->product_price }}</td>
                                 <td>{{ $product->uom }}</td>
                                 <td>{{ $product->product_stock_alert }}</td>
+                                @if (settings()->enable_branch == 1)
+                                <td>{{ $product->branch->name ?? 'N/A' }}</td>
+                                @endif
                                 <td class="d-flex justify-content-center">
                                     <a title="Show"
                                         class="btn btn-outline btn-outline-dashed btn-outline-primary p-0 me-1"
@@ -75,7 +91,7 @@
                             </tr>
                             @empty
                                 <tr>
-                                    <th class="font-weight-bold text-center text-danger" colspan="9">No Data Found!</th>
+                                    <th class="font-weight-bold text-center text-danger" colspan="{{ settings()->enable_branch == 1 ? '10' : '9' }}">No Data Found!</th>
                                 </tr>
                             @endforelse
                         </tbody>

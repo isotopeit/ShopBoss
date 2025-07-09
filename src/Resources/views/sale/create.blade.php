@@ -7,6 +7,7 @@
 @endpush
 
 @section('content')
+<form action="{{ route('sales.store') }}" method="post">
 
 <div class="card">
     <div class="card-body">
@@ -20,16 +21,31 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-6">
-                <div class="mb-2 d-none">
-                    <label class="form-label">{{ __('Branch') }}: </label>
-                    <select class="form-select form-select-sm" id="product"></select>
+        
+             @if (settings()->enable_branch == 1)
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="branch_id">{{ __('Branch') }}</label>
+                    <div class="input-group">
+                        @php $userBranch = Auth::user()->branch ?? null; @endphp
+                        <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
+                            data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                            <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}"
+                                    @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
+                                    {{ $branch->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @if ($userBranch)
+                            <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                        @endif
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>
-<form action="{{ route('sales.store') }}" method="post">
     @csrf
     <div class="card mt-3">
         <div class="card-body">

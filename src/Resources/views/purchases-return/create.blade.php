@@ -3,7 +3,7 @@
 @section('title', 'Create Purchase Return')
 
 @push('buttons')
-<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchase-returns.index') }}">{{ __('List') }}</a>
+    <a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchase-returns.index') }}">{{ __('List') }}</a>
 @endpush
 
 @section('content')
@@ -13,12 +13,27 @@
     <div class="card mt-3">
         <div class="card-body">
             <div class="row">
+                @if (settings()->enable_branch == 1)
                 <div class="col-md-3 col-12">
-                    <div class="mb-2 d-none">
+                    <div class="mb-2">
                         <label class="form-label">{{ __('Branch') }}: </label>
-                        <select class="form-select form-select-sm" id="product"></select>
+                        @php $userBranch = Auth::user()->branch ?? null; @endphp
+                        <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
+                            data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                            <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}"
+                                    @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
+                                    {{ $branch->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @if ($userBranch)
+                            <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                        @endif
                     </div>
                 </div>
+                @endif
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('Supplier') }} <span class="text-danger">*</span></label>
@@ -43,15 +58,17 @@
                             <tr class="bg-isotope text-center">
                                 <th>{{ __('Product') }}</th>
                                 <th>{{ __('Unit Price') }}</th>
-                                <th>{{ __('Purchase Quantity') }}</th>
+                                <th>{{ __('Purchase Qty') }}</th>
                                 <th>{{ __('Purchase Price') }}</th>
-                                <th>{{ __('Return Quantity') }}</th>
+                                <th>{{ __('Pre Returnd Qty') }}</th>
+                                <th>{{ __('Returnable Qty') }}</th>
+                                <th>{{ __('Return Qty') }}</th>
                                 <th>{{ __('Sub Total') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="removeable-tr text-center fw-bold text-isotope">
-                                <td colspan="6">{{ __('Please search & select Reference') }}!</td>
+                                <td colspan="8" class="text-danger">{{ __('Please search & select Reference') }}!</td>
                             </tr>
                         </tbody>
                     </table>
@@ -64,10 +81,6 @@
                                 <td>(=) ৳<span id="total-sub-total">0.00</span></td>
                             </tr>
                             <tr>
-                                <th>{{ __('Damaged Price') }}</th>
-                                <td>(-) ৳<span id="damaged-price">0.00</span></td>
-                            </tr>
-                            <tr>
                                 <th>{{ __('Grand Total') }}</th>
                                 <th>
                                     (=) ৳<span id="grand-total">0.00</span>
@@ -76,23 +89,8 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-md-3 col-12">
-                    <div class="mb-2">
-                        <label class="form-label">{{ __('Damaged Price') }}:</label>
-                        <input type="number" class="form-control form-control-sm" name="damaged_price" value="0" onchange="grandTotalCalc()">
-                    </div>
-                </div>
-                <div class="col-md-3 col-12">
-                    <div class="mb-2">
-                        <label class="form-label">{{ __('Status') }}:</label>
-                        <select class="form-select form-select-sm" name="status">
-                            <option value="Pending">{{ __('Pending') }}</option>
-                            <option value="Ordered">{{ __('Ordered') }}</option>
-                            <option value="Completed">{{ __('Completed') }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3 col-12">
+
+                <div class="col-md-6 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('Payment Method') }}:</label>
                         <select class="form-select form-select-sm" name="payment_method">
@@ -104,7 +102,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3 col-12">
+                <div class="col-md-6 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('Amount Paid') }}:</label>
                         <input type="text" class="form-control form-control-sm" name="paid_amount" required>
@@ -127,12 +125,11 @@
     </div>
 </form>
 
-@push('css')
-    <script></script>
-@endpush
 
 @push('js')
 <script>
+    let branchId = '';
+    
     const templateResult = (r) => (
         $(`<div class="row-fluid">
             <div class="col-12 fw-bold">${r.text}</div>
@@ -152,6 +149,44 @@
         ) { return $.extend({}, data, true);}
         return null;
     }
+
+    @if (settings()->enable_branch == 1)
+    // Update the branch ID when the branch dropdown changes
+    $('#branch_id').on('change', function() {
+        branchId = $(this).val();
+        
+        // Refresh suppliers based on branch
+        if (branchId) {
+            // Clear and disable supplier dropdown while loading
+            $('#supplier').empty().prop('disabled', true);
+            
+            $.ajax({
+                url: "{{ url('/') }}/purchases/branch/" + branchId + "/suppliers",
+                type: "GET",
+                success: function(response) {
+                    $('#supplier').empty();
+                    
+                    if (response.suppliers && response.suppliers.length > 0) {
+                        response.suppliers.forEach(function(supplier) {
+                            $('#supplier').append(new Option(supplier.text, supplier.id, false, false));
+                        });
+                    }
+                    
+                    $('#supplier').prop('disabled', false).trigger('change');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading suppliers: " + error);
+                    $('#supplier').prop('disabled', false);
+                }
+            });
+        }
+    });
+    
+    // Trigger on page load to initialize with current branch
+    if ($('#branch_id').val()) {
+        branchId = $('#branch_id').val();
+    }
+    @endif
 
     $('#supplier').select2({
         placeholder: 'Select Supplier',
@@ -179,7 +214,8 @@
                 data            : function (data) {
                     return {
                         supplier: $('#supplier').val(),
-                        product : data.term
+                        product : data.term,
+                        branch_id: branchId
                     };
                 },
                 processResults  : function (response) {
@@ -194,31 +230,42 @@
     $(document).on('change', '#purchase', ({ target : element })=> {
         const purchaseId = element.value;
         if(purchaseId) {
-            axios.get('/api/purchases/'+purchaseId)
+            let apiUrl = '/api/purchase/' + purchaseId;
+            
+            @if (settings()->enable_branch == 1)
+            // Add branch parameter if branch system is enabled
+            if (branchId) {
+                apiUrl += '?branch_id=' + branchId;
+            }
+            @endif
+            
+            axios.get(apiUrl)
                 .then((res)=>{
                     let html = ``;
                     let rowKey = 0;
-                    for (const purchase_details of res.data.purchase_details) {
+                    for (const purchaseDetails of res.data.purchase_details) {
                         html += `
                             <tr class="align-middle text-end">
                                 <td class="text-start">
-                                    <p class="p-0 m-0">${purchase_details.product_name}</p>
-                                    <span class="badge badge-success">${purchase_details.product_code}</span>
+                                    <p class="p-0 m-0">${purchaseDetails.product_name}</p>
+                                    <span class="badge badge-success">${purchaseDetails.product_code}</span>
                                 </td>
-                                <td class="unit-price">${purchase_details.unit_price}</td>
-                                <td>${purchase_details.purchase_qty} ${purchase_details.product.uom}</td>
-                                <td class="purchase-price">${purchase_details.sub_total}</td>
+                                <td class="unit-price">${purchaseDetails.unit_price}</td>
+                                <td>${purchaseDetails.purchase_qty} ${purchaseDetails.product.uom}</td>
+                                <td class="purchase-price">${purchaseDetails.sub_total}</td>
+                                <td>${purchaseDetails.return_qty} ${purchaseDetails.product.uom}</td>
+                                <td>${purchaseDetails.purchase_qty - purchaseDetails.return_qty} ${purchaseDetails.product.uom}</td>
                                 <td width="10%">
-                                    <input type="hidden" value="${purchase_details.id}" name="products[${ rowKey }][product_id]" />
-                                    <input type="number" step="0.01" class="form-control form-control-sm qty" value="1" min="0" max="${purchase_details.quantity}" onchange="subTotalCalc(this)" name="products[${ rowKey }][qty]" required />
+                                    <input type="hidden" value="${purchaseDetails.id}" name="products[${ rowKey }][product_id]" />
+                                    <input type="number" step="0.01" class="form-control form-control-sm qty" value="1" min="0" max="${purchaseDetails.purchase_qty}" onchange="subTotalCalc(this)" name="products[${ rowKey }][qty]" />
                                 </td>
-                                <td class="sub-total">${purchase_details.unit_price}</td>
+                                <td class="sub-total">${purchaseDetails.unit_price}</td>
                             </tr>
                         `;
                         rowKey++;
                     }
                     $('#product-table tbody').html(html);
-                    // grandTotalCalc();
+                    grandTotalCalc();
                 })
                 .catch((err)=> {
                     console.log(err);
@@ -239,7 +286,6 @@
             sum += parseFloat($(element).text());
         }
         $('#total-sub-total').text(parseFloat(sum).toFixed(2));
-        $('#damaged-price').text(parseFloat(damagedPrice).toFixed(2));
         $('#grand-total').text((sum - damagedPrice).toFixed(2));
     }
 

@@ -17,6 +17,26 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
+                            @if (settings()->enable_branch == 1)
+                            <div class="form-group mb-3">
+                                <label for="branch_id">{{ __('Branch') }} <span class="text-danger">*</span></label>
+                                @php $userBranch = Auth::user()->branch ?? null; @endphp
+                                <select name="branch_id" class="form-select form-select-sm" data-control="select2" 
+                                    data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                                    <option value="" disabled>{{ __('Select Branch') }}</option>
+                                    @foreach ($branches as $branch)
+                                        <option value="{{ $branch->id }}"
+                                            @if (($userBranch && $userBranch->id == $branch->id) || $supplier->branch_id == $branch->id) selected @endif>
+                                            {{ $branch->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if ($userBranch)
+                                    <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                                @endif
+                            </div>
+                            @endif
+                            
                             <div class="form-row">
                                 <div class="col-lg-12">
                                     <div class="form-group">

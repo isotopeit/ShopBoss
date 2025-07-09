@@ -19,6 +19,14 @@ class SaleReturn extends BaseModel
     public function saleReturnPayments() {
         return $this->hasMany(SaleReturnPayment::class, 'sale_return_id', 'id');
     }
+    
+    /**
+     * Get the branch that owns the sale return.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public static function boot() {
         parent::boot();
@@ -35,5 +43,4 @@ class SaleReturn extends BaseModel
     public function scopeCompleted($query) {
         return $query->where('status', 'Completed');
     }
-
 }

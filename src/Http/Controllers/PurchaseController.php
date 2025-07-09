@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Isotope\ShopBoss\Models\Branch;
+use Illuminate\Support\Facades\Auth;
 use Isotope\ShopBoss\Models\Product;
 use Isotope\ShopBoss\Models\Purchase;
 use Isotope\ShopBoss\Models\Supplier;
@@ -26,18 +28,45 @@ class PurchaseController extends Controller
 
     public function index()
     {
-        $purchases = Purchase::search()->orderBydesc('id')->paginate(15);
-        return view('shopboss::purchase.index', compact('purchases'));
+        $query = Purchase::search();
+        
+        // Filter by branch if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch) {
+                $query->where('branch_id', Auth::user()->branch->id);
+            }
+        }
+        
+        $purchases = $query->orderByDesc('id')->paginate(15);
+        
+        // Get branches for dropdown
+        $branches = [];
+        if (settings()->enable_branch == 1) {
+            $branches = Branch::all();
+        }
+        
+        return view('shopboss::purchase.index', compact('purchases', 'branches'));
     }
 
     public function create()
     {
-        $suppliers = Supplier::selectRaw("
-                            id,
-                            supplier_name as text,
-                            supplier_phone as subText
-                        ")->get();
-        return view('shopboss::purchase.create', compact('suppliers'));
+        // Get suppliers
+        $query = Supplier::selectRaw("id, supplier_name as text, supplier_phone as subText");
+        
+        // Filter suppliers by branch if enabled
+        if (settings()->enable_branch == 1 && Auth::user()->branch) {
+            $query->where('branch_id', Auth::user()->branch->id);
+        }
+        
+        $suppliers = $query->get();
+        
+        // Get branches for dropdown
+        $branches = [];
+        if (settings()->enable_branch == 1) {
+            $branches = Branch::all();
+        }
+        
+        return view('shopboss::purchase.create', compact('suppliers', 'branches'));
     }
 
 
@@ -48,12 +77,24 @@ class PurchaseController extends Controller
             DB::beginTransaction();
 
             $products = [];
+            
+            // Set branch_id with a proper default
+            $branch_id = 1; // Default branch ID
+            
+            // If branch system is enabled, get branch_id from request or user
+            if (settings()->enable_branch == 1) {
+                if (isset($req['branch_id']) && !empty($req['branch_id'])) {
+                    $branch_id = $req['branch_id'];
+                } elseif (Auth::user()->branch) {
+                    $branch_id = Auth::user()->branch->id;
+                }
+            }
 
             foreach ($req['products'] as $item) {
                 $product  = Product::find($item['product_id']);
                 $discount = array_key_exists('percentage', $item) ? ($product->product_cost / 100) * floatval($item['discount']) : $item['discount'];
                 array_push($products, [
-                    'branch_id'               => 1,
+                    'branch_id'               => $branch_id,
                     'product_id'              => $product->id,
                     'product_name'            => $product->product_name,
                     'product_code'            => $product->product_code,
@@ -71,7 +112,7 @@ class PurchaseController extends Controller
 
             $totalSubTotal = collect($products)->sum('sub_total');
             $payload = [
-                'branch_id'           => 1,
+                'branch_id'           => $branch_id,
                 'supplier_id'         => $supplier->id,
                 'supplier_name'       => $supplier->supplier_name,
                 'date'                => $req['date'],
@@ -104,7 +145,8 @@ class PurchaseController extends Controller
                     'reference'      => 'INV/' . $purchase->reference,
                     'amount'         => $purchase->paid_amount,
                     'purchase_id'    => $purchase->id,
-                    'payment_method' => $req['payment_method']
+                    'payment_method' => $req['payment_method'],
+                    'branch_id'      => $branch_id,
                 ]);
             }
             foreach ($products as $product) {
@@ -116,7 +158,7 @@ class PurchaseController extends Controller
             DB::commit();
             return redirect()->route('purchases.index')->withSuccess("Purchase Created");
         } catch (Exception $e) {
-            dd($e);
+            DB::rollBack();
             return redirect()->route('purchases.index')->withErrors($e->getMessage());
         }
     }
@@ -125,19 +167,48 @@ class PurchaseController extends Controller
     public function show($id)
     {
         $purchase = Purchase::with('supplier', 'purchaseDetails')->findOrFail($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $purchase->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('purchases.index')
+                    ->withErrors('You do not have access to view this purchase.');
+            }
+        }
+        
         return view('shopboss::purchase.show', compact('purchase'));
     }
 
 
     public function edit($id)
     {
-        $suppliers = Supplier::selectRaw("
-                            id,
-                            supplier_name as text,
-                            supplier_phone as subText
-                        ")->get();
         $purchase = Purchase::with('purchaseDetails.product')->find($id);
-        return view('shopboss::purchase.edit', compact('purchase', 'suppliers'));
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $purchase->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('purchases.index')
+                    ->withErrors('You do not have access to edit this purchase.');
+            }
+        }
+        
+        // Get suppliers
+        $query = Supplier::selectRaw("id, supplier_name as text, supplier_phone as subText");
+        
+        // Filter suppliers by branch if enabled
+        if (settings()->enable_branch == 1 && Auth::user()->branch) {
+            $query->where('branch_id', Auth::user()->branch->id);
+        }
+        
+        $suppliers = $query->get();
+        
+        // Get branches for dropdown
+        $branches = [];
+        if (settings()->enable_branch == 1) {
+            $branches = Branch::all();
+        }
+        
+        return view('shopboss::purchase.edit', compact('purchase', 'suppliers', 'branches'));
     }
 
 
@@ -147,8 +218,28 @@ class PurchaseController extends Controller
         {
             $req = $request->all();
             $purchase = Purchase::with('purchaseDetails.product')->find($id);
+            
+            // Check branch access if enabled
+            if (settings()->enable_branch == 1) {
+                if (Auth::user()->branch && $purchase->branch_id != Auth::user()->branch->id) {
+                    return redirect()->route('purchases.index')
+                        ->withErrors('You do not have access to update this purchase.');
+                }
+            }
 
             DB::beginTransaction();
+            
+            // Set branch_id with a proper default
+            $branch_id = $purchase->branch_id; // Default to current branch_id
+            
+            // If branch system is enabled, get branch_id from request or user
+            if (settings()->enable_branch == 1) {
+                if (isset($req['branch_id']) && !empty($req['branch_id'])) {
+                    $branch_id = $req['branch_id'];
+                } elseif (Auth::user()->branch) {
+                    $branch_id = Auth::user()->branch->id;
+                }
+            }
 
             foreach ($req['products'] as $item) {
                 $product  = Product::find($item['product_id']);
@@ -163,6 +254,7 @@ class PurchaseController extends Controller
                     'sub_total'               => ($product->product_cost - $discount) * floatval($item['qty']),
                     'product_discount_amount' => $discount,
                     'product_tax_amount'      => 0,
+                    'branch_id'               => $branch_id,
                 ];
 
                 if (array_key_exists('detail_id', $item)) {
@@ -189,6 +281,7 @@ class PurchaseController extends Controller
                 'note'                => $req['note'],
                 'shipping_amount'     => $req['shipping_amount'],
                 'total_amount'        => $totalSubTotal + $req['shipping_amount'] + $purchase->tax_amount - $req['discount_amount'],
+                'branch_id'           => $branch_id,
             ];
 
             $payload['due_amount'] = $payload['total_amount'] - $purchase->paid_amount;
@@ -216,6 +309,15 @@ class PurchaseController extends Controller
     public function destroy($id)
     {
         $purchase = Purchase::with('purchaseDetails', 'purchasePayments', 'purchaseReturns')->findOrFail($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $purchase->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('purchases.index')
+                    ->withErrors('You do not have access to delete this purchase.');
+            }
+        }
+        
         $purchase->purchaseDetails()->delete();
         $purchase->purchasePayments()->delete();
         $purchase->delete();
@@ -225,6 +327,15 @@ class PurchaseController extends Controller
     public function pdf($id)
     {
         $purchase = Purchase::findOrFail($id);
+        
+        // Check branch access if enabled
+        if (settings()->enable_branch == 1) {
+            if (Auth::user()->branch && $purchase->branch_id != Auth::user()->branch->id) {
+                return redirect()->route('purchases.index')
+                    ->withErrors('You do not have access to view this purchase PDF.');
+            }
+        }
+        
         $supplier = Supplier::findOrFail($purchase->supplier_id);
 
         $pdf = \PDF::loadView('shopboss::purchase.print', [

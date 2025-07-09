@@ -13,12 +13,27 @@
     <div class="card mt-3">
         <div class="card-body">
             <div class="row">
+                @if (settings()->enable_branch == 1)
                 <div class="col-md-3 col-12">
-                    <div class="mb-2 d-none">
+                    <div class="mb-2">
                         <label class="form-label">{{ __('Branch') }}: </label>
-                        <select class="form-select form-select-sm" id="product"></select>
+                        @php $userBranch = Auth::user()->branch ?? null; @endphp
+                        <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
+                            data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
+                            <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}"
+                                    @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
+                                    {{ $branch->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @if ($userBranch)
+                            <input type="hidden" name="branch_id" value="{{ $userBranch->id }}">
+                        @endif
                     </div>
                 </div>
+                @endif
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('Customer') }} <span class="text-danger">*</span></label>
@@ -113,6 +128,8 @@
 
 @push('js')
 <script>
+    let branchId = '';
+    
     const templateResult = (r) => (
         $(`<div class="row-fluid">
             <div class="col-12 fw-bold">${r.text}</div>
@@ -132,6 +149,44 @@
         ) { return $.extend({}, data, true);}
         return null;
     }
+
+    @if (settings()->enable_branch == 1)
+    // Update the branch ID when the branch dropdown changes
+    $('#branch_id').on('change', function() {
+        branchId = $(this).val();
+        
+        // Refresh customers based on branch
+        if (branchId) {
+            // Clear and disable customer dropdown while loading
+            $('#customer').empty().prop('disabled', true);
+            
+            $.ajax({
+                url: "{{ url('/') }}/sales/branch/" + branchId + "/customers",
+                type: "GET",
+                success: function(response) {
+                    $('#customer').empty();
+                    
+                    if (response.customers && response.customers.length > 0) {
+                        response.customers.forEach(function(customer) {
+                            $('#customer').append(new Option(customer.text, customer.id, false, false));
+                        });
+                    }
+                    
+                    $('#customer').prop('disabled', false).trigger('change');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading customers: " + error);
+                    $('#customer').prop('disabled', false);
+                }
+            });
+        }
+    });
+    
+    // Trigger on page load to initialize with current branch
+    if ($('#branch_id').val()) {
+        branchId = $('#branch_id').val();
+    }
+    @endif
 
     $('#customer').select2({
         placeholder: 'Select Customer',
@@ -159,7 +214,8 @@
                 data            : function (data) {
                     return {
                         customer: $('#customer').val(),
-                        product : data.term
+                        product : data.term,
+                        branch_id: branchId
                     };
                 },
                 processResults  : function (response) {
@@ -174,7 +230,16 @@
     $(document).on('change', '#sale', ({ target : element })=> {
         const saleId = element.value;
         if(saleId) {
-            axios.get('/api/sale/'+saleId)
+            let apiUrl = '/api/sale/' + saleId;
+            
+            @if (settings()->enable_branch == 1)
+            // Add branch parameter if branch system is enabled
+            if (branchId) {
+                apiUrl += '?branch_id=' + branchId;
+            }
+            @endif
+            
+            axios.get(apiUrl)
                 .then((res)=>{
                     let html = ``;
                     let rowKey = 0;
@@ -197,6 +262,7 @@
                                 <td class="sub-total">${saleDetails.unit_price}</td>
                             </tr>
                         `;
+                        rowKey++;
                     }
                     $('#product-table tbody').html(html);
                     grandTotalCalc();

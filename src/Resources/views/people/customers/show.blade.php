@@ -28,6 +28,12 @@
                     <th>{{ __('Customer Phone') }}</th>
                     <td>{{ $customer->customer_phone }}</td>
                 </tr>
+                @if (settings()->enable_branch == 1)
+                <tr>
+                    <th>{{ __('Branch') }}</th>
+                    <td>{{ $customer->branch->name ?? 'N/A' }}</td>
+                </tr>
+                @endif
                 <tr>
                     <th>{{ __('City') }}</th>
                     <td>{{ $customer->city }}</td>
