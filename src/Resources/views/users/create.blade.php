@@ -1,6 +1,6 @@
 @extends('pos::layouts.app')
 
-@section('title', 'Create User')
+@section('title', __('shopboss::shopboss.createUser'))
 
 @section('third_party_stylesheets')
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet"/>
@@ -10,9 +10,9 @@
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('users.index') }}">{{ __('Users') }}</a></li>
-        <li class="breadcrumb-item active">Create</li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('users.index') }}">{{ __('shopboss::shopboss.users') }}</a></li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.create') }}</li>
     </ol>
 @endsection
 
@@ -29,13 +29,13 @@
                             <div class="form-row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="name">{{ __('Name') }} <span class="text-danger">*</span></label>
+                                        <label for="name">{{ __('shopboss::shopboss.name') }} <span class="text-danger">*</span></label>
                                         <input class="form-control" type="text" name="name" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="email">{{ __('Email') }} <span class="text-danger">*</span></label>
+                                        <label for="email">{{ __('shopboss::shopboss.email') }} <span class="text-danger">*</span></label>
                                         <input class="form-control" type="email" name="email" required>
                                     </div>
                                 </div>
@@ -43,13 +43,13 @@
                             <div class="form-row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="password">{{ __('Password') }} <span class="text-danger">*</span></label>
+                                        <label for="password">{{ __('shopboss::shopboss.password') }} <span class="text-danger">*</span></label>
                                         <input class="form-control" type="password" name="password" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="password_confirmation">{{ __('Confirm Password') }} <span
+                                        <label for="password_confirmation">{{ __('shopboss::shopboss.confirmPassword') }} <span
                                                 class="text-danger">*</span></label>
                                         <input class="form-control" type="password" name="password_confirmation"
                                                required>
@@ -57,9 +57,9 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="role">Role <span class="text-danger">*</span></label>
+                                <label for="role">{{ __('shopboss::shopboss.role') }} <span class="text-danger">*</span></label>
                                 <select class="form-control" name="role" id="role" required>
-                                    <option value="" selected disabled>{{ __('Select Role') }}</option>
+                                    <option value="" selected disabled>{{ __('shopboss::shopboss.selectRole') }}</option>
                                     {{-- @foreach(\Spatie\Permission\Models\Role::where('name', '!=', 'Super Admin')->get() as $role)
                                         <option value="{{ $role->name }}">{{ $role->name }}</option>
                                     @endforeach --}}
@@ -67,11 +67,11 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="is_active">{{ __('Status') }} <span class="text-danger">*</span></label>
+                                <label for="is_active">{{ __('shopboss::shopboss.status') }} <span class="text-danger">*</span></label>
                                 <select class="form-control" name="is_active" id="is_active" required>
-                                    <option value="" selected disabled>{{ __('Select Status') }}</option>
-                                    <option value="1">Active</option>
-                                    <option value="2">Deactive</option>
+                                    <option value="" selected disabled>{{ __('shopboss::shopboss.selectStatus') }}</option>
+                                    <option value="1">{{ __('shopboss::shopboss.active') }}</option>
+                                    <option value="2">{{ __('shopboss::shopboss.deactive') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -81,7 +81,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="image">{{ __('Profile Image') }} <span class="text-danger">*</span></label>
+                                <label for="image">{{ __('shopboss::shopboss.profileImage') }} <span class="text-danger">*</span></label>
                                 <input id="image" type="file" name="image" data-max-file-size="500KB">
                             </div>
                         </div>
@@ -90,7 +90,7 @@
             </div>
             <div class="col-lg-12 float-right">
                 <div class="form-group">
-                    <button class="btn btn-primary">{{ __('Create User') }} <i class="bi bi-check"></i></button>
+                    <button class="btn btn-primary">{{ __('shopboss::shopboss.createUser') }} <i class="bi bi-check"></i></button>
                 </div>
             </div>
         </form>

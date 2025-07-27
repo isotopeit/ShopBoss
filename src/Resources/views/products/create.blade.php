@@ -1,10 +1,10 @@
 @extends('isotope::master')
 
-@section('title', 'Create Product')
+@section('title', __('shopboss::shopboss.createProduct'))
 
 @push('buttons')
 <a href="{{ route('products.index') }}" type="button" class="btn btn-sm btn-isotope fw-bold">
-    {{ __('Product List') }}
+    {{ __('shopboss::shopboss.productList') }}
 </a>
 @endpush
 
@@ -15,12 +15,12 @@
             @csrf
             @if (settings()->enable_branch == 1)
             <div class="mb-1 row">
-                <label class="col-md-2" for="branch_id">{{ __('Branch') }}</label>
+                <label class="col-md-2" for="branch_id">{{ __('shopboss::shopboss.branch') }}</label>
                 <div class="col-md-10">
                     @php $userBranch = Auth::user()->branch ?? null; @endphp
                     <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
-                        data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
-                        <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                        data-placeholder="{{ __('shopboss::shopboss.selectBranch') }}" @if ($userBranch) disabled @endif>
+                        <option value="" disabled selected>{{ __('shopboss::shopboss.selectBranch') }}</option>
                         @foreach ($branches as $branch)
                             <option value="{{ $branch->id }}"
                                 @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
@@ -35,10 +35,10 @@
             </div>
             @endif
             <div class="mb-1 row">
-                <label class="col-md-2" for="category_id">{{ __('Category') }}</label>
+                <label class="col-md-2" for="category_id">{{ __('shopboss::shopboss.category') }}</label>
                 <div class="col-md-10">
                     <select class="form-select form-select-sm" name="category_id" id="category_id" required>
-                        <option value="" selected disabled>Select Category</option>
+                        <option value="" selected disabled>{{ __('shopboss::shopboss.selectCategory') }}</option>
                         @foreach ($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->category_name }}
                         </option>
@@ -47,56 +47,56 @@
                 </div>
             </div>
             <div class="mb-1 row">
-                <label class="col-md-2" for="product_name">{{ __('Product Name') }}</label>
+                <label class="col-md-2" for="product_name">{{ __('shopboss::shopboss.productName') }}</label>
                 <div class="col-md-10">
                     <input type="text" class="form-control form-control-sm" name="product_name" required value="{{ old('product_name') }}"
-                        placeholder="{{ __('Enter Product Name') }}">
+                        placeholder="{{ __('shopboss::shopboss.enterProductName') }}">
                 </div>
             </div>
             <div class="mb-1 row">
-                <label class="col-md-2" for="product_code">{{ __('Code') }}</label>
+                <label class="col-md-2" for="product_code">{{ __('shopboss::shopboss.code') }}</label>
                 <div class="col-md-10">
                     <input type="text" class="form-control form-control-sm" name="product_code" required value="{{ old('product_code') }}"
-                        placeholder="{{ __('Enter Product Code') }}">
+                        placeholder="{{ __('shopboss::shopboss.enterProductCode') }}">
                 </div>
             </div>
             <div class="mb-1 row">
-                <label class="col-md-2" for="product_cost">{{ __('Cost') }}</label>
+                <label class="col-md-2" for="product_cost">{{ __('shopboss::shopboss.cost') }}</label>
                 <div class="col-md-10">
                     <input id="product_cost" type="number" class="form-control form-control-sm" name="product_cost" required
                         value="{{ old('product_cost') }}" placeholder="Per Product Cost">
                 </div>
             </div>
             <div class="mb-1 row">
-                <label class="col-md-2" for="product_price">{{ __('Price') }}</label>
+                <label class="col-md-2" for="product_price">{{ __('shopboss::shopboss.price') }}</label>
                 <div class="col-md-10">
                     <input id="product_price" type="number" class="form-control form-control-sm" name="product_price" required
                         value="{{ old('product_price') }}" placeholder="Per Product Price">
                 </div>
             </div>
             <div class="mb-1 row">
-                <label class="col-md-2" for="product_stock_alert">{{ __('Alert Quantity') }}(Max 100)</label>
+                <label class="col-md-2" for="product_stock_alert">{{ __('shopboss::shopboss.alertQuantity') }}(Max 100)</label>
                 <div class="col-md-10">
                     <input type="number" class="form-control form-control-sm" name="product_stock_alert" required
                         value="{{ old('product_stock_alert') }}" min="0" max="100"
-                        placeholder="{{ __('Enter Product Stock Alert') }}">
+                        placeholder="{{ __('shopboss::shopboss.enterProductStockAlert') }}">
                 </div>
             </div>
             <div class="mb-1 row">
-                <label class="col-md-2" for="product_unit">{{ __('UoM') }} <i class="bi bi-question-circle-fill text-info"
+                <label class="col-md-2" for="product_unit">{{ __('shopboss::shopboss.uom') }} <i class="bi bi-question-circle-fill text-info"
                         data-toggle="tooltip" data-placement="top"
                         title="This text will be placed after Product Quantity."></i></label>
                 <div class="col-md-10">
                     <input type="text" class="form-control form-control-sm" max="16" name="uom" value="{{ old('product_unit') }}" required
-                        placeholder="{{ __('Enter Product Unit') }}">
+                        placeholder="{{ __('shopboss::shopboss.enterProductUnit') }}">
                 </div>
             </div>
             <div class="mb-1">
-                <label for="product_note">{{ __('Note') }}</label>
+                <label for="product_note">{{ __('shopboss::shopboss.note') }}</label>
                 <textarea name="product_note" id="product_note" rows="2" class="form-control"></textarea>
             </div>
             <div class="mb-1">
-                <label class="col-md-2" for="image">{{ __('Product Images') }}
+                <label class="col-md-2" for="image">{{ __('shopboss::shopboss.productImages') }}
                     <i class="bi bi-question-circle-fill text-info" data-toggle="tooltip" data-placement="top" title="Max Files: 3, Max File Size: 1MB, Image Size: 400x400"></i>
                 </label>
                 <div class="dropzone d-flex flex-wrap align-items-center justify-content-center" id="document-dropzone">
@@ -107,7 +107,7 @@
             </div>
             <div class="mb-1">
                 <button class="btn btn-sm btn-isotope float-end mt-3">
-                    {{ __('Create Product') }}
+                    {{ __('shopboss::shopboss.createProduct') }}
                     <i class="bi bi-check"></i>
                 </button>
             </div>
@@ -167,7 +167,7 @@
                     type: "GET",
                     success: function(response) {
                         $('#category_id').empty();
-                        $('#category_id').append('<option value="" selected disabled>Select Category</option>');
+                        $('#category_id').append('<option value="" selected disabled>{{ __('shopboss::shopboss.selectCategory') }}</option>');
                         
                         if (response.categories && response.categories.length > 0) {
                             $.each(response.categories, function(index, category) {

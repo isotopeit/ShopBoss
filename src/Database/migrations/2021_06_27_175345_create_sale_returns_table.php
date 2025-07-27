@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('sale_returns', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid');
-            $table->foreignId('branch_id')->constrained('branches');
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->foreignId('sale_id')->constrained('sales');
             $table->date('date');
             $table->string('reference', 32);

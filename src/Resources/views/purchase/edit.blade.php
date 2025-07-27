@@ -1,9 +1,9 @@
 @extends('isotope::master')
 
-@section('title', 'Edit Purchase')
+@section('title', __('shopboss::shopboss.editPurchase'))
 
 @push('buttons')
-<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchases.index') }}">{{ __('List') }}</a>
+<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchases.index') }}">{{ __('shopboss::shopboss.list') }}</a>
 @endpush
 
 @section('content')
@@ -13,7 +13,7 @@
         <div class="row">
             <div class="col-12 col-md-6">
                 <div class="mb-2">
-                    <label class="form-label">{{ __('Product') }}: </label>
+                    <label class="form-label">{{ __('shopboss::shopboss.product') }}: </label>
                     <div class="input-group">
                         <div class="input-group-text"><i class="fa-solid fa-search text-dark"></i></div>
                         <select class="form-select form-select-sm" id="product"></select>
@@ -24,11 +24,11 @@
             @if (settings()->enable_branch == 1)
             <div class="col-12 col-md-6">
                 <div class="mb-2">
-                    <label class="form-label">{{ __('Branch') }}: </label>
+                    <label class="form-label">{{ __('shopboss::shopboss.branch') }}: </label>
                     @php $userBranch = Auth::user()->branch ?? null; @endphp
                     <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
-                        data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
-                        <option value="" disabled>{{ __('Select Branch') }}</option>
+                        data-placeholder="{{ __('shopboss::shopboss.selectBranch') }}" @if ($userBranch) disabled @endif>
+                        <option value="" disabled>{{ __('shopboss::shopboss.selectBranch') }}</option>
                         @foreach ($branches as $branch)
                             <option value="{{ $branch->id }}"
                                 @if (($userBranch && $userBranch->id == $branch->id) || $purchase->branch_id == $branch->id) selected @endif>
@@ -53,19 +53,19 @@
             <div class="row">
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Supplier') }} <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ __('shopboss::shopboss.supplier') }} <span class="text-danger">*</span></label>
                         <select class="form-select form-select-sm" id="supplier" name="supplier_id"></select>
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Reference') }}: <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ __('shopboss::shopboss.reference') }}: <span class="text-danger">*</span></label>
                         <input type="text" class="form-control form-control-sm" value="{{ $purchase->reference }}" disabled>
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Date') }}: <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ __('shopboss::shopboss.date') }}: <span class="text-danger">*</span></label>
                         <input type="date" class="form-control form-control-sm" name="date" value="{{ $purchase->date }}">
                     </div>
                 </div>
@@ -76,12 +76,12 @@
                     <table class="table table-sm table-bordered table-striped mt-2" id="product-table">
                         <thead>
                             <tr class="bg-isotope text-ce">
-                                <th>{{ __('Product') }}</th>
-                                <th class="text-end">{{ __('Net Unit Price') }}</th>
-                                <th>{{ __('Quantity') }}</th>
-                                <th>{{ __('Discount') }}</th>
-                                <th class="text-end">{{ __('Sub Total') }}</th>
-                                <th>{{ __('Action') }}</th>
+                                <th>{{ __('shopboss::shopboss.product') }}</th>
+                                <th class="text-end">{{ __('shopboss::shopboss.netUnitPrice') }}</th>
+                                <th>{{ __('shopboss::shopboss.quantity') }}</th>
+                                <th>{{ __('shopboss::shopboss.discount') }}</th>
+                                <th class="text-end">{{ __('shopboss::shopboss.subTotal') }}</th>
+                                <th>{{ __('shopboss::shopboss.action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -119,23 +119,23 @@
                     <table class="table table-sm">
                         <tbody>
                             <tr>
-                                <th>{{ __('Total') }}</th>
+                                <th>{{ __('shopboss::shopboss.total') }}</th>
                                 <td>(=) ৳<span id="total-sub-total">{{ $purchase->purchaseDetails->sum('sub_total') }}</span></td>
                             </tr>
                             <tr>
-                                <th>{{ __('Order Tax (0%)') }}</th>
+                                <th>{{ __('shopboss::shopboss.orderTaxPercent') }}</th>
                                 <td>(+) ৳<span id="order-tax">{{ $purchase->tax_amount }}</span></td>
                             </tr>
                             <tr>
-                                <th>{{ __('Discount') }}</th>
+                                <th>{{ __('shopboss::shopboss.discount') }}</th>
                                 <td>(-) ৳<span id="order-discount">{{ $purchase->discount_amount }}</span></td>
                             </tr>
                             <tr>
-                                <th>{{ __('Shipping') }}</th>
+                                <th>{{ __('shopboss::shopboss.shipping') }}</th>
                                 <td>(+) ৳<span id="order-shipping">{{ $purchase->shipping_amount }}</span></td>
                             </tr>
                             <tr>
-                                <th>{{ __('Grand Total') }}</th>
+                                <th>{{ __('shopboss::shopboss.grandTotal') }}</th>
                                 <th>
                                     (=) ৳<span id="grand-total">{{ $purchase->total_amount }}</span>
                                 </th>
@@ -145,53 +145,53 @@
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Order Tax (%)') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.orderTaxPercent') }}:</label>
                         <input type="number" class="form-control form-control-sm" name="tax_percentage" value="{{ $purchase->tax_percentage }}" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Discount(Fixed)') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.discountFixed') }}:</label>
                         <input type="number" class="form-control form-control-sm" name="discount_amount" value="{{ $purchase->discount_amount }}" step="0.01" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Shipping') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.shipping') }}:</label>
                         <input type="number" class="form-control form-control-sm" name="shipping_amount" step="0.01" value="{{ $purchase->shipping_amount }}" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Status') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.status') }}:</label>
                         <select class="form-select form-select-sm" name="status">
-                            <option value="Pending">{{ __('Pending') }}</option>
-                            <option value="Ordered">{{ __('Ordered') }}</option>
-                            <option value="Completed">{{ __('Completed') }}</option>
+                            <option value="Pending">{{ __('shopboss::shopboss.pending') }}</option>
+                            <option value="Ordered">{{ __('shopboss::shopboss.ordered') }}</option>
+                            <option value="Completed">{{ __('shopboss::shopboss.completed') }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Payment Method') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.paymentMethod') }}:</label>
                         <input type="text" class="form-control form-control-sm" name="payment_method" value="{{ $purchase->payment_method }}" disabled>
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Amount Paid') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.amountPaid') }}:</label>
                         <input type="text" class="form-control form-control-sm" name="paid_amount"  value="{{ $purchase->paid_amount }}" disabled>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Note (If Needed)') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.noteIfNeeded') }}:</label>
                         <textarea class="form-control form-control-sm" rows="5" name="note">{{  $purchase->note }}</textarea>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="my-5 text-center">
-                        <button type="submit" class="btn btn-sm bg-isotope text-white">{{ __('Update Purchase') }}
+                        <button type="submit" class="btn btn-sm bg-isotope text-white">{{ __('shopboss::shopboss.updatePurchase') }}
                             <i class="fa-solid fa-paper-plane ms-2 text-white"></i></button>
                     </div>
                 </div>
@@ -280,7 +280,7 @@
                     if($(`#${productId}`).length > 0)
                     {
                         Swal.fire({
-                            title: "{{ __('This product already selected') }}",
+                            title: "{{ __('shopboss::shopboss.thisProductAlreadySelected') }}",
                             icon : "error",
                             type : 'error'
                         });
@@ -290,7 +290,7 @@
                     if(res.data.product_quantity < 1)
                     {
                         Swal.fire({
-                            title: "{{ __('This product stock not avaiable') }}",
+                            title: "{{ __('shopboss::shopboss.thisProductStockNotAvailable') }}",
                             icon : "error",
                             type : 'error'
                         });
@@ -419,7 +419,7 @@
     
     function loadProductSelect(branchId) {
         $('#product').select2({
-            placeholder: "{{ __('Select Product') }}",
+            placeholder: "{{ __('shopboss::shopboss.selectProduct') }}",
             templateResult,
             templateSelection,
             matcher,

@@ -1,6 +1,6 @@
 @extends('isotope::master')
 
-@section('title', __('Point of Sell (POS)'))
+@section('title', __('shopboss::shopboss.pointOfSellPOS'))
 
 @push('buttons')
 <div class="my-5"></div>
@@ -16,9 +16,9 @@
                         <div class="mb-2 text-center">
                             <label class="form-label scan-label">
                                 <i class="bi bi-upc-scan text-dark"></i>
-                                {{ __('Scan Product') }}
+                                {{ __('shopboss::shopboss.scanProduct') }}
                              </label>
-                            <input type="text" class="form-control text-center" placeholder="{{ __('Scan Product Barcode') }}" id="product">
+                            <input type="text" class="form-control text-center" placeholder="{{ __('shopboss::shopboss.scanProductBarcode') }}" id="product">
                         </div>
                     </div>
             </div>
@@ -27,17 +27,17 @@
                     <table class="table table-sm table-bordered table-striped mt-2" id="product-table">
                         <thead>
                             <tr class="bg-isotope text-center">
-                                <th>{{ __('Product') }}</th>
-                                <th>{{ __('Price') }}</th>
-                                <th>{{ __('Stock') }}</th>
-                                <th>{{ __('Quantity') }}</th>
-                                <th>{{ __('Sub Total') }}</th>
-                                <th>{{ __('Action') }}</th>
+                                <th>{{ __('shopboss::shopboss.product') }}</th>
+                                <th>{{ __('shopboss::shopboss.price') }}</th>
+                                <th>{{ __('shopboss::shopboss.stock') }}</th>
+                                <th>{{ __('shopboss::shopboss.quantity') }}</th>
+                                <th>{{ __('shopboss::shopboss.subTotal') }}</th>
+                                <th>{{ __('shopboss::shopboss.action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="removeable-tr text-center fw-bold text-isotope">
-                                <td colspan="6" class="text-danger">{{ __('Please Scan products') }}!</td>
+                                <td colspan="6" class="text-danger">{{ __('shopboss::shopboss.pleaseScanProducts') }}!</td>
                             </tr>
                         </tbody>
                     </table>
@@ -52,13 +52,13 @@
                             <div class="row">
                                 <div class="col-md-12 col-12">
                                     <div class="mb-2">
-                                        <label class="form-label">{{ __('Customer') }} <span class="text-danger">*</span></label>
+                                        <label class="form-label">{{ __('shopboss::shopboss.customer') }} <span class="text-danger">*</span></label>
                                         <select class="form-select form-select-sm" id="customer" name="customer" required></select>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-12 d-none" >
                                     <div class="mb-2">
-                                        <label class="form-label">{{ __('Branch') }} <span class="text-danger">*</span></label>
+                                        <label class="form-label">{{ __('shopboss::shopboss.branch') }} <span class="text-danger">*</span></label>
                                         <select class="form-select form-select-sm"></select>
                                     </div>
                                 </div>
@@ -66,19 +66,19 @@
                                     <table class="table table-sm">
                                         <tbody>
                                             <tr>
-                                                <th>{{ __('Total') }}</th>
+                                                <th>{{ __('shopboss::shopboss.total') }}</th>
                                                 <td>(=) ৳<span id="total-sub-total">0.00</span></td>
                                             </tr>
                                             <tr>
-                                                <th>{{ __('Order Tax (0%)') }}</th>
+                                                <th>{{ __('shopboss::shopboss.orderTax') }} (0%)</th>
                                                 <td>(+) ৳<span id="order-tax">0.00</span></td>
                                             </tr>
                                             <tr>
-                                                <th>{{ __('Discount') }}</th>
+                                                <th>{{ __('shopboss::shopboss.discount') }}</th>
                                                 <td>(-) ৳<span id="order-discount">0.00</span></td>
                                             </tr>
                                             <tr>
-                                                <th class="fw-bold text-success-emphasis fs-3">{{ __('Grand Total') }}</th>
+                                                <th class="fw-bold text-success-emphasis fs-3">{{ __('shopboss::shopboss.grandTotal') }}</th>
                                                 <th class="fw-bold text-success-emphasis fs-3">
                                                     (=) ৳<span id="grand-total">0.00</span>
                                                 </th>
@@ -88,19 +88,19 @@
                                 </div>
                                 <div class="col-md-6 col-12">
                                     <div class="mb-2">
-                                        <label class="form-label">{{ __('Tax') }}</label>
+                                        <label class="form-label">{{ __('shopboss::shopboss.tax') }}</label>
                                         <input type="number" class="form-control form-control-sm" value="0" name="tax_percentage" onchange="grandTotalCalc()">
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-12">
                                     <div class="mb-2">
-                                        <label class="form-label">{{ __('Discount(Fixed)') }}</label>
+                                        <label class="form-label">{{ __('shopboss::shopboss.discountFixed') }}</label>
                                         <input type="number" class="form-control form-control-sm" value="0" name="discount_amount" onchange="grandTotalCalc()">
                                     </div>
                                 </div>
                                 <div class="col-md-12 col-12">
                                     <div class="mb-2">
-                                        <label class="form-label">{{ __('Cash on Hand') }} <span value="0"
+                                        <label class="form-label">{{ __('shopboss::shopboss.cashOnHand') }} <span value="0"
                                                 class="text-danger">*</span></label>
                                         <input type="number" class="form-control form-control-sm" value="" name="cash_on_hand" onchange="cashCalc()">
                                     </div>
@@ -108,7 +108,7 @@
                                 <div class="col-12 text-center mt-4">
                                     <button type="button" class="btn btn-isotope text-white" id="submit-btn">
                                         <i class="bi bi-save fs-3"></i>
-                                        {{ __('Proceed') }}
+                                        {{ __('shopboss::shopboss.proceed') }}
                                     </button>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@
                         if($(`#${productId}`).length > 0)
                     {
                         Swal.fire({
-                            title: "{{ __('This product already selected') }}",
+                            title: "{{ __('shopboss::shopboss.thisProductAlreadySelected') }}",
                             icon : "error",
                             type : 'error'
                         });   
@@ -162,7 +162,7 @@
                     if(res.data.product_quantity < 1)
                     {
                         Swal.fire({
-                            title: "{{ __('This product stock not avaiable') }}",
+                            title: "{{ __('shopboss::shopboss.thisProductStockNotAvailable') }}",
                             icon : "error",
                             type : 'error'
                         });   

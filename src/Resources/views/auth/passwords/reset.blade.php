@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 
-    <title>Reset password | {{ config('app.name') }}</title>
+    <title>{{ __('shopboss::shopboss.resetPassword') }} | {{ config('app.name') }}</title>
 
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('images/favicon.png') }}">
@@ -24,8 +24,8 @@
                 <div class="card-body p-4">
                     <form method="post" action="{{ url('/password/reset') }}">
                         @csrf
-                        <h1>{{ __('Reset Password') }}</h1>
-                        <p class="text-muted">{{ __('Enter email and new password') }}</p>
+                        <h1>{{ __('shopboss::shopboss.resetPassword') }}</h1>
+                        <p class="text-muted">{{ __('shopboss::shopboss.enterEmailAndNewPassword') }}</p>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">
@@ -33,7 +33,7 @@
                                 </span>
                             </div>
                             <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                                   value="{{ $email ?? old('email') }}" placeholder="Email">
+                                   value="{{ $email ?? old('email') }}" placeholder="{{ __('shopboss::shopboss.email') }}">
                             @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -45,7 +45,7 @@
                               </span>
                             </div>
                             <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                   name="password" placeholder="Password">
+                                   name="password" placeholder="{{ __('shopboss::shopboss.password') }}">
                             @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -57,10 +57,10 @@
                               </span>
                             </div>
                             <input type="password" name="password_confirmation" class="form-control"
-                                   placeholder="Confirm password">
+                                   placeholder="{{ __('shopboss::shopboss.confirmPasswordPlaceholder') }}">
                         </div>
                         <button type="submit" class="btn btn-block btn-primary btn-block btn-flat">
-                            <i class="fa fa-btn fa-refresh"></i> {{ __('Reset') }}
+                            <i class="fa fa-btn fa-refresh"></i> {{ __('shopboss::shopboss.reset') }}
                         </button>
                     </form>
                 </div>

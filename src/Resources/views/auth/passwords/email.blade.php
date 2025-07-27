@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 
-    <title>Send Reset Password Link | {{ config('app.name') }}</title>
+    <title>{{ __('shopboss::shopboss.sendPasswordResetLink') }} | {{ config('app.name') }}</title>
 
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('images/favicon.png') }}">
@@ -28,8 +28,8 @@
                         @endif
                         <form method="post" action="{{ url('/password/email') }}">
                             @csrf
-                            <h1>{{ __('Reset Your Password') }}</h1>
-                            <p class="text-muted">{{ __('Enter Email to reset password') }}</p>
+                            <h1>{{ __('shopboss::shopboss.resetYourPassword') }}</h1>
+                            <p class="text-muted">{{ __('shopboss::shopboss.enterEmailToReset') }}</p>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
@@ -38,7 +38,7 @@
                                 </div>
                                 <input type="email"
                                        class="form-control @error('email') is-invalid @enderror" name="email"
-                                       value="{{ old('email') }}" placeholder="Email">
+                                       value="{{ old('email') }}" placeholder="{{ __('shopboss::shopboss.email') }}">
                                 @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -47,7 +47,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <button class="btn btn-block btn-primary" type="submit">
-                                        <i class="fa fa-btn fa-envelope"></i> {{ __('Send Password Reset Link') }}
+                                        <i class="fa fa-btn fa-envelope"></i> {{ __('shopboss::shopboss.sendPasswordResetLink') }}
                                     </button>
                                 </div>
                             </div>

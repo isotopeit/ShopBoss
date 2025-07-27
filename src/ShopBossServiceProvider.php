@@ -34,6 +34,7 @@ class ShopBossServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/Routes/api.php');
         $this->loadMigrationsFrom(__DIR__ . '/Database/migrations');
         $this->loadViewsFrom(__DIR__ . '/Resources/views', 'shopboss');
+        $this->loadTranslationsFrom(__DIR__ . '/Resources/lang', 'shopboss');
 
         $this->publishes([
             __DIR__ . '/../stubs/assets' => public_path('isotope/shopboss'),

@@ -1,13 +1,13 @@
 @extends('isotope::master')
 
-@section('title', 'Customer Details')
+@section('title', __('shopboss::shopboss.customerDetails'))
 
 @push('buttons')
     <a href="{{ route('customers.index') }}" type="button" class="btn btn-sm btn-isotope fw-bold">
-        {{ __('Customer List') }}
+        {{ __('shopboss::shopboss.customerList') }}
     </a>&nbsp;&nbsp
     <a href="{{ route('customers.create') }}" type="button" class="btn btn-sm btn-isotope fw-bold">
-        {{ __('Add customer') }}
+        {{ __('shopboss::shopboss.addCustomer') }}
     </a>
 @endpush
 
@@ -17,33 +17,33 @@
         <div class="table-responsive">
             <table class="table table-bordered">
                 <tr>
-                    <th>{{ __('Customer Name') }}</th>
+                    <th>{{ __('shopboss::shopboss.customerName') }}</th>
                     <td>{{ $customer->customer_name }}</td>
                 </tr>
                 <tr>
-                    <th>{{ __('Customer Email') }}</th>
+                    <th>{{ __('shopboss::shopboss.customerEmail') }}</th>
                     <td>{{ $customer->customer_email }}</td>
                 </tr>
                 <tr>
-                    <th>{{ __('Customer Phone') }}</th>
+                    <th>{{ __('shopboss::shopboss.customerPhone') }}</th>
                     <td>{{ $customer->customer_phone }}</td>
                 </tr>
                 @if (settings()->enable_branch == 1)
                 <tr>
-                    <th>{{ __('Branch') }}</th>
+                    <th>{{ __('shopboss::shopboss.branch') }}</th>
                     <td>{{ $customer->branch->name ?? 'N/A' }}</td>
                 </tr>
                 @endif
                 <tr>
-                    <th>{{ __('City') }}</th>
+                    <th>{{ __('shopboss::shopboss.city') }}</th>
                     <td>{{ $customer->city }}</td>
                 </tr>
                 <tr>
-                    <th>{{ __('Country') }}</th>
+                    <th>{{ __('shopboss::shopboss.country') }}</th>
                     <td>{{ $customer->country }}</td>
                 </tr>
                 <tr>
-                    <th>{{ __('Address') }}</th>
+                    <th>{{ __('shopboss::shopboss.address') }}</th>
                     <td>{{ $customer->address }}</td>
                 </tr>
             </table>

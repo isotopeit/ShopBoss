@@ -122,7 +122,7 @@ class PurchasesReturnController extends Controller
                 array_push($products, [
                     'branch_id'         => $branch_id,
                     'product_id'        => $purchaseDetail->product_id,
-                    'product_name'      => $purchaseDetail->product_name,
+                    // 'product_name'      => $purchaseDetail->product_name,
                     'product_code'      => $purchaseDetail->product_code,
                     'purchase_id'       => $purchaseDetail->purchase_id,
                     'purchase_detail_id'=> $purchaseDetail->id,
@@ -184,7 +184,8 @@ class PurchasesReturnController extends Controller
             return redirect()->route('purchase-returns.index')->withSuccess(__('Purchase Return Successfull'));
 
         } catch (Exception $th) {
-            // DB::rollBack();
+            dd($th);
+            DB::rollBack();
             return redirect()->route('purchase-returns.index')->withSuccess(__($th->getMessage()));
         }
     }

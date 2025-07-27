@@ -200,7 +200,7 @@ class SalesReturnController extends Controller
             return redirect()->route('sale-returns.index')->withSuccess(__('Sale Return Successfull'));
 
         } catch (Exception $e) {
-            // DB::rollBack();
+            DB::rollBack();
             return redirect()->route('sale-returns.index')->withSuccess(__($e->getMessage()));
         }
     }

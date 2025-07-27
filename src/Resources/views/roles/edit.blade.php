@@ -1,12 +1,12 @@
 @extends('pos::layouts.app')
 
-@section('title', 'Edit Role')
+@section('title', __('shopboss::shopboss.editRole'))
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
-        <li class="breadcrumb-item active">Edit</li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">{{ __('shopboss::shopboss.roles') }}</a></li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.edit') }}</li>
     </ol>
 @endsection
 
@@ -30,7 +30,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="name">Role Name <span class="text-danger">*</span></label>
+                                <label for="name">{{ __('shopboss::shopboss.roleName') }} <span class="text-danger">*</span></label>
                                 <input class="form-control" type="text" name="name" required value="{{ $role->name }}">
                             </div>
 
@@ -38,14 +38,14 @@
 
                             <div class="form-group">
                                 <label for="permissions">
-                                    Permissions <span class="text-danger">*</span>
+                                    {{ __('shopboss::shopboss.permissions') }} <span class="text-danger">*</span>
                                 </label>
                             </div>
 
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input" id="select-all">
-                                    <label class="custom-control-label" for="select-all">Give All Permissions</label>
+                                    <label class="custom-control-label" for="select-all">{{ __('shopboss::shopboss.giveAllPermissions') }}</label>
                                 </div>
                             </div>
 
@@ -872,7 +872,7 @@
                         </div>
                     </div>
                     <div class="form-group float-right">
-                        <button type="submit" class="btn btn-primary">Update Role <i class="bi bi-check"></i>
+                        <button type="submit" class="btn btn-primary">{{ __('shopboss::shopboss.updateRole') }} <i class="bi bi-check"></i>
                         </button>
                     </div>
                 </form>

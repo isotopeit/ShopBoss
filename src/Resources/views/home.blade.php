@@ -1,6 +1,6 @@
 @extends('isotope::master')
 
-@section('title', 'Home')
+@section('title', __('shopboss::shopboss.home'))
 
 @section('content')
     <div class="container-fluid">
@@ -16,7 +16,7 @@
                                 </div>
                                 <div>
                                     <div class="text-value text-primary">{{ $revenue }}</div>
-                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('Revenue') }}</div>
+                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('shopboss::shopboss.revenue') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -30,7 +30,7 @@
                                 </div>
                                 <div>
                                     <div class="text-value text-warning">{{ $sale_returns }}</div>
-                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('Sales Return') }}</div>
+                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('shopboss::shopboss.salesReturn') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -44,7 +44,7 @@
                                 </div>
                                 <div>
                                     <div class="text-value text-success">{{ $purchase_returns }}</div>
-                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('Purchases Return') }}</div>
+                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('shopboss::shopboss.purchasesReturn') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -58,7 +58,7 @@
                                 </div>
                                 <div>
                                     <div class="text-value text-info">{{ $profit }}</div>
-                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('All Profit') }}</div>
+                                    <div class="text-muted text-uppercase font-weight-bold small">{{ __('shopboss::shopboss.allProfit') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                 <div class="col-lg-7">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-header">
-                            {{ __('Sales & Purchases of Last 7 Days') }}
+                            {{ __('shopboss::shopboss.salesPurchasesLast7Days') }}
                         </div>
                         <div class="card-body">
                             <canvas id="salesPurchasesChart"></canvas>
@@ -86,7 +86,7 @@
                 <div class="col-lg-5">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-header">
-                            {{ __('Overview of ' . now()->format('F')) }}, {{ now()->format('Y') }}
+                            {{ __('shopboss::shopboss.overviewOf') }} {{ now()->format('F') }}, {{ now()->format('Y') }}
                         </div>
                         <div class="card-body d-flex justify-content-center">
                             <div class="chart-container" style="position: relative; height:auto; width:280px">
@@ -103,7 +103,7 @@
                 <div class="col-lg-12">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header">
-                            {{ __('Monthly Cash Flow (Payment Sent & Received)') }}
+                            {{ __('shopboss::shopboss.monthlyCashFlowPaymentSentReceived') }}
                         </div>
                         <div class="card-body">
                             <canvas id="paymentChart"></canvas>

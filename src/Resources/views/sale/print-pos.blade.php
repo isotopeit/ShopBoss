@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title></title>
+    <title>{{ $sale->reference }} | {{ __('shopboss::shopboss.invoice') }}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
@@ -120,25 +120,25 @@
             </div>
 
             <div class="d">
-                <p class="m-0" style="width:60%;float: left"><b>{{ __('Reference') }}: </b> {{ $sale->reference }}
+                <p class="m-0" style="width:60%;float: left"><b>{{ __('shopboss::shopboss.reference') }}: </b> {{ $sale->reference }}
                 </p>
-                <p class="m-0" style="width:30%;float: right"><b>{{ __('Date') }}: </b>
+                <p class="m-0" style="width:30%;float: right"><b>{{ __('shopboss::shopboss.date') }}: </b>
                     {{ \Carbon\Carbon::parse($sale->date)->format('d M, Y') }}</p>
             </div>
-            <p class="m-0"><b>{{ __('Customer Name') }}: </b> {{ $sale->customer_name }}</p>
+            <p class="m-0"><b>{{ __('shopboss::shopboss.customerName') }}: </b> {{ $sale->customer_name }}</p>
 
 
             <table class="table-data" style="margin-top: 20px">
                 <tr>
-                    <th class="product-name-column">{{ __('Product Name') }}</th>
-                    <th class="qty-column">{{ __('Qty') }}</th>
-                    <th class="price-column">{{ __('Price') }}</th>
-                    <th class="total-column">{{ __('Total') }}</th>
+                    <th class="product-name-column">{{ __('shopboss::shopboss.productName') }}</th>
+                    <th class="qty-column">{{ __('shopboss::shopboss.qty') }}</th>
+                    <th class="price-column">{{ __('shopboss::shopboss.price') }}</th>
+                    <th class="total-column">{{ __('shopboss::shopboss.total') }}</th>
                 </tr>
                 <tbody>
                     @foreach ($sale->saleDetails as $saleDetail)
                         <tr>
-                            <td style="font-size: 30px">{{ $saleDetail->product->product_name }}</td>
+                            <td>{{ $saleDetail->product->product_name }}</td>
                             <td>{{ $saleDetail->quantity }}</td>
                             <td>{{ $saleDetail->price }}</td>
                             <td style="text-align:right;vertical-align:bottom">
@@ -148,48 +148,48 @@
 
                     @if ($sale->tax_percentage)
                         <tr>
-                            <th colspan="2" style="text-align:left">{{ __('Tax') }}
+                            <th colspan="3" style="text-align:left">{{ __('shopboss::shopboss.tax') }}
                                 ({{ $sale->tax_percentage }}%)</th>
                             <th style="text-align:right">{{ format_currency($sale->tax_amount) }}</th>
                         </tr>
                     @endif
-                    @if ($sale->discount_percentage)
+                    @if ($sale->discount_amount)
                         <tr>
-                            <th colspan="2" style="text-align:left">{{ __('Discount') }}</th>
+                            <th colspan="3" style="text-align:left">{{ __('shopboss::shopboss.discount') }}</th>
                             <th style="text-align:right">{{ format_currency($sale->discount_amount) }}</th>
                         </tr>
                     @endif
                     @if ($sale->shipping_amount)
                         <tr>
-                            <th colspan="2" style="text-align:left">{{ __('Shipping') }}</th>
+                            <th colspan="3" style="text-align:left">{{ __('shopboss::shopboss.shipping') }}</th>
                             <th style="text-align:right">{{ format_currency($sale->shipping_amount) }}</th>
                         </tr>
                     @endif
-                    {{-- <tr>
-                    <th colspan="2" style="text-align:left">{{ __('Grand Total') }}</th>
-                    <th style="text-align:right">{{ format_currency($sale->total_amount) }}</th>
-                </tr> --}}
+                    <tr>
+                        <th colspan="3" style="text-align:left">{{ __('shopboss::shopboss.grandTotal') }}</th>
+                        <th style="text-align:right">{{ format_currency($sale->total_amount) }}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" style="text-align:left">{{ __('shopboss::shopboss.paidAmount') }}</th>
+                        <th style="text-align:right">{{ format_currency($sale->paid_amount) }}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" style="text-align:left">{{ __('shopboss::shopboss.dueAmount') }}</th>
+                        <th style="text-align:right">{{ format_currency($sale->due_amount) }}</th>
+                    </tr>
                 </tbody>
             </table>
-            {{-- <table>
-            <tbody>
-                <tr style="background-color:#ddd;">
-                    <td class="centered" style="padding: 5px;">
-                        {{ __('Paid By') }}: {{ $sale->payment_method }}
-                    </td>
-                    <td class="centered" style="padding: 5px;">
-                        {{ __('Amount') }}: {{ format_currency($sale->paid_amount) }}
-                    </td>
-                </tr>
-                <tr style="background-color:#ddd;">
-                    <td class="centered" style="padding: 5px;">
-                        {{ __('Paid By') }}: {{ $sale->payment_method }}
-                    </td>
-                    <td class="centered" style="padding: 5px;">
-                        {{ __('Amount') }}: {{ format_currency($sale->due_amount) }}
-                    </td>
-                </tr>
-            </tbody>
+            
+            <div class="centered" style="margin-top: 20px;">
+                <p>{{ __('shopboss::shopboss.paymentMethod') }}: {{ __($sale->payment_method) }}</p>
+                <p>{{ __('shopboss::shopboss.thankYouForYourBusiness') }}</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
         </table> --}}
         </div>
     </div>

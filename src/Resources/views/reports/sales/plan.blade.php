@@ -1,20 +1,18 @@
-
 <h2 class="text-center">{{ settings()->company_name }}</h2>
-<h4 class="text-center">Sales Report</h4>
-<p class="text-center">For Period <span class="fw-bold">{{ $from }}</span> To <span
-        class="fw-bold">{{ $to }}</span></p>
+<h4 class="text-center">{{ __('shopboss::shopboss.salesReport') }}</h4>
+<p class="text-center">{{ __('shopboss::shopboss.forPeriod') }} <span class="fw-bold">{{ $from }}</span> {{ __('shopboss::shopboss.to') }} <span class="fw-bold">{{ $to }}</span></p>
 
 <table class="table table-bordered table-striped table-sm mt-2">
     <thead>
         <tr>
-            <th>Sl</th>
-            <th>Date</th>
-            <th>Reference</th>
-            <th>Customer</th>
-            <th>Total</th>
-            <th>Paid</th>
-            <th>Due</th>
-            <th>Payment Status</th>
+            <th>{{ __('shopboss::shopboss.sl') }}</th>
+            <th>{{ __('shopboss::shopboss.date') }}</th>
+            <th>{{ __('shopboss::shopboss.reference') }}</th>
+            <th>{{ __('shopboss::shopboss.customer') }}</th>
+            <th>{{ __('shopboss::shopboss.total') }}</th>
+            <th>{{ __('shopboss::shopboss.paid') }}</th>
+            <th>{{ __('shopboss::shopboss.due') }}</th>
+            <th>{{ __('shopboss::shopboss.paymentStatus') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -33,7 +31,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="4" class="text-end">Total :</th>
+            <th colspan="4" class="text-end">{{ __('shopboss::shopboss.total') }} :</th>
             <th>{{ $data->sum('total_amount') }}</th>
             <th>{{ $data->sum('paid_amount') }}</th>
             <th>{{ $data->sum('due_amount') }}</th>

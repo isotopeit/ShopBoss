@@ -1,6 +1,6 @@
 @extends('pos::layouts.app')
 
-@section('title', 'Adjustment Details')
+@section('title', __('shopboss::shopboss.adjustmentDetails'))
 
 @push('page_css')
     @livewireStyles
@@ -8,9 +8,9 @@
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('adjustments.index') }}">{{ __('Adjustments') }}</a></li>
-        <li class="breadcrumb-item active">{{ __('Details') }}</li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('adjustments.index') }}">{{ __('shopboss::shopboss.adjustments') }}</a></li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.details') }}</li>
     </ol>
 @endsection
 
@@ -24,10 +24,10 @@
                             <table class="table table-bordered">
                                 <tr>
                                     <th colspan="2">
-                                        {{ __('Date') }}
+                                        {{ __('shopboss::shopboss.date') }}
                                     </th>
                                     <th colspan="2">
-                                        {{ __('Reference') }}
+                                        {{ __('shopboss::shopboss.reference') }}
                                     </th>
                                 </tr>
                                 <tr>
@@ -40,10 +40,10 @@
                                 </tr>
 
                                 <tr>
-                                    <th>{{ __('Product Name') }}</th>
-                                    <th>{{ __('Code') }}</th>
-                                    <th>{{ __('Quantity') }}</th>
-                                    <th>{{ __('Type') }}</th>
+                                    <th>{{ __('shopboss::shopboss.productName') }}</th>
+                                    <th>{{ __('shopboss::shopboss.code') }}</th>
+                                    <th>{{ __('shopboss::shopboss.quantity') }}</th>
+                                    <th>{{ __('shopboss::shopboss.type') }}</th>
                                 </tr>
 
                                 @foreach($adjustment->adjustedProducts as $adjustedProduct)
@@ -53,9 +53,9 @@
                                         <td>{{ $adjustedProduct->quantity }}</td>
                                         <td>
                                             @if($adjustedProduct->type == 'add')
-                                                (+) Addition
+                                                (+) {{ __('shopboss::shopboss.addition') }}
                                             @else
-                                                (-) Subtraction
+                                                (-) {{ __('shopboss::shopboss.subtraction') }}
                                             @endif
                                         </td>
                                     </tr>

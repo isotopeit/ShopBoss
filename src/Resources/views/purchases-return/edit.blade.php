@@ -1,9 +1,9 @@
 @extends('isotope::master')
 
-@section('title', 'Edit Purchase Return')
+@section('title', __('shopboss::shopboss.editPurchaseReturn'))
 
 @push('buttons')
-    <a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchase-returns.index') }}">{{ __('List') }}</a>
+    <a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchase-returns.index') }}">{{ __('shopboss::shopboss.list') }}</a>
 @endpush
 
 @section('content')
@@ -16,11 +16,11 @@
                     @if (settings()->enable_branch == 1)
                     <div class="col-md-3 col-12">
                         <div class="mb-2">
-                            <label class="form-label">{{ __('Branch') }}: </label>
+                            <label class="form-label">{{ __('shopboss::shopboss.branch') }}: </label>
                             @php $userBranch = Auth::user()->branch ?? null; @endphp
                             <select name="branch_id" id="branch_id" class="form-select form-select-sm" data-control="select2" 
-                                data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
-                                <option value="" disabled>{{ __('Select Branch') }}</option>
+                                data-placeholder="{{ __('shopboss::shopboss.selectBranch') }}" @if ($userBranch) disabled @endif>
+                                <option value="" disabled>{{ __('shopboss::shopboss.selectBranch') }}</option>
                                 @foreach ($branches as $branch)
                                     <option value="{{ $branch->id }}"
                                         @if (($userBranch && $userBranch->id == $branch->id) || $purchase_return->branch_id == $branch->id) selected @endif>
@@ -36,21 +36,21 @@
                     @endif
                     <div class="col-md-3 col-12">
                         <div class="mb-2">
-                            <label class="form-label">{{ __('Supplier') }}</label>
+                            <label class="form-label">{{ __('shopboss::shopboss.supplier') }}</label>
                             <input type="text" class="form-control form-control-sm"
                                 value="{{ $purchase_return->supplier_name }}" disabled>
                         </div>
                     </div>
                     <div class="col-md-3 col-12">
                         <div class="mb-2">
-                            <label class="form-label">{{ __('Reference') }}:</label>
+                            <label class="form-label">{{ __('shopboss::shopboss.reference') }}:</label>
                             <input type="text" class="form-control form-control-sm"
                                 value="{{ $purchase_return->reference }}" disabled>
                         </div>
                     </div>
                     <div class="col-md-3 col-12">
                         <div class="mb-2">
-                            <label class="form-label">{{ __('Date') }}: <span class="text-danger">*</span></label>
+                            <label class="form-label">{{ __('shopboss::shopboss.date') }}: <span class="text-danger">*</span></label>
                             <input type="date" class="form-control form-control-sm" name="date"
                                 value="{{ $purchase_return->date }}" required>
                         </div>
@@ -59,14 +59,14 @@
                         <table class="table table-sm table-bordered table-striped mt-2" id="product-table">
                             <thead>
                                 <tr class="bg-isotope text-center">
-                                    <th>{{ __('Product') }}</th>
-                                    <th>{{ __('Unit Price') }}</th>
-                                    <th>{{ __('Purchase Qty') }}</th>
-                                    <th>{{ __('Purchase Price') }}</th>
-                                    <th>{{ __('Pre Returnd Qty') }}</th>
-                                    <th>{{ __('Returnable Qty') }}</th>
-                                    <th>{{ __('Return Qty') }}</th>
-                                    <th>{{ __('Sub Total') }}</th>
+                                    <th>{{ __('shopboss::shopboss.product') }}</th>
+                                    <th>{{ __('shopboss::shopboss.unitPrice') }}</th>
+                                    <th>{{ __('shopboss::shopboss.purchaseQty') }}</th>
+                                    <th>{{ __('shopboss::shopboss.purchasePrice') }}</th>
+                                    <th>{{ __('shopboss::shopboss.preReturnedQty') }}</th>
+                                    <th>{{ __('shopboss::shopboss.returnableQty') }}</th>
+                                    <th>{{ __('shopboss::shopboss.returnQty') }}</th>
+                                    <th>{{ __('shopboss::shopboss.subTotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,13 +103,13 @@
                         <table class="table table-sm">
                             <tbody>
                                 <tr>
-                                    <th>{{ __('Total') }}</th>
+                                    <th>{{ __('shopboss::shopboss.total') }}</th>
                                     <td>(=) ৳<span
                                             id="total-sub-total">{{ $purchase_return->purchaseReturnDetails->sum('sub_total') }}</span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>{{ __('Grand Total') }}</th>
+                                    <th>{{ __('shopboss::shopboss.grandTotal') }}</th>
                                     <th>
                                         (=) ৳<span id="grand-total">{{ $purchase_return->total_amount }}</span>
                                     </th>
@@ -120,33 +120,33 @@
                     
                     <div class="col-md-6 col-12">
                         <div class="mb-2">
-                            <label class="form-label">{{ __('Payment Method') }}:</label>
+                            <label class="form-label">{{ __('shopboss::shopboss.paymentMethod') }}:</label>
                             <select class="form-select form-select-sm bg-secondary" name="payment_method">
-                                <option value="Cash">{{ __('Cash') }}</option>
-                                <option value="Credit Card">{{ __('Credit Card') }}</option>
-                                <option value="Bank Transfer">{{ __('Bank Transfer') }}</option>
-                                <option value="Cheque">{{ __('Cheque') }}</option>
-                                <option value="Other">{{ __('Other') }}</option>
+                                <option value="Cash">{{ __('shopboss::shopboss.cash') }}</option>
+                                <option value="Credit Card">{{ __('shopboss::shopboss.creditCard') }}</option>
+                                <option value="Bank Transfer">{{ __('shopboss::shopboss.bankTransfer') }}</option>
+                                <option value="Cheque">{{ __('shopboss::shopboss.cheque') }}</option>
+                                <option value="Other">{{ __('shopboss::shopboss.other') }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
                         <div class="mb-2">
-                            <label class="form-label">{{ __('Amount Paid') }}:</label>
+                            <label class="form-label">{{ __('shopboss::shopboss.amountPaid') }}:</label>
                             <input type="text" class="form-control form-control-sm bg-secondary text-dark"
                                 value="{{ $purchase_return->paid_amount }}" name="paid_amount" disabled>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="mb-2">
-                            <label class="form-label">{{ __('Note (If Needed)') }}:</label>
+                            <label class="form-label">{{ __('shopboss::shopboss.noteIfNeeded') }}:</label>
                             <textarea class="form-control form-control-sm" rows="5" name="note">{{ $purchase_return->note }}</textarea>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="my-5 text-center">
                             <button type="submit"
-                                class="btn btn-sm bg-isotope text-white">{{ __('Update Purchase Return') }}
+                                class="btn btn-sm bg-isotope text-white">{{ __('shopboss::shopboss.updatePurchaseReturn') }}
                                 <i class="fa-solid fa-paper-plane ms-2 text-white"></i></button>
                         </div>
                     </div>
@@ -181,7 +181,7 @@
             // Disable branch change to prevent inconsistencies
             $('#branch_id').on('change', function() {
                 // This is a confirmation dialog to warn about changing branch
-                if (confirm("Changing branch may affect product availability. Are you sure you want to continue?")) {
+                if (confirm("{{ __('shopboss::shopboss.areYouSure') }}")) {
                     // You could add additional logic here if needed
                 } else {
                     // Revert to original value

@@ -1,10 +1,10 @@
 @extends('isotope::master')
 
-@section('title', 'Customers')
+@section('title', __('shopboss::shopboss.customers'))
 
 @push('buttons')
     <a href="{{ route('customers.create') }}" type="button" class="btn btn-sm btn-isotope fw-bold">
-        {{ __('Add customer') }}
+        {{ __('shopboss::shopboss.addCustomer') }}
     </a>
 @endpush
 
@@ -15,18 +15,18 @@
                 <div class="card-body">
                     <form class="row mb-3">
                         <div class="col-md">
-                            <input type="text" value="{{ Request::input('search')['customer_name'] ?? '' }}" class="form-control form-control-sm" name="search[customer_name]" placeholder="{{ __('Enter Customer Name') }}">
+                            <input type="text" value="{{ Request::input('search')['customer_name'] ?? '' }}" class="form-control form-control-sm" name="search[customer_name]" placeholder="{{ __('shopboss::shopboss.enterCustomerName') }}">
                         </div>
                         <div class="col-md">
-                            <input type="text" value="{{ Request::input('search')['customer_email'] ?? '' }}" class="form-control form-control-sm" name="search[customer_email]" placeholder="{{ __('Enter Customer Email') }}">
+                            <input type="text" value="{{ Request::input('search')['customer_email'] ?? '' }}" class="form-control form-control-sm" name="search[customer_email]" placeholder="{{ __('shopboss::shopboss.enterCustomerEmail') }}">
                         </div>
                         <div class="col-md">
-                            <input type="text" value="{{ Request::input('search')['customer_phone'] ?? '' }}" class="form-control form-control-sm" name="search[customer_phone]" placeholder="{{ __('Enter Customer Phone') }}">
+                            <input type="text" value="{{ Request::input('search')['customer_phone'] ?? '' }}" class="form-control form-control-sm" name="search[customer_phone]" placeholder="{{ __('shopboss::shopboss.enterCustomerPhone') }}">
                         </div>
                         @if (settings()->enable_branch == 1)
                         <div class="col-md">
-                            <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
-                                <option value="">All Branches</option>
+                            <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="{{ __('shopboss::shopboss.selectBranch') }}">
+                                <option value="">{{ __('shopboss::shopboss.allBranches') }}</option>
                                 @foreach ($branches as $branch)
                                     <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                                 @endforeach
@@ -34,21 +34,21 @@
                         </div>
                         @endif
                         <div class="col-md">
-                            <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> Search</button>
+                            <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> {{ __('shopboss::shopboss.search') }}</button>
                         </div>
                     </form>
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered table-striped">
                             <thead class="bg-isotope">
                                 <tr>
-                                    <td>{{ __('#SL') }}</td>
-                                    <td>{{ __('Customer Name') }}</td>
-                                    <td>{{ __('Customer Email') }}</td>
-                                    <td>{{ __('Customer Phone') }}</td>
+                                    <td>{{ __('shopboss::shopboss.slNo') }}</td>
+                                    <td>{{ __('shopboss::shopboss.customerName') }}</td>
+                                    <td>{{ __('shopboss::shopboss.customerEmail') }}</td>
+                                    <td>{{ __('shopboss::shopboss.customerPhone') }}</td>
                                     @if (settings()->enable_branch == 1)
-                                    <td>{{ __('Branch') }}</td>
+                                    <td>{{ __('shopboss::shopboss.branch') }}</td>
                                     @endif
-                                    <td>{{ __('Actions') }}</td>
+                                    <td>{{ __('shopboss::shopboss.actions') }}</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -62,12 +62,12 @@
                                     <td>{{ $customer->branch->name ?? 'N/A' }}</td>
                                     @endif
                                     <td class="d-flex justify-content-center">
-                                        <a title="Show"
+                                        <a title="{{ __('shopboss::shopboss.show') }}"
                                             class="btn btn-outline btn-outline-dashed btn-outline-primary p-0 me-1"
                                             href="{{ route('customers.show', $customer->uuid) }}">
                                             <i class="fas fa-eye ms-1"></i>
                                         </a>
-                                        <a title="Edit"
+                                        <a title="{{ __('shopboss::shopboss.edit') }}"
                                             class="btn btn-outline btn-outline-dashed btn-outline-info p-0 me-1"
                                             href="{{ route('customers.edit', $customer->uuid) }}">
                                             <i class="fas fa-edit ms-1"></i>
@@ -75,7 +75,7 @@
                                         <form action="{{ route('customers.destroy', $customer->uuid) }}"
                                             method="post">
                                             @method('delete') @csrf
-                                            <button title="Delete" type="submit" onclick="return confirm('{{ __('Are You Want To Delete This?') }}')"
+                                            <button title="{{ __('shopboss::shopboss.delete') }}" type="submit" onclick="return confirm('{{ __('shopboss::shopboss.deleteConfirm') }}')"
                                                 class="btn btn-outline btn-outline-dashed btn-outline-danger p-0 me-1">
                                                 <i class="fa-solid fa-trash ms-1"></i>
                                             </button>
@@ -84,7 +84,7 @@
                                 </tr>
                                 @empty
                                     <tr>
-                                        <th class="font-weight-bold text-center text-danger" colspan="{{ settings()->enable_branch == 1 ? '6' : '5' }}">No Data Found!</th>
+                                        <th class="font-weight-bold text-center text-danger" colspan="{{ settings()->enable_branch == 1 ? '6' : '5' }}">{{ __('shopboss::shopboss.noDataFound') }}!</th>
                                     </tr>
                                 @endforelse
                             </tbody>

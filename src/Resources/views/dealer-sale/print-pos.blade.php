@@ -76,9 +76,9 @@
             <barcode height="0.6" code="{{ $sale->reference }}" type="C128A" />
         </div>
 
-        <p class="m-0"><b>{{ __('Date') }}: </b> {{ \Carbon\Carbon::parse($sale->date)->format('d M, Y') }}</p>
-        <p class="m-0"><b>{{ __('Reference') }}: </b> {{ $sale->reference }}</p>
-        <p class="m-0"><b>{{ __('Name') }}: </b> {{ $sale->customer_name }}</p>
+        <p class="m-0"><b>{{ __('shopboss::shopboss.date') }}: </b> {{ \Carbon\Carbon::parse($sale->date)->format('d M, Y') }}</p>
+        <p class="m-0"><b>{{ __('shopboss::shopboss.reference') }}: </b> {{ $sale->reference }}</p>
+        <p class="m-0"><b>{{ __('shopboss::shopboss.name') }}: </b> {{ $sale->customer_name }}</p>
 
         <table class="table-data">
             <tbody>
@@ -94,24 +94,24 @@
 
                 @if($sale->tax_percentage)
                     <tr>
-                        <th colspan="2" style="text-align:left">{{ __('Tax') }} ({{ $sale->tax_percentage }}%)</th>
+                        <th colspan="2" style="text-align:left">{{ __('shopboss::shopboss.tax') }} ({{ $sale->tax_percentage }}%)</th>
                         <th style="text-align:right">{{ format_currency($sale->tax_amount) }}</th>
                     </tr>
                 @endif
                 @if($sale->discount_percentage)
                     <tr>
-                        <th colspan="2" style="text-align:left">{{ __('Discount') }} ({{ $sale->discount_percentage }}%)</th>
+                        <th colspan="2" style="text-align:left">{{ __('shopboss::shopboss.discount') }} ({{ $sale->discount_percentage }}%)</th>
                         <th style="text-align:right">{{ format_currency($sale->discount_amount) }}</th>
                     </tr>
                 @endif
                 @if($sale->shipping_amount)
                     <tr>
-                        <th colspan="2" style="text-align:left">{{ __('Shipping') }}</th>
+                        <th colspan="2" style="text-align:left">{{ __('shopboss::shopboss.shipping') }}</th>
                         <th style="text-align:right">{{ format_currency($sale->shipping_amount) }}</th>
                     </tr>
                 @endif
                 <tr>
-                    <th colspan="2" style="text-align:left">{{ __('Grand Total') }}</th>
+                    <th colspan="2" style="text-align:left">{{ __('shopboss::shopboss.grandTotal') }}</th>
                     <th style="text-align:right">{{ format_currency($sale->total_amount) }}</th>
                 </tr>
             </tbody>
@@ -120,10 +120,10 @@
             <tbody>
                 <tr style="background-color:#ddd;">
                     <td class="centered" style="padding: 5px;">
-                        {{ __('Paid By') }}: {{ $sale->payment_method }}
+                        {{ __('shopboss::shopboss.paidBy') }}: {{ $sale->payment_method }}
                     </td>
                     <td class="centered" style="padding: 5px;">
-                        {{ __('Amount') }}: {{ format_currency($sale->paid_amount) }}
+                        {{ __('shopboss::shopboss.amount') }}: {{ format_currency($sale->paid_amount) }}
                     </td>
                 </tr>
             </tbody>

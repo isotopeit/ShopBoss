@@ -1,7 +1,6 @@
 @extends('pos::layouts.app')
 
-
-@section('title', 'Expense Categories')
+@section('title', __('shopboss::shopboss.expenseCategories'))
 
 @section('third_party_stylesheets')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
@@ -9,9 +8,9 @@
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('expenses.index') }}">{{ __('Expenses') }}</a></li>
-        <li class="breadcrumb-item active">{{ __('Categories') }}</li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('expenses.index') }}">{{ __('shopboss::shopboss.expenses') }}</a></li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.categories') }}</li>
     </ol>
 @endsection
 
@@ -24,7 +23,7 @@
                     <div class="card-body">
                         <!-- Button trigger modal -->
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#categoryCreateModal">
-                            {{ __('Add Category') }} <i class="bi bi-plus"></i>
+                            {{ __('shopboss::shopboss.addCategory') }} <i class="bi bi-plus"></i>
                         </button>
 
                         <hr>
@@ -43,7 +42,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="categoryCreateModalLabel">{{ __('Create Category') }}</h5>
+                    <h5 class="modal-title" id="categoryCreateModalLabel">{{ __('shopboss::shopboss.createCategory') }}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -52,16 +51,16 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="category_name">{{ __('Category Name') }} <span class="text-danger">*</span></label>
+                            <label for="category_name">{{ __('shopboss::shopboss.categoryName') }} <span class="text-danger">*</span></label>
                             <input class="form-control" type="text" name="category_name" required>
                         </div>
                         <div class="form-group">
-                            <label for="category_description">{{ __('Description') }}</label>
+                            <label for="category_description">{{ __('shopboss::shopboss.description') }}</label>
                             <textarea class="form-control" name="category_description" id="category_description" rows="5"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">{{ __('Create') }} <i class="bi bi-check"></i></button>
+                        <button type="submit" class="btn btn-primary">{{ __('shopboss::shopboss.create') }} <i class="bi bi-check"></i></button>
                     </div>
                 </form>
             </div>
@@ -71,4 +70,5 @@
 
 @push('page_scripts')
     {!! $dataTable->scripts() !!}
+@endpush
 @endpush

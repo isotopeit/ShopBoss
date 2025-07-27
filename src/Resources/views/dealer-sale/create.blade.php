@@ -1,12 +1,12 @@
 @extends('pos::layouts.app')
 
-@section('title', 'Create Dealer Sale')
+@section('title', __('shopboss::shopboss.createDealerSale'))
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('dealer-sales.index') }}">{{ __('Dealer Sale') }}</a></li>
-        <li class="breadcrumb-item active">{{ __('Add') }}</li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('dealer-sales.index') }}">{{ __('shopboss::shopboss.dealerSale') }}</a></li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.add') }}</li>
     </ol>
 @endsection
 
@@ -29,7 +29,7 @@
                             <div class="form-row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="reference">{{ __('Reference') }} <span
+                                        <label for="reference">{{ __('shopboss::shopboss.reference') }} <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" class="form-control" name="reference" required readonly
                                             value="SL">
@@ -38,7 +38,7 @@
                                 <div class="col-lg-4">
                                     <div class="from-group">
                                         <div class="form-group">
-                                            <label for="company_id">{{ __('Company') }} <span
+                                            <label for="company_id">{{ __('shopboss::shopboss.company') }} <span
                                                     class="text-danger">*</span></label>
 
                                             <div class="input-group">
@@ -57,7 +57,7 @@
                                 <div class="col-lg-4">
                                     <div class="from-group">
                                         <div class="form-group">
-                                            <label for="date">{{ __('Date') }} <span
+                                            <label for="date">{{ __('shopboss::shopboss.date') }} <span
                                                     class="text-danger">*</span></label>
                                             <input type="date" class="form-control" name="date" required
                                                 value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
@@ -71,7 +71,7 @@
                             <div class="form-row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="status">{{ __('Status') }} <span
+                                        <label for="status">{{ __('shopboss::shopboss.status') }} <span
                                                 class="text-danger">*</span></label>
                                         <select class="form-control" name="status" id="status" required>
                                             <option value="Pending">Pending</option>
@@ -83,7 +83,7 @@
                                 <div class="col-lg-4">
                                     <div class="from-group">
                                         <div class="form-group">
-                                            <label for="payment_method">{{ __('Payment Method') }} <span
+                                            <label for="payment_method">{{ __('shopboss::shopboss.paymentMethod') }} <span
                                                     class="text-danger">*</span></label>
                                             <select class="form-control" name="payment_method" id="payment_method" required>
                                                 <option value="Cash">Cash</option>
@@ -97,7 +97,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="paid_amount">{{ __('Amount Received') }} <span
+                                        <label for="paid_amount">{{ __('shopboss::shopboss.amountReceived') }} <span
                                                 class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <input id="paid_amount" type="text" class="form-control" name="paid_amount"
@@ -113,13 +113,13 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="note">{{ __('Note (If Needed)') }}</label>
+                                <label for="note">{{ __('shopboss::shopboss.noteIfNeeded') }}</label>
                                 <textarea name="note" id="note" rows="5" class="form-control"></textarea>
                             </div>
 
                             <div class="mt-3">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Create Dealer Sale') }} <i class="bi bi-check"></i>
+                                    {{ __('shopboss::shopboss.createDealerSale') }} <i class="bi bi-check"></i>
                                 </button>
                             </div>
                         </form>
@@ -134,24 +134,24 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="customer_create_modal_label">Create Customer</h5>
+                    <h5 class="modal-title" id="customer_create_modal_label">{{ __('shopboss::shopboss.createCustomer') }}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="customer_name">Name <span class="text-danger">*</span></label>
+                        <label for="customer_name">{{ __('shopboss::shopboss.name') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="customer_name" placeholder="Enter Customer Name" required>
                     </div>
                     <div class="form-group">
-                        <label for="customer_name">Phone <span class="text-danger">*</span></label>
+                        <label for="customer_name">{{ __('shopboss::shopboss.phone') }} <span class="text-danger">*</span></label>
                         <input type="number" class="form-control" id="customer_phone" placeholder="Enter Customer Phone" max="11" min="11" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="customer_save">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('shopboss::shopboss.close') }}</button>
+                    <button type="button" class="btn btn-primary" id="customer_save">{{ __('shopboss::shopboss.saveChanges') }}</button>
                 </div>
             </div>
         </div>

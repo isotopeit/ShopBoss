@@ -5,6 +5,7 @@ use Isotope\ShopBoss\Http\Controllers\PosController;
 use Isotope\ShopBoss\Http\Controllers\HomeController;
 use Isotope\ShopBoss\Http\Controllers\SaleController;
 use Isotope\ShopBoss\Http\Controllers\StockController;
+use Isotope\Metronic\Http\Middlewares\LocaleMiddleware;
 use Isotope\ShopBoss\Http\Controllers\BranchController;
 use Isotope\ShopBoss\Http\Controllers\UploadController;
 use Isotope\ShopBoss\Http\Controllers\BarcodeController;
@@ -30,7 +31,7 @@ use Isotope\ShopBoss\Http\Controllers\SaleReturnPaymentsController;
 use Isotope\ShopBoss\Http\Controllers\SendQuotationEmailController;
 use Isotope\ShopBoss\Http\Controllers\PurchaseReturnPaymentsController;
 
-Route::group(['middleware' => ['web', 'auth','authorization']], function () {
+Route::group(['middleware' => ['web', 'auth','authorization', LocaleMiddleware::class]], function () {
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -43,6 +44,7 @@ Route::group(['middleware' => ['web', 'auth','authorization']], function () {
 
     Route::resource('adjustments', AdjustmentController::class);
     Route::resource('shopboss-branches', BranchController::class)->except('show');
+    Route::post('/branch-enable', [BranchController::class, 'branchEnable'])->name('shopboss.branchEnable');
     Route::resource('shop-branch-user', BranchUserController::class);
     Route::resource('currencies', CurrencyController::class)->except('show');
     Route::resource('expense-categories', ExpenseCategoriesController::class)->except('show', 'create');

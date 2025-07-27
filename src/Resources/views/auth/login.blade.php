@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 
-    <title>Login | {{ config('app.name') }}</title>
+    <title>{{ __('shopboss::shopboss.login') }} | {{ config('app.name') }}</title>
 
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('images/favicon.png') }}">
@@ -34,8 +34,8 @@
                     <div class="card-body">
                         <form method="post" action="{{ url('/login') }}">
                             @csrf
-                            <h1>{{ __('Login') }}</h1>
-                            <p class="text-muted">{{ __('Sign In to your account') }}</p>
+                            <h1>{{ __('shopboss::shopboss.login') }}</h1>
+                            <p class="text-muted">{{ __('shopboss::shopboss.signInToAccount') }}</p>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
@@ -44,7 +44,7 @@
                                 </div>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
                                        name="email" value="{{ old('email') }}"
-                                       placeholder="Email">
+                                       placeholder="{{ __('shopboss::shopboss.email') }}">
                                 @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -57,14 +57,14 @@
                                 </div>
                                 <input type="password"
                                        class="form-control @error('password') is-invalid @enderror"
-                                       placeholder="Password" name="password">
+                                       placeholder="{{ __('shopboss::shopboss.password') }}" name="password">
                                 @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="row">
                                 <div class="col-4">
-                                    <button class="btn btn-primary px-4" type="submit">{{ __('Login') }}</button>
+                                    <button class="btn btn-primary px-4" type="submit">{{ __('shopboss::shopboss.login') }}</button>
                                 </div>
                             </div>
                         </form>
@@ -74,9 +74,9 @@
                 <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
                     <div class="card-body text-center">
                         <div>
-                            <h2>{{ __('Sign up') }}</h2>
-                            <p>{{ __('Sign in to start your session') }}</p>
-                            <a class="btn btn-lg btn-outline-light mt-3" href="{{ route('register') }}">{{ __('Register Now!') }}</a>
+                            <h2>{{ __('shopboss::shopboss.signUp') }}</h2>
+                            <p>{{ __('shopboss::shopboss.signInToStartSession') }}</p>
+                            <a class="btn btn-lg btn-outline-light mt-3" href="{{ route('register') }}">{{ __('shopboss::shopboss.registerNow') }}</a>
                         </div>
                     </div>
                 </div>

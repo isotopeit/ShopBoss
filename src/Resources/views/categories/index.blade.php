@@ -1,11 +1,12 @@
 @extends('isotope::master')
 
-@section('title', 'Product Categories')
+@section('title', __('shopboss::shopboss.productCategories')).
+{{-- @section('title', __('therapy::therapy.assessmentList')) --}}
 
 @push('buttons')
 <button type="button" class="btn btn-sm btn-isotope fw-bold" data-bs-toggle="modal"
     data-bs-target="#categoryCreateModal">
-    {{ __('Add Category') }}
+    {{ __('shopboss::shopboss.addCategory') }}
 </button>
 @endpush
 
@@ -17,15 +18,15 @@
                 <div class="card-body">
                     <form class="row mb-3">
                         <div class="col-md">
-                            <input type="text" value="{{ Request::input('search')['category_code'] ?? '' }}" class="form-control form-control-sm" name="search[category_code]" placeholder="Enter Category Code">
+                            <input type="text" value="{{ Request::input('search')['category_code'] ?? '' }}" class="form-control form-control-sm" name="search[category_code]" placeholder="{{ __('shopboss::shopboss.enterCategoryCode') }}">
                         </div>
                         <div class="col-md">
-                            <input type="text" value="{{ Request::input('search')['category_name'] ?? '' }}" class="form-control form-control-sm" name="search[category_name]" placeholder="Enter Category Name">
+                            <input type="text" value="{{ Request::input('search')['category_name'] ?? '' }}" class="form-control form-control-sm" name="search[category_name]" placeholder="{{ __('shopboss::shopboss.enterCategoryName') }}">
                         </div>
                         @if (settings()->enable_branch == 1)
                         <div class="col-md">
-                            <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
-                                <option value="">All Branches</option>
+                            <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="{{ __('shopboss::shopboss.selectBranch') }}">
+                                <option value="">{{ __('shopboss::shopboss.allBranches') }}</option>
                                 @foreach ($branches as $branch)
                                     <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                                 @endforeach
@@ -33,7 +34,7 @@
                         </div>
                         @endif
                         <div class="col-md">
-                            <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> Search</button>
+                            <button type="submit" class="btn btn-sm bg-isotope text-white"><i class="fa-solid fa-search text-white"></i> {{ __('shopboss::shopboss.search') }}</button>
                         </div>
                     </form>
                     <div class="table-responsive">
@@ -41,12 +42,12 @@
                             <thead class="bg-isotope">
                                 <tr>
                                     <td>#SL</td>
-                                    <td>Category Code</td>
-                                    <td>Category Name</td>
+                                    <td>{{ __('shopboss::shopboss.categoryCode') }}</td>
+                                    <td>{{ __('shopboss::shopboss.categoryName') }}</td>
                                     @if (settings()->enable_branch == 1)
-                                    <td>Branch</td>
+                                    <td>{{ __('shopboss::shopboss.branch') }}</td>
                                     @endif
-                                    <td>Actions</td>
+                                    <td>{{ __('shopboss::shopboss.actions') }}</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -92,27 +93,27 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="categoryCreateModalLabel">{{ __('Create Category') }}</h5>
+                <h5 class="modal-title" id="categoryCreateModalLabel">{{ __('shopboss::shopboss.createCategory') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('product-categories.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-2">
-                        <label class="form-label" for="category_code">{{ __('Category Code') }}</label>
+                        <label class="form-label" for="category_code">{{ __('shopboss::shopboss.categoryCode') }}</label>
                         <input class="form-control form-control-sm" type="text" name="category_code" required>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label" for="category_name">{{ __('Category Name') }}</label>
+                        <label class="form-label" for="category_name">{{ __('shopboss::shopboss.categoryName') }}</label>
                         <input class="form-control form-control-sm" type="text" name="category_name" required>
                     </div>
                     @if (settings()->enable_branch == 1)
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Branch') }}</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.branch') }}</label>
                         @php $userBranch = Auth::user()->branch ?? null; @endphp
                         <select name="branch_id" class="form-select form-select-sm" data-control="select2" 
-                            data-placeholder="{{ __('Select Branch') }}" @if ($userBranch) disabled @endif>
-                            <option value="" disabled selected>{{ __('Select Branch') }}</option>
+                            data-placeholder="{{ __('shopboss::shopboss.selectBranch') }}" @if ($userBranch) disabled @endif>
+                            <option value="" disabled selected>{{ __('shopboss::shopboss.selectBranch') }}</option>
                             @foreach ($branches as $branch)
                                 <option value="{{ $branch->id }}"
                                     @if ($userBranch && $userBranch->id == $branch->id) selected @endif>
@@ -127,7 +128,7 @@
                     @endif
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-sm btn-primary">{{ __('Create') }} <i
+                    <button type="submit" class="btn btn-sm btn-primary">{{ __('shopboss::shopboss.create') }} <i
                             class="fa-solid fa-paper-plane ms-2"></i></button>
                 </div>
             </form>

@@ -1,6 +1,6 @@
 @extends('pos::layouts.app')
 
-@section('title', 'User Profile')
+@section('title', __('shopboss::shopboss.userProfile'))
 
 @section('third_party_stylesheets')
     @include('pos::includes.filepond-css')
@@ -8,8 +8,8 @@
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-        <li class="breadcrumb-item active">Profile</li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.profile') }}</li>
     </ol>
 @endsection
 
@@ -18,8 +18,8 @@
         <div class="row">
             <div class="col-12">
                 @include('pos::utils.alerts')
-                <h3>{{ __('Hello') }}, <span class="text-primary">{{ auth()->user()->name }}</span></h3>
-                <p class="font-italic">{{ __('Change your profile information & password from here...') }}</p>
+                <h3>{{ __('shopboss::shopboss.hello') }}, <span class="text-primary">{{ auth()->user()->name }}</span></h3>
+                <p class="font-italic">{{ __('shopboss::shopboss.changeProfileInfo') }}</p>
             </div>
             <div class="col-lg-6">
                 <div class="card">
@@ -29,27 +29,27 @@
                             @method('patch')
 
                             <div class="form-group">
-                                <label for="image">{{ __('Profile Image') }} <span class="text-danger">*</span></label>
+                                <label for="image">{{ __('shopboss::shopboss.profileImage') }} <span class="text-danger">*</span></label>
                                 <img style="width: 100px;height: 100px;" class="d-block mx-auto img-thumbnail img-fluid rounded-circle mb-2" src="{{ auth()->user()->getFirstMediaUrl('avatars') }}" alt="Profile Image">
                                 <input id="image" type="file" name="image" data-max-file-size="500KB">
                             </div>
 
                             <div class="form-group">
-                                <label for="name">{{ __('Name') }} <span class="text-danger">*</span></label>
+                                <label for="name">{{ __('shopboss::shopboss.name') }} <span class="text-danger">*</span></label>
                                 <input class="form-control" type="text" name="name" required value="{{ auth()->user()->name }}">
                                 @error('name')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="email">{{ __('Email') }} <span class="text-danger">*</span></label>
+                                <label for="email">{{ __('shopboss::shopboss.email') }} <span class="text-danger">*</span></label>
                                 <input class="form-control" type="email" name="email" required value="{{ auth()->user()->email }}">
                                 @error('email')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary">{{ __('Update Profile') }} <i class="bi bi-check"></i></button>
+                                <button type="submit" class="btn btn-primary">{{ __('shopboss::shopboss.updateProfile') }} <i class="bi bi-check"></i></button>
                             </div>
                         </form>
                     </div>
@@ -62,28 +62,28 @@
                             @csrf
                             @method('patch')
                             <div class="form-group">
-                                <label for="current_password">{{ __('Current Password') }} <span class="text-danger">*</span></label>
+                                <label for="current_password">{{ __('shopboss::shopboss.currentPassword') }} <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control" name="current_password" required>
                                 @error('current_password')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="password">{{ __('New Password') }} <span class="text-danger">*</span></label>
+                                <label for="password">{{ __('shopboss::shopboss.newPassword') }} <span class="text-danger">*</span></label>
                                 <input class="form-control" type="password" name="password" required>
                                 @error('password')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="password_confirmation">{{ __('Confirm Password') }} <span class="text-danger">*</span></label>
+                                <label for="password_confirmation">{{ __('shopboss::shopboss.confirmPassword') }} <span class="text-danger">*</span></label>
                                 <input class="form-control" type="password" name="password_confirmation" required>
                                 @error('password_confirmation')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary">{{ __('Update Password') }} <i class="bi bi-check"></i></button>
+                                <button type="submit" class="btn btn-primary">{{ __('shopboss::shopboss.updatePassword') }} <i class="bi bi-check"></i></button>
                             </div>
                         </form>
                     </div>

@@ -1,6 +1,6 @@
 @extends('pos::layouts.app')
 
-@section('title', 'Print Barcode')
+@section('title', __('shopboss::shopboss.printBarcode'))
 
 @push('page_css')
     @livewireStyles
@@ -8,8 +8,8 @@
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-        <li class="breadcrumb-item active">{{ __('Print Barcode') }}</li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.printBarcode') }}</li>
     </ol>
 @endsection
 

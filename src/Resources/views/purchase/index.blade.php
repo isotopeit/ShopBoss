@@ -1,9 +1,9 @@
 @extends('isotope::master')
 
-@section('title', 'Purchase List')
+@section('title', __('shopboss::shopboss.purchaseList'))
 
 @push('buttons')
-<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchases.create') }}">Create</a>
+<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchases.create') }}">{{ __('shopboss::shopboss.create') }}</a>
 @endpush
 
 @section('content')
@@ -15,17 +15,17 @@
                     <div class="col-md">
                         <input type="text" value="{{ Request::input('search')['reference'] ?? '' }}"
                             class="form-control form-control-sm" name="search[reference]"
-                            placeholder="{{ __('Enter Reference') }}">
+                            placeholder="{{ __('shopboss::shopboss.enterReference') }}">
                     </div>
                     <div class="col-md">
                         <input type="text" value="{{ Request::input('search')['supplier_name'] ?? '' }}"
                             class="form-control form-control-sm" name="search[supplier_name]"
-                            placeholder="{{ __('Enter Supplier Name') }}">
+                            placeholder="{{ __('shopboss::shopboss.enterSupplierName') }}">
                     </div>
                     @if (settings()->enable_branch == 1)
                     <div class="col-md">
-                        <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="Select Branch">
-                            <option value="">All Branches</option>
+                        <select name="search[branch_id]" class="form-select form-select-sm" data-control="select2" data-placeholder="{{ __('shopboss::shopboss.selectBranch') }}">
+                            <option value="">{{ __('shopboss::shopboss.allBranches') }}</option>
                             @foreach ($branches as $branch)
                                 <option value="{{ $branch->id }}" {{ (Request::input('search')['branch_id'] ?? '') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                             @endforeach
@@ -41,17 +41,17 @@
                     <table class="table table-sm table-bordered table-striped h-100">
                         <thead class="bg-isotope">
                             <tr>
-                                <td>{{ __('#SL') }}</td>
-                                <td>{{ __('Reference') }}</td>
-                                <td>{{ __('Supplier') }}</td>
-                                <td>{{ __('Total Amount') }}</td>
-                                <td>{{ __('Paid Amount') }}</td>
-                                <td>{{ __('Due Amount') }}</td>
-                                <td>{{ __('Payment Status') }}</td>
+                                <td>{{ __('shopboss::shopboss.slNo') }}</td>
+                                <td>{{ __('shopboss::shopboss.reference') }}</td>
+                                <td>{{ __('shopboss::shopboss.supplier') }}</td>
+                                <td>{{ __('shopboss::shopboss.totalAmount') }}</td>
+                                <td>{{ __('shopboss::shopboss.paidAmount') }}</td>
+                                <td>{{ __('shopboss::shopboss.dueAmount') }}</td>
+                                <td>{{ __('shopboss::shopboss.paymentStatus') }}</td>
                                 @if (settings()->enable_branch == 1)
-                                <td>{{ __('Branch') }}</td>
+                                <td>{{ __('shopboss::shopboss.branch') }}</td>
                                 @endif
-                                <td class="text-center">{{ __('Actions') }}</td>
+                                <td class="text-center">{{ __('shopboss::shopboss.actions') }}</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,7 +73,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <th class="text-danger text-center" colspan="{{ settings()->enable_branch == 1 ? '10' : '9' }}">No Data Found...</th>
+                                <th class="text-danger text-center" colspan="{{ settings()->enable_branch == 1 ? '10' : '9' }}">{{ __('shopboss::shopboss.noDataFound') }}</th>
                             </tr>
                             @endforelse
                         </tbody>

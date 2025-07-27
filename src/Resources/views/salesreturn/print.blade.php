@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ __('Sale Return Details') }}</title>
+    <title>{{ __('shopboss::shopboss.saleReturnDetails') }}</title>
     <link rel="stylesheet" href="{{ public_path('b3/bootstrap.min.css') }}">
 </head>
 <body>
@@ -15,37 +15,37 @@
             <div style="text-align: center;margin-bottom: 25px;">
                 <img width="180" src="{{ settings()->logo ?? public_path('images/logo-dark.png') }}" alt="Logo">
                 <h4 style="margin-bottom: 20px;">
-                    <span>Reference::</span> <strong>{{ $sale_return->reference }}</strong>
+                    <span>{{ __('shopboss::shopboss.reference') }}::</span> <strong>{{ $sale_return->reference }}</strong>
                 </h4>
             </div>
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-xs-4 mb-3 mb-md-0">
-                            <h4 class="mb-2" style="border-bottom: 1px solid #dddddd;padding-bottom: 10px;">Company Info:</h4>
+                            <h4 class="mb-2" style="border-bottom: 1px solid #dddddd;padding-bottom: 10px;">{{ __('shopboss::shopboss.companyInfo') }}:</h4>
                             <div><strong>{{ settings()->company_name }}</strong></div>
                             <div>{{ settings()->company_address }}</div>
-                            <div>{{ __('Email') }}: {{ settings()->company_email }}</div>
-                            <div>{{ __('Phone') }}: {{ settings()->company_phone }}</div>
+                            <div>{{ __('shopboss::shopboss.email') }}: {{ settings()->company_email }}</div>
+                            <div>{{ __('shopboss::shopboss.phone') }}: {{ settings()->company_phone }}</div>
                         </div>
 
                         <div class="col-xs-4 mb-3 mb-md-0">
-                            <h4 class="mb-2" style="border-bottom: 1px solid #dddddd;padding-bottom: 10px;">Customer Info:</h4>
+                            <h4 class="mb-2" style="border-bottom: 1px solid #dddddd;padding-bottom: 10px;">{{ __('shopboss::shopboss.customerInfo') }}:</h4>
                             <div><strong>{{ $customer->customer_name }}</strong></div>
                             <div>{{ $customer->address }}</div>
-                            <div>{{ __('Email') }}: {{ $customer->customer_email }}</div>
-                            <div>{{ __('Phone') }}: {{ $customer->customer_phone }}</div>
+                            <div>{{ __('shopboss::shopboss.email') }}: {{ $customer->customer_email }}</div>
+                            <div>{{ __('shopboss::shopboss.phone') }}: {{ $customer->customer_phone }}</div>
                         </div>
 
                         <div class="col-xs-4 mb-3 mb-md-0">
-                            <h4 class="mb-2" style="border-bottom: 1px solid #dddddd;padding-bottom: 10px;">Invoice Info:</h4>
-                            <div>{{ __('Invoice') }}: <strong>INV/{{ $sale_return->reference }}</strong></div>
-                            <div>{{ __('Date') }}: {{ \Carbon\Carbon::parse($sale_return->date)->format('d M, Y') }}</div>
+                            <h4 class="mb-2" style="border-bottom: 1px solid #dddddd;padding-bottom: 10px;">{{ __('shopboss::shopboss.invoiceInfo') }}:</h4>
+                            <div>{{ __('shopboss::shopboss.invoice') }}: <strong>INV/{{ $sale_return->reference }}</strong></div>
+                            <div>{{ __('shopboss::shopboss.date') }}: {{ \Carbon\Carbon::parse($sale_return->date)->format('d M, Y') }}</div>
                             <div>
-                                {{ __('Status') }}: <strong>{{ $sale_return->status }}</strong>
+                                {{ __('shopboss::shopboss.status') }}: <strong>{{ $sale_return->status }}</strong>
                             </div>
                             <div>
-                                {{ __('Payment Status') }}: <strong>{{ $sale_return->payment_status }}</strong>
+                                {{ __('shopboss::shopboss.paymentStatus') }}: <strong>{{ $sale_return->payment_status }}</strong>
                             </div>
                         </div>
 
@@ -55,12 +55,12 @@
                         <table class="table table-striped">
                             <thead>
                             <tr>
-                                <th class="align-middle">{{ __('Product') }}</th>
-                                <th class="align-middle">{{ __('Net Unit Price') }}</th>
-                                <th class="align-middle">{{ __('Quantity') }}</th>
-                                <th class="align-middle">{{ __('Discount') }}</th>
-                                <th class="align-middle">{{ __('Tax') }}</th>
-                                <th class="align-middle">{{ __('Sub Total') }}</th>
+                                <th class="align-middle">{{ __('shopboss::shopboss.product') }}</th>
+                                <th class="align-middle">{{ __('shopboss::shopboss.netUnitPrice') }}</th>
+                                <th class="align-middle">{{ __('shopboss::shopboss.quantity') }}</th>
+                                <th class="align-middle">{{ __('shopboss::shopboss.discount') }}</th>
+                                <th class="align-middle">{{ __('shopboss::shopboss.tax') }}</th>
+                                <th class="align-middle">{{ __('shopboss::shopboss.subTotal') }}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -100,19 +100,19 @@
                             <table class="table">
                                 <tbody>
                                 <tr>
-                                    <td class="left"><strong>{{ __('Discount') }} ({{ $sale_return->discount_percentage }}%)</strong></td>
+                                    <td class="left"><strong>{{ __('shopboss::shopboss.discount') }} ({{ $sale_return->discount_percentage }}%)</strong></td>
                                     <td class="right">{{ format_currency($sale_return->discount_amount) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="left"><strong>{{ __('Tax') }} ({{ $sale_return->tax_percentage }}%)</strong></td>
+                                    <td class="left"><strong>{{ __('shopboss::shopboss.tax') }} ({{ $sale_return->tax_percentage }}%)</strong></td>
                                     <td class="right">{{ format_currency($sale_return->tax_amount) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="left"><strong>{{ __('Shipping') }}</strong></td>
+                                    <td class="left"><strong>{{ __('shopboss::shopboss.shipping') }}</strong></td>
                                     <td class="right">{{ format_currency($sale_return->shipping_amount) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="left"><strong>{{ __('Grand Total') }}</strong></td>
+                                    <td class="left"><strong>{{ __('shopboss::shopboss.grandTotal') }}</strong></td>
                                     <td class="right"><strong>{{ format_currency($sale_return->total_amount) }}</strong></td>
                                 </tr>
                                 </tbody>

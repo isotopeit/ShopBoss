@@ -1,6 +1,6 @@
 @extends('pos::layouts.app')
 
-@section('title', 'Sale Payments')
+@section('title', __('shopboss::shopboss.salePayments'))
 
 @section('third_party_stylesheets')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
@@ -8,10 +8,10 @@
 
 @section('breadcrumb')
     <ol class="breadcrumb border-0 m-0">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('sales.index') }}">{{ __('Sales') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('shopboss::shopboss.home') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('sales.index') }}">{{ __('shopboss::shopboss.sales') }}</a></li>
         <li class="breadcrumb-item"><a href="{{ route('sales.show', $sale) }}">{{ $sale->reference }}</a></li>
-        <li class="breadcrumb-item active">{{ __('Payments') }}</li>
+        <li class="breadcrumb-item active">{{ __('shopboss::shopboss.payments') }}</li>
     </ol>
 @endsection
 

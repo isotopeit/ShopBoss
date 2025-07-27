@@ -1,6 +1,6 @@
 @extends('isotope::guest')
 
-@section('title', 'Purchases Report')
+@section('title', __('shopboss::shopboss.purchaseReport'))
 
 @section('content')
     @include('shopboss::reports.purchases.plan')

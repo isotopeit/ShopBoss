@@ -1,9 +1,9 @@
 @extends('isotope::master')
 
-@section('title', 'Create Purchase Return')
+@section('title', __('shopboss::shopboss.createPurchaseReturn'))
 
 @push('buttons')
-<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchase-returns.index') }}">{{ __('List') }}</a>
+<a class="btn btn-sm btn-isotope fw-bold" href="{{ route('purchase-returns.index') }}">{{ __('shopboss::shopboss.list') }}</a>
 @endpush
 
 @section('content')
@@ -15,25 +15,25 @@
             <div class="row">
                 <div class="col-md-3 col-12">
                     <div class="mb-2 d-none">
-                        <label class="form-label">{{ __('Branch') }}: </label>
+                        <label class="form-label">{{ __('shopboss::shopboss.branch') }}: </label>
                         <select class="form-select form-select-sm" id="product"></select>
                     </div>
                 </div>
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Supplier') }} <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ __('shopboss::shopboss.supplier') }} <span class="text-danger">*</span></label>
                         <select class="form-select form-select-sm" id="supplier" name="supplier_id" required></select>
                     </div>
                 </div>
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Reference') }}: <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ __('shopboss::shopboss.reference') }}: <span class="text-danger">*</span></label>
                         <select class="form-select form-select-sm" id="purchase" name="reference" required></select>
                     </div>
                 </div>
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Date') }}: <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ __('shopboss::shopboss.date') }}: <span class="text-danger">*</span></label>
                         <input type="date" class="form-control form-control-sm" name="date" value="{{ now()->toDateString() }}" required>
                     </div>
                 </div>
@@ -41,17 +41,17 @@
                     <table class="table table-sm table-bordered table-striped mt-2" id="product-table">
                         <thead>
                             <tr class="bg-isotope text-center">
-                                <th>{{ __('Product') }}</th>
-                                <th>{{ __('Unit Price') }}</th>
-                                <th>{{ __('Purchase Quantity') }}</th>
-                                <th>{{ __('Purchase Price') }}</th>
-                                <th>{{ __('Return Quantity') }}</th>
-                                <th>{{ __('Sub Total') }}</th>
+                                <th>{{ __('shopboss::shopboss.product') }}</th>
+                                <th>{{ __('shopboss::shopboss.unitPrice') }}</th>
+                                <th>{{ __('shopboss::shopboss.purchaseQuantity') }}</th>
+                                <th>{{ __('shopboss::shopboss.purchasePrice') }}</th>
+                                <th>{{ __('shopboss::shopboss.returnQuantity') }}</th>
+                                <th>{{ __('shopboss::shopboss.subTotal') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="removeable-tr text-center fw-bold text-isotope">
-                                <td colspan="6">{{ __('Please search & select Reference') }}!</td>
+                                <td colspan="6">{{ __('shopboss::shopboss.pleaseSearchSelectReference') }}!</td>
                             </tr>
                         </tbody>
                     </table>
@@ -60,15 +60,15 @@
                     <table class="table table-sm">
                         <tbody>
                             <tr>
-                                <th>{{ __('Total') }}</th>
+                                <th>{{ __('shopboss::shopboss.total') }}</th>
                                 <td>(=) ৳<span id="total-sub-total">0.00</span></td>
                             </tr>
                             <tr>
-                                <th>{{ __('Damaged Price') }}</th>
+                                <th>{{ __('shopboss::shopboss.damagedPrice') }}</th>
                                 <td>(-) ৳<span id="damaged-price">0.00</span></td>
                             </tr>
                             <tr>
-                                <th>{{ __('Grand Total') }}</th>
+                                <th>{{ __('shopboss::shopboss.grandTotal') }}</th>
                                 <th>
                                     (=) ৳<span id="grand-total">0.00</span>
                                 </th>
@@ -78,47 +78,47 @@
                 </div>
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Damaged Price') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.damagedPrice') }}:</label>
                         <input type="number" class="form-control form-control-sm" name="damaged_price" value="0" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Status') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.status') }}:</label>
                         <select class="form-select form-select-sm" name="status">
-                            <option value="Pending">{{ __('Pending') }}</option>
-                            <option value="Ordered">{{ __('Ordered') }}</option>
-                            <option value="Completed">{{ __('Completed') }}</option>
+                            <option value="Pending">{{ __('shopboss::shopboss.pending') }}</option>
+                            <option value="Ordered">{{ __('shopboss::shopboss.ordered') }}</option>
+                            <option value="Completed">{{ __('shopboss::shopboss.completed') }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Payment Method') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.paymentMethod') }}:</label>
                         <select class="form-select form-select-sm" name="payment_method">
-                            <option value="Cash">{{ __('Cash') }}</option>
-                            <option value="Credit Card">{{ __('Credit Card') }}</option>
-                            <option value="Bank Transfer">{{ __('Bank Transfer') }}</option>
-                            <option value="Cheque">{{ __('Cheque') }}</option>
-                            <option value="Other">{{ __('Other') }}</option>
+                            <option value="Cash">{{ __('shopboss::shopboss.cash') }}</option>
+                            <option value="Credit Card">{{ __('shopboss::shopboss.creditCard') }}</option>
+                            <option value="Bank Transfer">{{ __('shopboss::shopboss.bankTransfer') }}</option>
+                            <option value="Cheque">{{ __('shopboss::shopboss.cheque') }}</option>
+                            <option value="Other">{{ __('shopboss::shopboss.other') }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-3 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Amount Paid') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.amountPaid') }}:</label>
                         <input type="text" class="form-control form-control-sm" name="paid_amount" required>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('Note (If Needed)') }}:</label>
+                        <label class="form-label">{{ __('shopboss::shopboss.noteIfNeeded') }}:</label>
                         <textarea class="form-control form-control-sm" rows="5" name="note"></textarea>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="my-5 text-center">
-                        <button type="submit" class="btn btn-sm bg-isotope text-white">{{ __('Create Purchase Return') }}
+                        <button type="submit" class="btn btn-sm bg-isotope text-white">{{ __('shopboss::shopboss.createPurchaseReturn') }}
                             <i class="fa-solid fa-paper-plane ms-2 text-white"></i></button>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
     }
 
     $('#supplier').select2({
-        placeholder: 'Select Supplier',
+        placeholder: '{{ __('shopboss::shopboss.selectSupplier') }}',
         data : @json($suppliers),
         templateResult,
         templateSelection,
@@ -162,12 +162,12 @@
     }).val(null).trigger('change');
 
     $('#purchase').select2({
-        placeholder: 'Select Purchase',
+        placeholder: '{{ __('shopboss::shopboss.selectPurchase') }}',
     }).val(null).trigger('change');
 
     $(document).on('change', '#supplier', ()=> {
         $('#purchase').select2({
-            placeholder: 'Select Purchase',
+            placeholder: '{{ __('shopboss::shopboss.selectPurchase') }}',
             templateResult,
             templateSelection,
             matcher,
