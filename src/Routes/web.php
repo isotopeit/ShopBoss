@@ -32,7 +32,7 @@ use Isotope\ShopBoss\Http\Controllers\SendQuotationEmailController;
 use Isotope\ShopBoss\Http\Controllers\PurchaseReturnPaymentsController;
 
 Route::group(['middleware' => ['web', 'auth','authorization', LocaleMiddleware::class]], function () {
-    Route::get('/', [HomeController::class, 'index']);
+    //Route::get('/', [HomeController::class, 'index']);
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::post('/app/pos', [PosController::class, 'store'])->name('app.pos.store');
