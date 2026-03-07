@@ -26,7 +26,6 @@ class PosController extends Controller
                             id,
                             concat(customer_name, ' [', customer_phone, ']') as text
                         ")
-                        ->where('branch_id', Auth::user()->branch->id)
                         ->get();
         return view('shopboss::pos.index', compact('customers'));
     }

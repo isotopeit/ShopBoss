@@ -10,12 +10,21 @@ class Customer extends BaseModel
     use HasFactory;
 
     protected $guarded = [];
-    
+
     /**
      * Get the branch that owns the customer.
      */
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('branch', function ($query) {
+            if (function_exists('settings') && settings()->enable_branch == 1 && auth()->check() && auth()->user()->branch) {
+                $query->where('branch_id', auth()->user()->branch->id);
+            }
+        });
     }
 }
