@@ -11,6 +11,11 @@ return [
             'url'   => '/'
         ],
         [
+            'icon'  => 'bi bi-speedometer2',
+            'title' => 'therapy::therapy.dashboard',
+            'url'   => '/dashboard',
+        ],
+        [
             'header' => 'Finance'
         ],
         [

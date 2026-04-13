@@ -29,11 +29,13 @@ class ProductApiController extends Controller
                 product_name as text,
                 product_code as subText
             ")
-            ->when(isset($req['product']), function($q) use($req) {
+            ->when(isset($req['product']), function ($q) use ($req) {
                 $product = $req['product'];
                 $q->whereRaw("product_name LIKE '%$product%' OR product_code LIKE '%$product%'");
             })
-            ->where('branch_id', Auth::user()->branch->id)
+            ->when(!is_null(Auth::user()->branch),function($q){
+                $q->where('branch_id', Auth::user()->branch->id);
+            })
             ->limit(10)
             ->get();
 
@@ -42,20 +44,17 @@ class ProductApiController extends Controller
 
     public function product($code)
     {
-        try 
-        {
+        try {
             $product = Product::firstWhere('product_code', $code);
-            if(is_null($product)) throw new Exception("Product not found", 404);
-            $product->stock = PurchaseDetail::where('product_id',$product->id)->where('available_qty','>',0)->sum('available_qty');
+            if (is_null($product)) throw new Exception("Product not found", 404);
+            $product->stock = PurchaseDetail::where('product_id', $product->id)->where('available_qty', '>', 0)->sum('available_qty');
 
             return response()->json($product, 200);
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'msg'  => $e->getMessage(),
                 'line' => $e->getLine()
             ], 400);
         }
     }
-
 }
