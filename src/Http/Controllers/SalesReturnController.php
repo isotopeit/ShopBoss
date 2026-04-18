@@ -5,14 +5,16 @@ namespace Isotope\ShopBoss\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use Isotope\ShopBoss\Models\Branch;
 use Illuminate\Support\Facades\Auth;
-use Isotope\ShopBoss\Models\Product;
+use Illuminate\Support\Facades\DB;
+use Isotope\Finance\Models\Bank;
+use Isotope\Finance\Models\FinanceParticular;
+use Isotope\ShopBoss\Models\Branch;
 use Isotope\ShopBoss\Models\Customer;
-use Isotope\ShopBoss\Models\SaleReturn;
-use Isotope\ShopBoss\Models\SaleDetails;
+use Isotope\ShopBoss\Models\Product;
 use Isotope\ShopBoss\Models\PurchaseDetail;
+use Isotope\ShopBoss\Models\SaleDetails;
+use Isotope\ShopBoss\Models\SaleReturn;
 use Isotope\ShopBoss\Models\SaleReturnDetail;
 use Isotope\ShopBoss\Models\SaleReturnPayment;
 
@@ -88,8 +90,16 @@ class SalesReturnController extends Controller
         if (settings()->enable_branch == 1) {
             $branches = Branch::all();
         }
+
+        $paymentMethods = FinanceParticular::where('transactionable', 1)->get();
+        $banks = Bank::all()->map(function ($bank) {
+            return [
+                'id' => $bank->id,
+                'text' => $bank->name
+            ];
+        });
         
-        return view('shopboss::salesreturn.create', compact('customers', 'branches'));
+        return view('shopboss::salesreturn.create', compact('customers', 'branches','paymentMethods', 'banks'));
     }
 
     public function store(Request $request) {
