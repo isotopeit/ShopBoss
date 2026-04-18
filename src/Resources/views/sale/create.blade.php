@@ -135,15 +135,30 @@
                     </div>
                 </div>
                 
-                <div class="col-md-6 col-12">
+<div class="col-md-6 col-12">
+                    <label class="form-label">@lang('therapy::therapy.paymentMethod'):</label>
                     <div class="mb-2">
-                        <label class="form-label">{{ __('shopboss::shopboss.paymentMethod') }}:</label>
-                        <select class="form-select form-select-sm" name="payment_method">
-                            <option value="Cash">{{ __('shopboss::shopboss.cash') }}</option>
-                            <option value="Credit Card">{{ __('shopboss::shopboss.creditCard') }}</option>
-                            <option value="Bank Transfer">{{ __('shopboss::shopboss.bankTransfer') }}</option>
-                            <option value="Cheque">{{ __('shopboss::shopboss.cheque') }}</option>
-                            <option value="Other">{{ __('shopboss::shopboss.other') }}</option>
+                        <select id="payment-method" class="form-select form-select-sm" data-control="select2" 
+                                data-placeholder="@lang('therapy::therapy.selectPaymentMethod')" required>
+                            <option value="">@lang('therapy::therapy.selectPaymentMethod')</option>
+                            @foreach ($paymentMethods as $method)
+                                <option value="{{ $method->title }}">{{ $method->title }}</option>
+                            @endforeach
+                        </select>
+                        <input type="hidden" name="payment_method_id" id="payment-method-id" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-12" id="bank-select-container" style="display: none;">
+                    <label class="form-label">@lang('therapy::therapy.bank'):</label>
+                    <div class="mb-2">
+                        <select id="bank-select" class="form-select form-select-sm" data-control="select2" 
+                                data-placeholder="@lang('therapy::therapy.selectBank')" name="bank_id">
+                            <option value=""></option>
+                            @foreach ($banks as $bank)
+                            
+                                <option value="{{ $bank['id'] }}">{{ $bank['text'] }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -356,6 +371,23 @@
     })
 
     $('.select2').css('width', '92%')
+
+                     $('#payment-method').on('change', function() {
+        const selectedMethod = $(this).val();
+        const paymentMethodText = $(this).find('option:selected').text().trim().toLowerCase();
+        
+        $('#payment-method-id').val(selectedMethod);
+
+        if (selectedMethod && paymentMethodText.includes('bank')) {
+            $('#bank-select-container').show();
+            $('#bank-select').attr('required', true);
+            
+        } else { 
+            $('#bank-select-container').hide();
+            $('#bank-select').attr('required', false).val(null).trigger('change');
+            
+        }
+    });
 </script>
 @endpush
 

@@ -2,19 +2,21 @@
 
 namespace Isotope\ShopBoss\Http\Controllers;
 
-use PDF;
 use Exception;
 use Illuminate\Http\Request;
-use Isotope\ShopBoss\Models\Sale;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use Isotope\ShopBoss\Models\Branch;
 use Illuminate\Support\Facades\Auth;
-use Isotope\ShopBoss\Models\Product;
+use Illuminate\Support\Facades\DB;
+use Isotope\Finance\Models\Bank;
+use Isotope\Finance\Models\FinanceParticular;
+use Isotope\ShopBoss\Models\Branch;
 use Isotope\ShopBoss\Models\Customer;
+use Isotope\ShopBoss\Models\Product;
+use Isotope\ShopBoss\Models\PurchaseDetail;
+use Isotope\ShopBoss\Models\Sale;
 use Isotope\ShopBoss\Models\SaleDetails;
 use Isotope\ShopBoss\Models\SalePayment;
-use Isotope\ShopBoss\Models\PurchaseDetail;
+use PDF;
 
 class SaleController extends Controller
 {
@@ -119,8 +121,15 @@ class SaleController extends Controller
         if (settings()->enable_branch == 1) {
             $branches = Branch::all();
         }
+        $paymentMethods = FinanceParticular::where('transactionable', 1)->get();
+        $banks = Bank::all()->map(function ($bank) {
+            return [
+                'id' => $bank->id,
+                'text' => $bank->name
+            ];
+        });
         
-        return view('shopboss::sale.create', compact('customers', 'branches'));
+        return view('shopboss::sale.create', compact('customers', 'branches','paymentMethods', 'banks'));
     }
 
     public function store(Request $request)
