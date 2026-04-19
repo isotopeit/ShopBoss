@@ -144,7 +144,7 @@
                                 data-placeholder="@lang('therapy::therapy.selectPaymentMethod')" required>
                             <option value="">@lang('therapy::therapy.selectPaymentMethod')</option>
                             @foreach ($paymentMethods as $method)
-                                <option value="{{ $method->title }}">{{ $method->title }}</option>
+                                <option value="{{ $method->id }}">{{ $method->title }}</option>
                             @endforeach
                         </select>
                         <input type="hidden" name="payment_method_id" id="payment-method-id" required>
@@ -343,29 +343,7 @@
         
         // Refresh suppliers based on branch
         let branchId = $(this).val();
-        if (branchId) {
-            // Clear and disable supplier dropdown while loading
-            $('#supplier').empty().prop('disabled', true);
-            
-            $.ajax({
-                url: "{{ url('/') }}/purchases/branch/" + branchId + "/suppliers",
-                type: "GET",
-                success: function(response) {
-                    $('#supplier').empty();
-                    
-                    if (response.suppliers && response.suppliers.length > 0) {
-                        response.suppliers.forEach(function(supplier) {
-                            $('#supplier').append(new Option(supplier.text, supplier.id, false, false));
-                        });
-                    }
-                    
-                    $('#supplier').prop('disabled', false).trigger('change');
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error loading suppliers: " + error);
-                    $('#supplier').prop('disabled', false);
-                }
-            });
+        if (branchId) {    
             
             // Also update product dropdown to only show products from this branch
             $('#product').select2('destroy');

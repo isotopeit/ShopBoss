@@ -4,23 +4,36 @@ namespace Isotope\ShopBoss\Observers;
 
 use Exception;
 use Illuminate\Support\Str;
-use Isotope\ShopBoss\Models\Purchase;
-use Isotope\Finance\Models\FinanceRoot;
-use Isotope\Finance\Models\FinanceRecord;
+use Isotope\Finance\Models\BankTransaction;
 use Isotope\Finance\Models\FinanceParticular;
+use Isotope\Finance\Models\FinanceRecord;
+use Isotope\Finance\Models\FinanceRoot;
+use Isotope\ShopBoss\Models\Purchase;
+use Isotope\Therapy\Models\Branch;
 
 class PurchaseObserver
 {
-    private function particularPayableCreate()
+    private function particularPayableCreate($branch_id)
     {
         $root = FinanceRoot::firstWhere('title', 'liability');
         if(is_null($root)) throw new Exception("Finance Root liability is not found", 404);
 
+        $title = 'Payable';
+        $alias = 'payable';
+
+        if ($branch_id && settings()->enable_branch == 1) {
+            $branch = Branch::find($branch_id);
+            if ($branch) {
+                $title = $branch->name . '- Payable';
+                $alias = 'payable' . $branch_id;
+            }
+        }
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
-            'title'           => 'Payable',
-            'alias'           => 'payable',
+            'title'           => $title,
+            'alias'           => $alias,
             'transactionable' => 0,
             'increment'       => $root->increment,
             'decrement'       => $root->decrement,
@@ -50,16 +63,28 @@ class PurchaseObserver
         return $method;
     }
 
-    private function particularPurchaseCreate()
+    private function particularPurchaseCreate($branch_id)
     {
         $root = FinanceRoot::firstWhere('title', 'expense');
         if(is_null($root)) throw new Exception("Finance Root expense is not found", 404);
 
+        $title = 'Purchase';
+        $alias = 'purchase';
+
+        if ($branch_id && settings()->enable_branch == 1) {
+            $branch = Branch::find($branch_id);
+            if ($branch) {
+                $title = $branch->name . '- Purchase';
+                $alias = 'purchase' . $branch_id;
+            }
+        }
+
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
-            'title'           => 'Purchase',
-            'alias'           => 'purchase',
+            'title'           => $title,
+            'alias'           => $alias,
             'transactionable' => 0,
             'increment'       => $root->increment,
             'decrement'       => $root->decrement,
@@ -71,15 +96,30 @@ class PurchaseObserver
     public function created(Purchase $purchase)
     {
         if (class_exists(FinanceRecord::class)) {
-            $payable = FinanceParticular::firstWhere('alias', 'payable');
+
+            $branch_id = null;
+            if (settings()->enable_branch == 1 && $purchase->branch_id) {
+                $branch_id = $purchase->branch_id;
+            }
+
+
+            $payable_alias = $branch_id && settings()->enable_branch == 1 ? 'payable_' . $branch_id : 'payable';
+            $payable = FinanceParticular::firstWhere('alias', $payable_alias);
             if(is_null($payable)) {
-                $payable = $this->particularPayableCreate();
+                $payable = $this->particularPayableCreate($branch_id);
             }
-            $paymentMethod = $this->paymentMethod($purchase->payment_method);
-            $expense = FinanceParticular::firstWhere('alias', 'purchase');
+
+            $expense_alias = $branch_id && settings()->enable_branch == 1 ? 'purchase_' . $branch_id : 'purchase';
+            $expense = FinanceParticular::firstWhere('alias', $expense_alias);
             if(is_null($expense)) {
-                $expense = $this->particularPurchaseCreate();
+                $expense = $this->particularPurchaseCreate($branch_id);
             }
+
+            $payment_method_perticular = FinanceParticular::firstWhere('id', $purchase->payment_method);
+            if (is_null($payment_method_perticular)) {
+                throw new Exception("Payment Method Particular not found", 404);
+            }
+
             FinanceRecord::entry([
                 'description'     => "Expense of Create Purchase : {$purchase->reference}",
                 'amount'          => $purchase->total_amount,
@@ -88,14 +128,14 @@ class PurchaseObserver
                 'recordable_id'   => $purchase->id,
             ], $expense, 'increment');
 
-            if($purchase->paid_amount > 0) {
+            if($purchase->paid_amount > 0 && !str_contains($payment_method_perticular->alias , 'bank')) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Create Purchase : {$purchase->reference}",
                     'amount'          => $purchase->paid_amount,
                     'reference_no'    => '',
                     'recordable_type' => Purchase::class,
                     'recordable_id'   => $purchase->id,
-                ], $paymentMethod, 'decrement');
+                ], $payment_method_perticular, 'decrement');
             }
 
             if($purchase->due_amount > 0) {
@@ -109,6 +149,7 @@ class PurchaseObserver
             }
         }
     }
+
 
     public function updated(Purchase $purchase)
     {
