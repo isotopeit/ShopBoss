@@ -8,19 +8,32 @@ use Isotope\ShopBoss\Models\Sale;
 use Isotope\Finance\Models\FinanceRoot;
 use Isotope\Finance\Models\FinanceRecord;
 use Isotope\Finance\Models\FinanceParticular;
+use Isotope\Therapy\Models\Branch;
+
 
 class SaleObserver
 {
-    private function particularReceivableCreate()
+    private function particularReceivableCreate($branch_id = null)
     {
         $root = FinanceRoot::firstWhere('title', 'asset');
-        if(is_null($root)) throw new Exception("Finance Root asset is not found", 404);
+        if (is_null($root)) throw new Exception("Finance Root asset is not found", 404);
+
+        $title = 'Receivable';
+        $alias = 'receivable';
+
+        if ($branch_id && settings()->enable_branch == 1) {
+            $branch = Branch::find($branch_id);
+            if ($branch) {
+                $title = $branch->name . '- Receivable';
+                $alias = 'receivable_' . $branch_id;
+            }
+        }
 
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
-            'title'           => 'Receivable',
-            'alias'           => 'receivable',
+            'title'           => $title,
+            'alias'           => $alias,
             'transactionable' => 0,
             'increment'       => $root->increment,
             'decrement'       => $root->decrement,
@@ -50,16 +63,27 @@ class SaleObserver
         return $method;
     }
 
-    private function particularSaleCreate()
+   private function particularSellCreate($branch_id = null)
     {
         $root = FinanceRoot::firstWhere('title', 'revenue');
-        if(is_null($root)) throw new Exception("Finance Root revenue is not found", 404);
+        if (is_null($root)) throw new Exception("Finance Root revenue is not found", 404);
+
+        $title = 'Sale Revenue';
+        $alias = 'sale_revenue';
+
+        if ($branch_id && settings()->enable_branch == 1) {
+            $branch = Branch::find($branch_id);
+            if ($branch) {
+                $title = $branch->name . '- Sale Revenue';
+                $alias = 'sale_revenue_' . $branch_id;
+            }
+        }
 
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
-            'title'           => 'Sale Revenue',
-            'alias'           => 'sale_revenue',
+            'title'           => $title,
+            'alias'           => $alias,
             'transactionable' => 0,
             'increment'       => $root->increment,
             'decrement'       => $root->decrement,
@@ -71,15 +95,36 @@ class SaleObserver
     public function created(Sale $sale)
     {
         if (class_exists(FinanceRecord::class)) {
-            $receivable = FinanceParticular::firstWhere('alias', 'receivable');
-            if(is_null($receivable)) {
-                $receivable = $this->particularReceivableCreate();
+
+            $branch_id = null;
+            if (settings()->enable_branch == 1 && $sale->branch_id) {
+                $branch_id = $sale->branch_id;
             }
-            $paymentMethod = $this->paymentMethod($sale->payment_method);
-            $revenue = FinanceParticular::firstWhere('alias', 'sale_revenue');
-            if(is_null($revenue)) {
-                $revenue = $this->particularSaleCreate();
+
+            // Receivable
+            $receivable_alias = $branch_id && settings()->enable_branch == 1 ? 'receivable_' . $branch_id : 'receivable';
+            $receivable = FinanceParticular::firstWhere('alias', $receivable_alias);
+            if (is_null($receivable)) {
+                $receivable = $this->particularReceivableCreate($branch_id);
             }
+
+            // Revenue
+            $revenue_alias = $branch_id && settings()->enable_branch == 1 ? 'sale_revenue_' . $branch_id : 'sale_revenue';
+            
+            $revenue = FinanceParticular::firstWhere('alias', $revenue_alias);
+            if (is_null($revenue)) {
+                $revenue = $this->particularSellCreate($branch_id);
+            }
+
+            $payment_method_particular = FinanceParticular::firstWhere('id', $sale->payment_method);
+            if (is_null($payment_method_particular)) {
+                $payment_method_particular = $this->paymentMethod($sale->payment_method);
+            }
+
+            if (is_null($payment_method_particular)) {
+                throw new \Exception("Payment Method Particular not found", 404);
+            }
+
             FinanceRecord::entry([
                 'description'     => "Revenue of Create Sale : {$sale->reference}",
                 'amount'          => $sale->total_amount,
@@ -88,19 +133,19 @@ class SaleObserver
                 'recordable_id'   => $sale->id,
             ], $revenue, 'increment');
 
-            if($sale->paid_amount > 0) {
+            if ($sale->paid_amount > 0 && !str_contains($payment_method_particular->alias, 'bank')) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Create Sale : {$sale->reference}",
                     'amount'          => $sale->paid_amount,
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,
                     'recordable_id'   => $sale->id,
-                ], $paymentMethod, 'increment');
+                ], $payment_method_particular, 'increment');
             }
 
-            if($sale->due_amount > 0) {
+            if ($sale->due_amount > 0) {
                 FinanceRecord::entry([
-                    'description'     => "Payment Due of Create Sale : {$sale->reference}",
+                    'description'     => "Due Amount of Create Sale : {$sale->reference}",
                     'amount'          => $sale->due_amount,
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,
@@ -109,6 +154,7 @@ class SaleObserver
             }
         }
     }
+
 
     public function updated(Sale $sale)
     {
