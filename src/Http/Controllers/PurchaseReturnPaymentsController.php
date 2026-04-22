@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Isotope\Finance\Models\Bank;
+use Isotope\Finance\Models\FinanceParticular;
 use Isotope\ShopBoss\Models\PurchaseReturn;
 use Isotope\ShopBoss\Models\PurchaseReturnPayment;
 use Isotope\ShopBoss\Observers\PurchaseReturnPaymentObserver;
@@ -30,7 +32,14 @@ class PurchaseReturnPaymentsController extends Controller
     public function create(Request $request)
     {
         $purchaseReturn = PurchaseReturn::with('purchaseReturnPayments')->findOrFail($request->input('purchase_return_id'));
-        return view('shopboss::purchases-return.payments.create', compact('purchaseReturn'));
+        $paymentMethods = FinanceParticular::where('transactionable', 1)->get();
+        $banks = Bank::all()->map(function ($bank) {
+            return [
+                'id' => $bank->id,
+                'text' => $bank->name
+            ];
+        });
+        return view('shopboss::purchases-return.payments.create', compact('purchaseReturn', 'paymentMethods', 'banks'));
     }
 
     public function store(Request $request)
