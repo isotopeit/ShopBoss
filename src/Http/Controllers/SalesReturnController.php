@@ -8,7 +8,9 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Isotope\Finance\Models\Bank;
+use Isotope\Finance\Models\BankTransaction;
 use Isotope\Finance\Models\FinanceParticular;
+use Isotope\Finance\Models\FinanceRecord;
 use Isotope\ShopBoss\Models\Branch;
 use Isotope\ShopBoss\Models\Customer;
 use Isotope\ShopBoss\Models\Product;
@@ -17,6 +19,7 @@ use Isotope\ShopBoss\Models\SaleDetails;
 use Isotope\ShopBoss\Models\SaleReturn;
 use Isotope\ShopBoss\Models\SaleReturnDetail;
 use Isotope\ShopBoss\Models\SaleReturnPayment;
+use Isotope\ShopBoss\Observers\SaleReturnObserver;
 
 class SalesReturnController extends Controller
 {
@@ -104,6 +107,7 @@ class SalesReturnController extends Controller
 
     public function store(Request $request) {
         try {
+            // dd($request->all());
             $req = $request->all();
             $products = [];
             DB::beginTransaction();
@@ -174,7 +178,7 @@ class SalesReturnController extends Controller
                 'customer_id'        => $customer->id,
                 'customer_name'      => $customer->customer_name,
                 'paid_amount'        => $req['paid_amount'],
-                'payment_method'     => $req['payment_method'],
+                'payment_method'     => $req['payment_method_id'],
                 'note'               => $req['note'],
             ];
             
@@ -197,7 +201,7 @@ class SalesReturnController extends Controller
                     'reference'      => 'INV/' . $saleReturn->reference,
                     'amount'         => $saleReturn->paid_amount,
                     'sale_return_id' => $saleReturn->id,
-                    'payment_method' => $req['payment_method'],
+                    'payment_method' => $req['payment_method_id'],
                     'branch_id'      => $branch_id,
                 ]);
             }
@@ -206,14 +210,98 @@ class SalesReturnController extends Controller
                     'sale_return_id' => $saleReturn->id
                 ], $product));
             }
+
+            $saleReturnObserver = new SaleReturnObserver();
+            $saleReturnObserver->created($saleReturn);
+            // Only handle bank transaction if payment method is bank
+            $paymentMethod = FinanceParticular::find($req['payment_method_id'] ?? null);
+
+            if (str_contains($paymentMethod->alias, 'bank') && !isset($req['bank_id']))
+                throw new Exception("Bank is required for bank payment method", 400);
+
+            if ($paymentMethod && str_contains($paymentMethod->alias, 'bank')) {
+                $this->handleBankTransaction($req, $saleReturn, $paymentMethod);
+            }
+
             DB::commit();
             return redirect()->route('sale-returns.index')->withSuccess(__('Sale Return Successfull'));
 
         } catch (Exception $e) {
+            dd($e);
             DB::rollBack();
             return redirect()->route('sale-returns.index')->withSuccess(__($e->getMessage()));
         }
     }
+
+    private function handleBankTransaction($req, $saleReturn, $paymentMethod)
+    {
+        if (!array_key_exists('bank_id', $req) || !class_exists(Bank::class) || !class_exists(BankTransaction::class)) {
+            return;
+        }
+
+        $bank = Bank::find($req['bank_id']);
+        if (!$bank) {
+            throw new Exception("Bank not found", 404);
+        }
+
+        $bank_last_record = BankTransaction::where('bank_id', $req['bank_id'])
+            ->orderByDesc('id')
+            ->first();
+
+        $amount = !empty($req['paid_amount']) && $req['paid_amount'] > 0
+            ? $req['paid_amount']
+            : ($req['due_amount'] ?? 0);
+
+        $previous_balance = $bank_last_record ? $bank_last_record->balance : 0;
+        $status = 0;
+        $balance = $previous_balance;
+
+        if (!empty($req['paid_amount']) && $req['paid_amount'] > 0) {
+            $balance += $amount;
+            $status = 0; // credit
+        } else {
+            $balance -= $amount;
+            if ($balance < 0) {
+                throw new Exception("The Amount Cannot Be Greater Than The Balance", 403);
+            }
+            $status = 1; // debit
+        }
+
+        $description = "Payment of Create Sale : {$saleReturn->reference} | Bank({$bank->name}:***" . substr($bank->account_number, -4) . ")";
+
+        // Finance record তৈরি
+        $financeRecordId = null;
+        if (class_exists(FinanceRecord::class) && class_exists(FinanceParticular::class)) {
+            $bankParticular = $paymentMethod;
+
+            if ($bankParticular) {
+                $operation = (!empty($req['paid_amount']) && $req['paid_amount'] > 0) ? 'increment' : 'decrement';
+                $financeRecord = FinanceRecord::entry([
+                    'description'     => $description,
+                    'amount'          => $amount,
+                    'reference_no'    => $saleReturn->reference,
+                    'recordable_type' => SaleReturn::class,
+                    'recordable_id'   => $saleReturn->id,
+                ], $bankParticular, $operation);
+
+                if ($financeRecord) {
+                    $financeRecordId = $financeRecord->id;
+                }
+            }
+        }
+
+        // BankTransaction তৈরি
+        return BankTransaction::create([
+            'bank_id'           => $bank->id,
+            'finance_record_id' => $financeRecordId,
+            'amount'            => $amount,
+            'balance'           => $balance,
+            'description'       => $description,
+            'status'            => $status,
+            'invoice_id'        => $saleReturn->id,
+        ]);
+    }
+
 
     public function show($id) 
     {
