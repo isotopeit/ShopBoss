@@ -100,7 +100,7 @@
                                 data-placeholder="@lang('therapy::therapy.selectPaymentMethod')" required>
                             <option value="">@lang('therapy::therapy.selectPaymentMethod')</option>
                             @foreach ($paymentMethods as $method)
-                                <option value="{{ $method->title }}">{{ $method->title }}</option>
+                                <option value="{{ $method->id }}">{{ $method->title }}</option>
                             @endforeach
                         </select>
                         <input type="hidden" name="payment_method_id" id="payment-method-id" required>

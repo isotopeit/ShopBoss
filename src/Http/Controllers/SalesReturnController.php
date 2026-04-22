@@ -107,7 +107,6 @@ class SalesReturnController extends Controller
 
     public function store(Request $request) {
         try {
-            // dd($request->all());
             $req = $request->all();
             $products = [];
             DB::beginTransaction();

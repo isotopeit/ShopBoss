@@ -42,8 +42,9 @@ class PurchaseReturn extends BaseModel
             $number = PurchaseReturn::max('id') + 1;
             $model->reference = make_reference_id('PRRN', $number);
         });
-        static::created(fn($model) => (new PurchaseReturnObserver())->created($model));
-        static::updated(fn($model) => (new PurchaseReturnObserver())->updated($model));
+        
+        // static::created(fn($model) => (new PurchaseReturnObserver())->created($model));
+        // static::updated(fn($model) => (new PurchaseReturnObserver())->updated($model));
         static::deleted(fn($model) => (new PurchaseReturnObserver())->deleted($model));
     }
 

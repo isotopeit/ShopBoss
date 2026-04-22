@@ -4,23 +4,35 @@ namespace Isotope\ShopBoss\Observers;
 
 use Exception;
 use Illuminate\Support\Str;
-use Isotope\Finance\Models\FinanceRoot;
-use Isotope\Finance\Models\FinanceRecord;
-use Isotope\ShopBoss\Models\PurchaseReturn;
 use Isotope\Finance\Models\FinanceParticular;
+use Isotope\Finance\Models\FinanceRecord;
+use Isotope\Finance\Models\FinanceRoot;
+use Isotope\ShopBoss\Models\PurchaseReturn;
+use Isotope\Therapy\Models\Branch;
 
 class PurchaseReturnObserver
 {
-    private function particularReceivableCreate()
+    private function particularReceivableCreate($branch_id = null)
     {
         $root = FinanceRoot::firstWhere('title', 'asset');
-        if(is_null($root)) throw new Exception("Finance Root asset is not found", 404);
+        if (is_null($root)) throw new Exception("Finance Root asset is not found", 404);
+
+        $title = 'Receivable';
+        $alias = 'receivable';
+
+        if ($branch_id && settings()->enable_branch == 1) {
+            $branch = Branch::find($branch_id);
+            if ($branch) {
+                $title = $branch->name . '- Receivable';
+                $alias = 'receivable_' . $branch_id;
+            }
+        }
 
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
-            'title'           => 'Receivable',
-            'alias'           => 'receivable',
+            'title'           => $title,
+            'alias'           => $alias,
             'transactionable' => 0,
             'increment'       => $root->increment,
             'decrement'       => $root->decrement,
@@ -50,16 +62,28 @@ class PurchaseReturnObserver
         return $method;
     }
 
-    private function particularPurchaseReturnCreate()
+    private function particularPurchaseReturnCreate($branch_id = null)
     {
         $root = FinanceRoot::firstWhere('title', 'expense');
         if(is_null($root)) throw new Exception("Finance Root expense is not found", 404);
 
+        $title = 'Purchase Return';
+        $alias = 'purchase_return';
+
+        if ($branch_id && settings()->enable_branch == 1) {
+            $branch = Branch::find($branch_id);
+            if ($branch) {
+                $title = $branch->name . '- Purchase Return';
+                $alias = 'purchase_return_' . $branch_id;
+            }
+        }
+        
+
         $data = FinanceParticular::create([
             'root_id'         => $root->id,
             'root_title'      => $root->title,
-            'title'           => 'Purchase Return',
-            'alias'           => 'purchase_return',
+            'title'           => $title,
+            'alias'           => $alias,
             'transactionable' => 0,
             'increment'       => $root->increment,
             'decrement'       => $root->decrement,
@@ -68,18 +92,84 @@ class PurchaseReturnObserver
         return $data;
     }
 
+    // public function created(PurchaseReturn $purchaseReturn)
+    // {
+    //     if (class_exists(FinanceRecord::class)) {
+    //         $receivable = FinanceParticular::firstWhere('alias', 'receivable');
+    //         if(is_null($receivable)) {
+    //             $receivable = $this->particularReceivableCreate();
+    //         }
+    //         $paymentMethod = $this->paymentMethod($purchaseReturn->payment_method);
+    //         $expense = FinanceParticular::firstWhere('alias', 'purchase_return');
+    //         if(is_null($expense)) {
+    //             $expense = $this->particularPurchaseReturnCreate();
+    //         }
+    //         FinanceRecord::entry([
+    //             'description'     => "Expense of Create Purchase Return : {$purchaseReturn->reference}",
+    //             'amount'          => $purchaseReturn->total_amount,
+    //             'reference_no'    => '',
+    //             'recordable_type' => PurchaseReturn::class,
+    //             'recordable_id'   => $purchaseReturn->id,
+    //         ], $expense, 'decrement');
+
+    //         if($purchaseReturn->paid_amount > 0) {
+    //             FinanceRecord::entry([
+    //                 'description'     => "Payment of Create Purchase Return : {$purchaseReturn->reference}",
+    //                 'amount'          => $purchaseReturn->paid_amount,
+    //                 'reference_no'    => '',
+    //                 'recordable_type' => PurchaseReturn::class,
+    //                 'recordable_id'   => $purchaseReturn->id,
+    //             ], $paymentMethod, 'increment');
+    //         }
+
+    //         if($purchaseReturn->due_amount > 0) {
+    //             FinanceRecord::entry([
+    //                 'description'     => "Payment Due of Create Purchase Return : {$purchaseReturn->reference}",
+    //                 'amount'          => $purchaseReturn->due_amount,
+    //                 'reference_no'    => '',
+    //                 'recordable_type' => PurchaseReturn::class,
+    //                 'recordable_id'   => $purchaseReturn->id,
+    //             ], $receivable, 'increment');
+    //         }
+    //     }
+    // }
+
     public function created(PurchaseReturn $purchaseReturn)
     {
         if (class_exists(FinanceRecord::class)) {
-            $receivable = FinanceParticular::firstWhere('alias', 'receivable');
-            if(is_null($receivable)) {
-                $receivable = $this->particularReceivableCreate();
+
+            $branch_id = null;
+            if (settings()->enable_branch == 1 && $purchaseReturn->branch_id) {
+                $branch_id = $purchaseReturn->branch_id;
             }
-            $paymentMethod = $this->paymentMethod($purchaseReturn->payment_method);
-            $expense = FinanceParticular::firstWhere('alias', 'purchase_return');
-            if(is_null($expense)) {
-                $expense = $this->particularPurchaseReturnCreate();
+
+            // Receivable (Asset) logic
+            // আপনার particularReceivableCreate মেথডে alias দেওয়া আছে 'receivable_'.$branch_id
+            $receivable_alias = $branch_id && settings()->enable_branch == 1 ? 'receivable_' . $branch_id : 'receivable';
+            $receivable = FinanceParticular::firstWhere('alias', $receivable_alias);
+            if (is_null($receivable)) {
+                $receivable = $this->particularReceivableCreate($branch_id);
             }
+
+            // Purchase Return (Expense) logic
+            // আপনার particularPurchaseReturnCreate মেথডে alias দেওয়া আছে 'purchase_return_'.$branch_id
+            $expense_alias = $branch_id && settings()->enable_branch == 1 ? 'purchase_return_' . $branch_id : 'purchase_return';
+            $expense = FinanceParticular::firstWhere('alias', $expense_alias);
+            if (is_null($expense)) {
+                $expense = $this->particularPurchaseReturnCreate($branch_id);
+            }
+
+            // Payment Method Particular
+            $payment_method_particular = FinanceParticular::firstWhere('id', $purchaseReturn->payment_method);
+            if (is_null($payment_method_particular)) {
+                $payment_method_particular = $this->paymentMethod($purchaseReturn->payment_method);
+            }
+
+            if (is_null($payment_method_particular)) {
+                throw new \Exception("Payment Method Particular not found", 404);
+            }
+
+            // 1. Expense/Purchase Return Entry (Decrement: যেহেতু পারচেজ রিটার্ন হলে এক্সপেন্স কমে যায়)
             FinanceRecord::entry([
                 'description'     => "Expense of Create Purchase Return : {$purchaseReturn->reference}",
                 'amount'          => $purchaseReturn->total_amount,
@@ -88,17 +178,19 @@ class PurchaseReturnObserver
                 'recordable_id'   => $purchaseReturn->id,
             ], $expense, 'decrement');
 
-            if($purchaseReturn->paid_amount > 0) {
+            // 2. Paid Amount Entry (Increment: সাপ্লায়ার থেকে ক্যাশ বা টাকা ফেরত পাওয়ার কারণে এসেট বাড়ছে)
+            if ($purchaseReturn->paid_amount > 0 && !str_contains($payment_method_particular->alias, 'bank')) {
                 FinanceRecord::entry([
                     'description'     => "Payment of Create Purchase Return : {$purchaseReturn->reference}",
                     'amount'          => $purchaseReturn->paid_amount,
                     'reference_no'    => '',
                     'recordable_type' => PurchaseReturn::class,
                     'recordable_id'   => $purchaseReturn->id,
-                ], $paymentMethod, 'increment');
+                ], $payment_method_particular, 'increment');
             }
 
-            if($purchaseReturn->due_amount > 0) {
+            // 3. Due Amount Entry (Increment: সাপ্লায়ারের কাছে টাকা প্রাপ্য/Receivable বাড়ছে)
+            if ($purchaseReturn->due_amount > 0) {
                 FinanceRecord::entry([
                     'description'     => "Payment Due of Create Purchase Return : {$purchaseReturn->reference}",
                     'amount'          => $purchaseReturn->due_amount,
@@ -109,7 +201,7 @@ class PurchaseReturnObserver
             }
         }
     }
-
+    
     public function updated(PurchaseReturn $purchaseReturn)
     {
         if (class_exists(FinanceRecord::class)) {
