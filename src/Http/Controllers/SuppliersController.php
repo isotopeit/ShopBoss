@@ -176,6 +176,28 @@ class SuppliersController extends Controller
         return redirect()->route('suppliers.index')->withSuccess('Supplier Deleted!');
     }
 
+    public function supplierStore(Request $request)
+    {
+        $data = [
+            'supplier_name'  => $request->name,
+            'supplier_phone' => $request->phone,
+            'supplier_email' => 'N/A',
+            'company_name'   => $request->company_name ?? 'N/A',
+            'city'           => 'N/A',
+            'country'        => 'N/A',
+            'address'        => 'N/A',
+        ];
+        
+        // Add branch ID if branch system is enabled
+        if (settings()->enable_branch == 1 && Auth::user()->branch) {
+            $data['branch_id'] = Auth::user()->branch->id;
+        }
+        
+        $supplier = Supplier::create($data);
+
+        return response()->json($supplier);
+    }
+
     public function supplierSelecr2()
     {
         $query = Supplier::query();

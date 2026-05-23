@@ -185,7 +185,7 @@ class PurchaseController extends Controller
             return redirect()->route('purchases.index')->withSuccess("Purchase Created");
         } catch (Exception $e) {
             DB::rollBack();
-            return redirect()->route('purchases.index')->withErrors($e->getMessage());
+            return back()->withInput()->withErrors($e->getMessage());
         }
     }
 

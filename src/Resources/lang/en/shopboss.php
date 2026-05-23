@@ -384,6 +384,7 @@ return [
     'reports' => 'Reports',
     'settings' => 'Settings',
     'createSale' => 'Create Sale',
+    'salesList' => 'Sale List',
     'saleDetails' => 'Sale Details',
     'selectCustomer' => 'Select Customer',
     'somethingWentWrong' => 'Something Went Wrong',

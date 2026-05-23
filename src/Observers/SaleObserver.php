@@ -126,7 +126,7 @@ class SaleObserver
             }
 
             FinanceRecord::entry([
-                'description'     => "Revenue of Create Sale : {$sale->reference}",
+                'description'     => "Revenue of Create Sale : {$sale->reference} | {$sale->customer_name}",
                 'amount'          => $sale->total_amount,
                 'reference_no'    => '',
                 'recordable_type' => Sale::class,
@@ -135,7 +135,7 @@ class SaleObserver
 
             if ($sale->paid_amount > 0 && !str_contains($payment_method_particular->alias, 'bank')) {
                 FinanceRecord::entry([
-                    'description'     => "Payment of Create Sale : {$sale->reference}",
+                    'description'     => "Payment of Create Sale : {$sale->reference} | {$sale->customer_name}",
                     'amount'          => $sale->paid_amount,
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,
@@ -145,7 +145,7 @@ class SaleObserver
 
             if ($sale->due_amount > 0) {
                 FinanceRecord::entry([
-                    'description'     => "Due Amount of Create Sale : {$sale->reference}",
+                    'description'     => "Due Amount of Create Sale : {$sale->reference} | {$sale->customer_name}",
                     'amount'          => $sale->due_amount,
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,
@@ -175,7 +175,7 @@ class SaleObserver
             $receivable = FinanceParticular::firstWhere('alias', 'receivable');
             if ($revenueAmount != $sale->total_amount) {
                 FinanceRecord::entry([
-                    'description'     => "Revenue of Update Sale : {$sale->reference}",
+                    'description'     => "Revenue of Update Sale : {$sale->reference} | {$sale->customer_name}",
                     'amount'          => $revenueAmount < $sale->total_amount ? ($sale->total_amount - $revenueAmount) : ($revenueAmount - $sale->total_amount),
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,
@@ -185,7 +185,7 @@ class SaleObserver
 
             if($receivableAmount != $sale->due_amount) {
                 FinanceRecord::entry([
-                    'description'     => "Payment Due of Update Sale : {$sale->reference}",
+                    'description'     => "Payment Due of Update Sale : {$sale->reference} | {$sale->customer_name}",
                     'amount'          => $receivableAmount < $sale->due_amount ? ($sale->due_amount - $receivableAmount) : ($receivableAmount - $sale->due_amount),
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,
@@ -204,7 +204,7 @@ class SaleObserver
             $receivable    = FinanceParticular::firstWhere('alias', 'receivable');
 
             FinanceRecord::entry([
-                'description'     => "Revenue of Delete Sale : {$sale->reference}",
+                'description'     => "Revenue of Delete Sale : {$sale->reference} | {$sale->customer_name}",
                 'amount'          => $sale->total_amount,
                 'reference_no'    => '',
                 'recordable_type' => Sale::class,
@@ -213,7 +213,7 @@ class SaleObserver
 
             if($sale->paid_amount > 0) {
                 FinanceRecord::entry([
-                    'description'     => "Payment of Delete Sale : {$sale->reference}",
+                    'description'     => "Payment of Delete Sale : {$sale->reference} | {$sale->customer_name}",
                     'amount'          => $sale->paid_amount,
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,
@@ -223,7 +223,7 @@ class SaleObserver
 
             if($sale->due_amount > 0) {
                 FinanceRecord::entry([
-                    'description'     => "Payment Due of Delete Invoice : {$sale->reference}",
+                    'description'     => "Payment Due of Delete Invoice : {$sale->reference} | {$sale->customer_name}",
                     'amount'          => $sale->due_amount,
                     'reference_no'    => '',
                     'recordable_type' => Sale::class,

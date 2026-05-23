@@ -38,10 +38,23 @@
             <div class="row">
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('shopboss::shopboss.customer') }} <span class="text-danger">*</span></label>
-                        <select class="form-select form-select-sm" id="customer" name="customer_id"></select>
+                        <label class="form-label">{{ __('shopboss::shopboss.customer') }}
+                            @if($hasPatients)
+                                <small class="text-muted">({{ __('Or select patient below') }})</small>
+                            @endif
+                        </label>
+                        <select class="form-select form-select-sm" id="customer" name="customer_id"
+                            @if(!$hasPatients) required @endif></select>
                     </div>
                 </div>
+                @if($hasPatients)
+                <div class="col-md-4 col-12">
+                    <div class="mb-2">
+                        <label class="form-label">{{ __('Patient') }}: <small class="text-muted">({{ __('Optional') }})</small></label>
+                        <select class="form-select form-select-sm" id="patient" name="patient_id"></select>
+                    </div>
+                </div>
+                @endif
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.reference') }}: <span class="text-danger">*</span></label>
@@ -145,16 +158,6 @@
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('shopboss::shopboss.status') }}:</label>
-                        <select class="form-select form-select-sm" name="status">
-                            <option value="Pending" @if ($sale->status == 'Pending') selected @endif >{{ __('shopboss::shopboss.pending') }}</option>
-                            <option value="Ordered" @if ($sale->status == 'Ordered') selected @endif >{{ __('shopboss::shopboss.ordered') }}</option>
-                            <option value="Completed" @if ($sale->status == 'Completed') selected @endif >{{ __('shopboss::shopboss.completed') }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4 col-12">
-                    <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.paymentMethod') }}:</label>
                         <input type="text" class="form-control form-control-sm" name="payment_method" value="{{ $sale->payment_method }}" disabled>
                     </div>
@@ -211,8 +214,46 @@
         data : @json($customers),
         templateResult,
         templateSelection,
-        matcher
+        matcher,
+        allowClear: true
     }).val(@json($sale->customer_id)).trigger('change');
+
+    @if($hasPatients)
+    $('#patient').select2({
+        placeholder: "Select Patient",
+        data : @json($patients),
+        templateResult,
+        templateSelection,
+        matcher,
+        allowClear: true
+    }).val(@json($sale->patient_id ?? null)).trigger('change');
+
+    // If patient selected → clear customer, remove required
+    $('#patient').on('change', function() {
+        if ($(this).val()) {
+            $('#customer').val(null).trigger('change');
+            $('#customer').prop('required', false);
+        } else {
+            $('#customer').prop('required', true);
+        }
+    });
+
+    // If customer selected → clear patient
+    $('#customer').on('change', function() {
+        if ($(this).val()) {
+            $('#patient').val(null).trigger('change');
+        }
+    });
+
+    // Initialize toggle on page load
+    (function() {
+        if ($('#patient').val()) {
+            $('#customer').prop('required', false);
+        } else {
+            $('#customer').prop('required', true);
+        }
+    })();
+    @endif
 
     $('#product').select2({
         placeholder: "{{ __('shopboss::shopboss.selectProduct') }}",

@@ -23,17 +23,14 @@
                     placeholder="{{ __('shopboss::shopboss.enterCustomerName') }}">
             </div>
             <div class="col-md">
-                <input type="date" value="{{ Request::input('search')['date'] ?? '' }}"
-                    class="form-control form-control-sm" name="search[date]"
-                    placeholder="{{ __('shopboss::shopboss.enterDate') }}">
+                <input type="date" value="{{ Request::input('search')['date_from'] ?? '' }}"
+                    class="form-control form-control-sm" name="search[date_from]"
+                    placeholder="{{ __('From Date') }}">
             </div>
             <div class="col-md">
-                <select class="form-select form-select-sm" name="search[status]">
-                    <option value="">{{ __('shopboss::shopboss.selectStatus') }}</option>
-                    <option value="Pending" {{ (Request::input('search')['status'] ?? '') == 'Pending' ? 'selected' : '' }}>{{ __('shopboss::shopboss.pending') }}</option>
-                    <option value="Ordered" {{ (Request::input('search')['status'] ?? '') == 'Ordered' ? 'selected' : '' }}>{{ __('shopboss::shopboss.ordered') }}</option>
-                    <option value="Completed" {{ (Request::input('search')['status'] ?? '') == 'Completed' ? 'selected' : '' }}>{{ __('shopboss::shopboss.completed') }}</option>
-                </select>
+                <input type="date" value="{{ Request::input('search')['date_to'] ?? '' }}"
+                    class="form-control form-control-sm" name="search[date_to]"
+                    placeholder="{{ __('To Date') }}">
             </div>
            
             <div class="col-md">
@@ -59,7 +56,6 @@
                         <td>{{ __('shopboss::shopboss.branch') }}</td>
                         @endif
                         <td>{{ __('shopboss::shopboss.date') }}</td>
-                        <td>{{ __('shopboss::shopboss.status') }}</td>
                         <td>{{ __('shopboss::shopboss.actions') }}</td>
                     </tr>
                 </thead>
@@ -81,11 +77,6 @@
                         <td>{{ $sale->branch->name ?? 'N/A' }}</td>
                         @endif
                         <td>{{ $sale->date }}</td>
-                        <td>
-                            <span class="badge badge-{{ $sale->status == 'Completed' ? 'success' : ($sale->status == 'Ordered' ? 'info' : 'warning') }}">
-                                {{ $sale->status }}
-                            </span>
-                        </td>
                         <td class="d-flex justify-content-center">
                             @include('shopboss::sale.partials.actions')
                         </td>

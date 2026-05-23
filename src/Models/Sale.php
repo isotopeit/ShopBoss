@@ -34,6 +34,26 @@ class Sale extends BaseModel
         return $this->belongsTo(Branch::class);
     }
 
+    /**
+     * Get the patient linked to the sale (optional).
+     * Only available if the Therapy package is installed.
+     */
+    public function patient()
+    {
+        if (!class_exists('\\Isotope\\Therapy\\Models\\Patient')) {
+            return null;
+        }
+        return $this->belongsTo('\Isotope\Therapy\Models\Patient');
+    }
+
+    /**
+     * Get the customer linked to the sale (optional).
+     */
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
     public static function boot() {
         parent::boot();
 

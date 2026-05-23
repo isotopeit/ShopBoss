@@ -52,10 +52,29 @@
             <div class="row">
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('shopboss::shopboss.customers') }}</label>
-                        <select class="form-select form-select-sm" id="customer" name="customer_id" required></select>
+                        <label class="form-label  align-items-center w-100">
+                            <span>
+                                {{ __('shopboss::shopboss.customers') }}
+                                @if($hasPatients)
+                                    <small class="text-muted">({{ __('Or select patient below') }})</small>
+                                @endif
+                            </span>
+                            <button type="button" class="btn btn-sm btn-isotope py-0 px-2" data-bs-toggle="modal" data-bs-target="#createCustomerModal" title="{{ __('Add Customer') }}">
+                                <i class="fa-solid fa-plus text-white"></i>
+                            </button>
+                        </label>
+                        <select class="form-select form-select-sm" id="customer" name="customer_id"
+                            @if(!$hasPatients) required @endif></select>
                     </div>
                 </div>
+                @if($hasPatients)
+                <div class="col-md-4 col-12">
+                    <div class="mb-2">
+                        <label class="form-label">{{ __('Patient') }}: <small class="text-muted">({{ __('Optional') }})</small></label>
+                        <select class="form-select form-select-sm" id="patient" name="patient_id"></select>
+                    </div>
+                </div>
+                @endif
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.reference') }}:</label>
@@ -65,7 +84,7 @@
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.date') }}: </label>
-                        <input type="date" class="form-control form-control-sm" name="date"required value="{{ date('Y-m-d') }}">
+                        <input type="date" class="form-control form-control-sm" name="date" required value="{{ old('date', date('Y-m-d')) }}">
                     </div>
                 </div>
                 <div class="col-12">
@@ -82,9 +101,56 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="removeable-tr text-center fw-bold">
-                                <td colspan="8" class="text-danger">{{ __('shopboss::shopboss.pleaseSearchSelectProducts') }}!</td>
-                            </tr>
+                            @if(old('products'))
+                                @foreach(old('products') as $key => $productOld)
+                                    @php
+                                        $productModel = \Isotope\ShopBoss\Models\Product::find($productOld['product_id']);
+                                    @endphp
+                                    @if($productModel)
+                                        @php
+                                            $stock = \Isotope\ShopBoss\Models\PurchaseDetail::where('product_id', $productModel->id)->sum('available_qty');
+                                        @endphp
+                                        <tr class="align-middle text-end" id="{{ $productModel->id }}" data-product_quantity="{{ $stock }}">
+                                            <td class="text-start">
+                                                <p class="p-0 m-0">{{ $productModel->product_name }}</p>
+                                                <span class="badge badge-success">{{ $productModel->product_code }}</span>
+                                            </td>
+                                            <td class="unit-price">{{ number_format($productModel->product_price, 2, '.', '') }}</td>
+                                            <td>{{ number_format($stock, 2) }}</td>
+                                            <td width="10%">
+                                                <input type="hidden" value="{{ $productModel->id }}" name="products[{{ $key }}][product_id]" />
+                                                <input type="number" step="0.01" class="form-control form-control-sm qty" value="{{ $productOld['qty'] ?? 1 }}" onchange="subTotalCalc(this)" name="products[{{ $key }}][qty]" />
+                                            </td>
+                                            <td width="10%">
+                                                <div class="d-flex">
+                                                    <input type="number" class="form-control form-control-sm discount" name="products[{{ $key }}][discount]" onchange="subTotalCalc(this)" value="{{ $productOld['discount'] ?? 0 }}" step="0.01">
+                                                    <input type="checkbox" class="form-check-input mt-2 mx-1 percentage" name="products[{{ $key }}][percentage]" onchange="subTotalCalc(this)" {{ isset($productOld['percentage']) ? 'checked' : '' }}>
+                                                    <label class="form-check-label mt-3 text-dark">%</label>
+                                                </div>
+                                            </td>
+                                            <td class="sub-total">
+                                                @php
+                                                    $discountAmt = $productOld['discount'] ?? 0;
+                                                    if(isset($productOld['percentage'])) {
+                                                        $discountAmt = ($productModel->product_price / 100) * $discountAmt;
+                                                    }
+                                                    $subTotal = ($productModel->product_price - $discountAmt) * ($productOld['qty'] ?? 1);
+                                                @endphp
+                                                {{ number_format($subTotal, 2, '.', '') }}
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm p-0 me-1 remove_product">
+                                                    <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>    
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            @else
+                                <tr class="removeable-tr text-center fw-bold">
+                                    <td colspan="8" class="text-danger">{{ __('shopboss::shopboss.pleaseSearchSelectProducts') }}!</td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -119,23 +185,23 @@
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.orderTaxPercent') }}:</label>
-                        <input type="number" class="form-control form-control-sm" name="tax_percentage" value="0" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
+                        <input type="number" class="form-control form-control-sm" name="tax_percentage" value="{{ old('tax_percentage', 0) }}" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.discountFixed') }}:</label>
-                        <input type="number" class="form-control form-control-sm" name="discount_amount" value="0" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
+                        <input type="number" class="form-control form-control-sm" name="discount_amount" value="{{ old('discount_amount', 0) }}" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.shipping') }}:</label>
-                        <input type="number" class="form-control form-control-sm" name="shipping_amount" step="0.01" value="0" onchange="grandTotalCalc()">
+                        <input type="number" class="form-control form-control-sm" name="shipping_amount" step="0.01" value="{{ old('shipping_amount', 0) }}" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 
-<div class="col-md-6 col-12">
+                <div class="col-md-6 col-12">
                     <label class="form-label">@lang('therapy::therapy.paymentMethod'):</label>
                     <div class="mb-2">
                         <select id="payment-method" class="form-select form-select-sm" data-control="select2" 
@@ -165,13 +231,13 @@
                 <div class="col-md-6 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.amountPaid') }}:</label>
-                        <input type="text" class="form-control form-control-sm" name="paid_amount" required>
+                        <input type="text" class="form-control form-control-sm" name="paid_amount" required value="{{ old('paid_amount') }}">
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.noteIfNeeded') }}:</label>
-                        <textarea class="form-control form-control-sm" rows="5" name="note"></textarea>
+                        <textarea class="form-control form-control-sm" rows="5" name="note">{{ old('note') }}</textarea>
                     </div>
                 </div>
                 <div class="col-12">
@@ -184,6 +250,35 @@
         </div>
     </div>
 </form>
+
+<!-- Customer Create Modal -->
+<div class="modal fade" id="createCustomerModal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="createCustomerForm">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createCustomerModalLabel">{{ __('Add Customer') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('shopboss::shopboss.customerName') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('shopboss::shopboss.phone') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="phone" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">{{ __('shopboss::shopboss.close') }}</button>
+                    <button type="submit" class="btn btn-sm btn-isotope text-white">{{ __('shopboss::shopboss.save') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @push('css')
     <script></script>
@@ -218,8 +313,37 @@
         data : @json($customers),
         templateResult,
         templateSelection,
-        matcher
-    }).val(null).trigger('change');
+        matcher,
+        allowClear: true
+    }).val(@json(old('customer_id'))).trigger('change');
+
+    @if($hasPatients)
+    $('#patient').select2({
+        placeholder: "Select Patient",
+        data : @json($patients),
+        templateResult,
+        templateSelection,
+        matcher,
+        allowClear: true
+    }).val(@json(old('patient_id'))).trigger('change');
+
+    // If patient selected → clear customer, remove required
+    $('#patient').on('change', function() {
+        if ($(this).val()) {
+            $('#customer').val(null).trigger('change');
+            $('#customer').prop('required', false);
+        } else {
+            $('#customer').prop('required', true);
+        }
+    });
+
+    // If customer selected → clear patient
+    $('#customer').on('change', function() {
+        if ($(this).val()) {
+            $('#patient').val(null).trigger('change');
+        }
+    });
+    @endif
 
     $('#product').select2({
         placeholder: "{{ __('shopboss::shopboss.selectProduct') }}",
@@ -387,6 +511,76 @@
             $('#bank-select').attr('required', false).val(null).trigger('change');
             
         }
+    });
+
+    // Initialize values on page load
+    $(document).ready(function() {
+        @if(old('products'))
+            rowKey = {{ max(array_keys(old('products'))) + 1 }};
+            grandTotalCalc();
+        @endif
+
+        const oldPaymentMethod = "{{ old('payment_method_id') }}";
+        if (oldPaymentMethod) {
+            $('#payment-method').val(oldPaymentMethod).trigger('change');
+        }
+
+        const oldBankId = "{{ old('bank_id') }}";
+        if (oldBankId) {
+            $('#bank-select').val(oldBankId).trigger('change');
+        }
+    });
+
+    // Handle Quick Customer Create
+    $('#createCustomerForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const submitBtn = form.find('button[type="submit"]');
+        submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        axios.post('/api/customer-store', form.serialize())
+            .then(response => {
+                const customer = response.data;
+                const newOption = new Option(customer.customer_name, customer.id, false, false);
+                
+                // Add the new option and select it
+                $('#customer').append(newOption).trigger('change');
+                
+                // Set the subText for select2
+                const dataObj = $('#customer').select2('data')[0];
+                if (dataObj && customer.customer_phone) {
+                    dataObj.subText = customer.customer_phone;
+                }
+
+                $('#customer').val(customer.id).trigger('change');
+
+                // Close modal and reset form
+                $('#createCustomerModal').modal('hide');
+                form[0].reset();
+                
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Customer Added Successfully!',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            })
+            .catch(error => {
+                let msg = 'Something went wrong';
+                if (error.response && error.response.data && error.response.data.message) {
+                    msg = error.response.data.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: msg,
+                });
+            })
+            .finally(() => {
+                submitBtn.prop('disabled', false).text("{{ __('shopboss::shopboss.save') }}");
+            });
     });
 </script>
 @endpush

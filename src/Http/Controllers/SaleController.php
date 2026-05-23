@@ -102,6 +102,15 @@ class SaleController extends Controller
                 $query->where('branch_id', Auth::user()->branch->id);
             }
         }
+
+        // Filter by created_at date range
+        $search = request('search');
+        if (!empty($search['date_from'])) {
+            $query->whereDate('created_at', '>=', $search['date_from']);
+        }
+        if (!empty($search['date_to'])) {
+            $query->whereDate('created_at', '<=', $search['date_to']);
+        }
         
         $sales = $query->orderByDesc('id')->paginate(15);
         
@@ -119,6 +128,17 @@ class SaleController extends Controller
         }
         
         $customers = $query->get();
+
+        // Get patients for dropdown — only if therapy package is installed
+        $hasPatients = class_exists('\Isotope\Therapy\Models\Patient');
+        $patients    = [];
+        if ($hasPatients) {
+            $patientQuery = \Isotope\Therapy\Models\Patient::selectRaw("id, CONCAT(name, ' (', code, ')') as text, mobile as subText");
+            if (settings()->enable_branch == 1 && Auth::user()->branch) {
+                $patientQuery->where('branch_id', Auth::user()->branch->id);
+            }
+            $patients = $patientQuery->get();
+        }
         
         // Get branches for dropdown
         $branches = [];
@@ -133,18 +153,17 @@ class SaleController extends Controller
             ];
         });
         
-        return view('shopboss::sale.create', compact('customers', 'branches','paymentMethods', 'banks'));
+        return view('shopboss::sale.create', compact('customers', 'patients', 'hasPatients', 'branches', 'paymentMethods', 'banks'));
     }
 
     public function store(Request $request)
     {
         // dd($request->all());
-        try {
+        try {            
             $req = $request->all();
             if(count($req['products']) < 1)
                 throw new Exception(__('Select Product'), 403);
 
-             // Set branch_id with a proper default
             $branch_id = 1; // Default branch ID
             
             // If branch system is enabled, get branch_id from request or user
@@ -165,7 +184,7 @@ class SaleController extends Controller
                 $discount = array_key_exists('percentage', $item) ? ($product->product_price / 100) * floatval($item['discount']) : $item['discount'];
                 
                 // Use branch_id from request if branch system is enabled, otherwise use default
-                $branch_id = settings()->enable_branch == 1 ? $req['branch_id'] : null;
+                $branch_id = settings()->enable_branch == 1 ? ($req['branch_id'] ?? null) : null;
                 $purchase_detail_query = PurchaseDetail::query()
                                     ->where('product_id', $product->id)
                                     ->where('available_qty', '>', 0.0001)
@@ -202,19 +221,37 @@ class SaleController extends Controller
                 ]);
             }
 
-            $customer = Customer::find($req['customer_id']);
-            if(is_null($customer)) throw new Exception(__('Customre not found'), 404);
+            // Determine customer or patient
+            $patient_id   = null;
+            $customer_id  = !empty($req['customer_id']) ? $req['customer_id'] : null;
+            $customer_name = null;
+
+            // Patient feature only available if therapy package is installed
+            $patientClassExists = class_exists('\Isotope\Therapy\Models\Patient');
+            if ($patientClassExists && !empty($req['patient_id'])) {
+                $patient_id = $req['patient_id'];
+                $patient = \Isotope\Therapy\Models\Patient::find($patient_id);
+                if (is_null($patient)) throw new Exception(__('Patient not found'), 404);
+                $customer_name = $patient->name;
+            } elseif ($customer_id) {
+                $customer = Customer::find($customer_id);
+                if (is_null($customer)) throw new Exception(__('Customer not found'), 404);
+                $customer_name = $customer->customer_name;
+            } else {
+                throw new Exception(__('Please select a customer or a patient'), 422);
+            }
 
             $totalSubTotal = collect($products)->sum('sub_total');
             
             // Use branch_id from request if branch system is enabled, otherwise use default
-            $branch_id = settings()->enable_branch == 1 ? $req['branch_id'] : null;
+            $branch_id = settings()->enable_branch == 1 ? ($req['branch_id'] ?? null) : null;
             
             $payload = [
                 'branch_id'           => $branch_id,
                 'date'                => $req['date'],
-                'customer_id'         => $customer->id,
-                'customer_name'       => $customer->customer_name,
+                'customer_id'         => $customer_id,
+                'patient_id'          => $patient_id,
+                'customer_name'       => $customer_name,
                 'tax_percentage'      => $req['tax_percentage'],
                 'tax_amount'          => ($totalSubTotal / 100) * $req['tax_percentage'],
                 'discount_percentage' => (100/$totalSubTotal)*$req['discount_amount'],
@@ -270,7 +307,7 @@ class SaleController extends Controller
             return redirect()->route('sales.index')->withSuccess(__('Sale Created'));
         } catch (Exception $e) {
             DB::rollBack();
-            return back()->withErrors($e->getMessage() .' || '. $e->getLine());
+            return back()->withInput()->withErrors($e->getMessage() .' || '. $e->getLine());
         }
     }
 
@@ -308,7 +345,7 @@ class SaleController extends Controller
             $status = 1; // debit
         }
 
-        $description = "Payment of Create Sale : {$sale->reference} | Bank({$bank->name}:***" . substr($bank->account_number, -4) . ")";
+        $description = "Payment of Create Sale : {$sale->reference} | {$sale->customer_name} | Bank({$bank->name}:***" . substr($bank->account_number, -4) . ")";
 
         // Finance record তৈরি
         $financeRecordId = null;
@@ -379,6 +416,17 @@ class SaleController extends Controller
         }
         
         $customers = $query->get();
+
+        // Get patients — only if therapy package is installed
+        $hasPatients = class_exists('\Isotope\Therapy\Models\Patient');
+        $patients    = [];
+        if ($hasPatients) {
+            $patientQuery = \Isotope\Therapy\Models\Patient::selectRaw("id, CONCAT(name, ' (', code, ')') as text, mobile as subText");
+            if (settings()->enable_branch == 1 && Auth::user()->branch) {
+                $patientQuery->where('branch_id', Auth::user()->branch->id);
+            }
+            $patients = $patientQuery->get();
+        }
         
         // Get branches for dropdown
         $branches = [];
@@ -386,7 +434,7 @@ class SaleController extends Controller
             $branches = Branch::all();
         }
 
-        return view('shopboss::sale.edit', compact('sale', 'customers', 'branches'));
+        return view('shopboss::sale.edit', compact('sale', 'customers', 'patients', 'hasPatients', 'branches'));
     }
 
     public function update(Request $request, $id)
@@ -462,14 +510,32 @@ class SaleController extends Controller
                 }
             }
 
-            $customer = Customer::findOrFail($request->customer_id);
-            if(is_null($customer)) throw new Exception(__('Customer not found'), 404);
+            // Determine customer or patient
+            $patient_id   = null;
+            $customer_id  = !empty($req['customer_id']) ? $req['customer_id'] : null;
+            $customer_name = null;
+
+            // Patient feature only available if therapy package is installed
+            $patientClassExists = class_exists('\Isotope\Therapy\Models\Patient');
+            if ($patientClassExists && !empty($req['patient_id'])) {
+                $patient_id = $req['patient_id'];
+                $patient = \Isotope\Therapy\Models\Patient::find($patient_id);
+                if (is_null($patient)) throw new Exception(__('Patient not found'), 404);
+                $customer_name = $patient->name;
+            } elseif ($customer_id) {
+                $customer = Customer::find($customer_id);
+                if (is_null($customer)) throw new Exception(__('Customer not found'), 404);
+                $customer_name = $customer->customer_name;
+            } else {
+                throw new Exception(__('Please select a customer or a patient'), 422);
+            }
 
             $sale->refresh();
             $totalSubTotal = $sale->saleDetails->sum('sub_total');
             $payload = [
-                'customer_id'         => $customer->id,
-                'customer_name'       => $customer->customer_name,
+                'customer_id'         => $customer_id,
+                'patient_id'          => $patient_id,
+                'customer_name'       => $customer_name,
                 'date'                => $req['date'],
                 'tax_percentage'      => $req['tax_percentage'],
                 'tax_amount'          => ($totalSubTotal / 100) * $req['tax_percentage'],

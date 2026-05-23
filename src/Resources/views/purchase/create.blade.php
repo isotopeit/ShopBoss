@@ -51,7 +51,12 @@
             <div class="row">
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
-                        <label class="form-label">{{ __('shopboss::shopboss.supplier') }}</label>
+                        <label class="form-label align-items-center w-100">
+                            <span>{{ __('shopboss::shopboss.supplier') }}</span>
+                            <button type="button" class="btn btn-sm btn-isotope py-0 px-2" data-bs-toggle="modal" data-bs-target="#createSupplierModal" title="{{ __('Add Supplier') }}">
+                                <i class="fa-solid fa-plus text-white"></i>
+                            </button>
+                        </label>
                         <select class="form-select form-select-sm" id="supplier" name="supplier_id" required></select>
                     </div>
                 </div>
@@ -64,7 +69,7 @@
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.date') }}:</label>
-                        <input type="date" class="form-control form-control-sm" value="{{ date('Y-m-d') }}"  name="date"required>
+                        <input type="date" class="form-control form-control-sm" value="{{ old('date', date('Y-m-d')) }}" name="date" required>
                     </div>
                 </div>
                 @if (settings()->enable_branch == 1)
@@ -84,9 +89,53 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="removeable-tr text-center fw-bold">
-                                <td colspan="8">{{ __('shopboss::shopboss.pleaseSearchSelectProducts') }}!</td>
-                            </tr>
+                            @if(old('products'))
+                                @foreach(old('products') as $key => $productOld)
+                                    @php
+                                        $productModel = \Isotope\ShopBoss\Models\Product::find($productOld['product_id']);
+                                    @endphp
+                                    @if($productModel)
+                                        <tr class="align-middle text-end" id="{{ $productModel->id }}">
+                                            <td class="text-start">
+                                                <p class="p-0 m-0">{{ $productModel->product_name }}</p>
+                                                <span class="badge badge-success">{{ $productModel->product_code }}</span>
+                                            </td>
+                                            <td class="unit-price">{{ number_format($productModel->product_cost, 2, '.', '') }}</td>
+                                            <td></td>
+                                            <td width="10%">
+                                                <input type="hidden" value="{{ $productModel->id }}" name="products[{{ $key }}][product_id]" />
+                                                <input type="number" step="0.01" class="form-control form-control-sm qty" value="{{ $productOld['qty'] ?? 1 }}" onchange="subTotalCalc(this)" name="products[{{ $key }}][qty]" />
+                                            </td>
+                                            <td width="10%">
+                                                <div class="d-flex">
+                                                    <input type="number" class="form-control form-control-sm discount" name="products[{{ $key }}][discount]" onchange="subTotalCalc(this)" value="{{ $productOld['discount'] ?? 0 }}" step="0.01">
+                                                    <input type="checkbox" class="form-check-input mt-2 mx-1 percentage" name="products[{{ $key }}][percentage]" onchange="subTotalCalc(this)" {{ isset($productOld['percentage']) ? 'checked' : '' }}>
+                                                    <label class="form-check-label mt-3 text-dark">%</label>
+                                                </div>
+                                            </td>
+                                            <td class="sub-total">
+                                                @php
+                                                    $discountAmt = $productOld['discount'] ?? 0;
+                                                    if(isset($productOld['percentage'])) {
+                                                        $discountAmt = ($productModel->product_cost / 100) * $discountAmt;
+                                                    }
+                                                    $subTotal = ($productModel->product_cost - $discountAmt) * ($productOld['qty'] ?? 1);
+                                                @endphp
+                                                {{ number_format($subTotal, 2, '.', '') }}
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm p-0 me-1 remove_product" onclick="$(this).closest('tr').remove(); grandTotalCalc();">
+                                                    <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>    
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            @else
+                                <tr class="removeable-tr text-center fw-bold">
+                                    <td colspan="8">{{ __('shopboss::shopboss.pleaseSearchSelectProducts') }}!</td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -121,19 +170,19 @@
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.orderTaxPercent') }}:</label>
-                        <input type="number" class="form-control form-control-sm" name="tax_percentage" value="0" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
+                        <input type="number" class="form-control form-control-sm" name="tax_percentage" value="{{ old('tax_percentage', 0) }}" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.discountFixed') }}:</label>
-                        <input type="number" class="form-control form-control-sm" name="discount_amount" value="0" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
+                        <input type="number" class="form-control form-control-sm" name="discount_amount" value="{{ old('discount_amount', 0) }}" min="0" max="100" step="0.01" onchange="grandTotalCalc()">
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.shipping') }}:</label>
-                        <input type="number" class="form-control form-control-sm" name="shipping_amount" step="0.01" value="0" onchange="grandTotalCalc()">
+                        <input type="number" class="form-control form-control-sm" name="shipping_amount" step="0.01" value="{{ old('shipping_amount', 0) }}" onchange="grandTotalCalc()">
                     </div>
                 </div>
 
@@ -168,14 +217,14 @@
                 <div class="col-md-6 col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.amountPaid') }}:</label>
-                        <input type="text" class="form-control form-control-sm" name="paid_amount" required>
+                        <input type="text" class="form-control form-control-sm" name="paid_amount" required value="{{ old('paid_amount') }}">
                     </div>
                 </div>
 
                 <div class="col-12">
                     <div class="mb-2">
                         <label class="form-label">{{ __('shopboss::shopboss.noteIfNeeded') }}:</label>
-                        <textarea class="form-control form-control-sm" rows="5" name="note"></textarea>
+                        <textarea class="form-control form-control-sm" rows="5" name="note">{{ old('note') }}</textarea>
                     </div>
                 </div>
                 <div class="col-12">
@@ -188,6 +237,35 @@
         </div>
     </div>
 </form>
+
+<!-- Supplier Create Modal -->
+<div class="modal fade" id="createSupplierModal" tabindex="-1" aria-labelledby="createSupplierModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="createSupplierForm">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createSupplierModalLabel">{{ __('Add Supplier') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('shopboss::shopboss.supplierName') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('shopboss::shopboss.phone') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="phone" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">{{ __('shopboss::shopboss.close') }}</button>
+                    <button type="submit" class="btn btn-sm btn-isotope text-white">{{ __('shopboss::shopboss.save') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @push('css')
     <script></script>
@@ -223,7 +301,7 @@
         templateResult,
         templateSelection,
         matcher
-    }).val(null).trigger('change');
+    }).val(@json(old('supplier_id'))).trigger('change');
 
     $('#product').select2({
         placeholder: '{{ __('shopboss::shopboss.selectProduct') }}',
@@ -292,7 +370,7 @@
                             </td>
                             <td class="sub-total">${res.data.product_cost}</td>
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm p-0 me-1">
+                                <button type="button" class="btn btn-sm p-0 me-1 remove_product">
                                     <i class="fa-solid fa-times ms-1 fs-2 text-danger"></i>
                                 </button>
                             </td>
@@ -335,6 +413,14 @@
     }
 
     $('.select2').css('width', '92%')
+
+    // Handle product removal for dynamically added rows
+    $(document).on('click', '#product-table tbody tr button', function() {
+        if ($(this).find('.fa-times').length > 0) {
+            $(this).closest('tr').remove();
+            grandTotalCalc();
+        }
+    });
 
     @if (settings()->enable_branch == 1)
     // Update the hidden branch field when the branch dropdown changes
@@ -393,6 +479,75 @@
             $('#bank-select').attr('required', false).val(null).trigger('change');
             
         }
+    });
+
+    $(document).ready(function() {
+        @if(old('products'))
+            rowKey = {{ max(array_keys(old('products'))) + 1 }};
+            grandTotalCalc();
+        @endif
+
+        const oldPaymentMethod = "{{ old('payment_method_id') }}";
+        if (oldPaymentMethod) {
+            $('#payment-method').val(oldPaymentMethod).trigger('change');
+        }
+
+        const oldBankId = "{{ old('bank_id') }}";
+        if (oldBankId) {
+            $('#bank-select').val(oldBankId).trigger('change');
+        }
+    });
+
+    // Handle Quick Supplier Create
+    $('#createSupplierForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const submitBtn = form.find('button[type="submit"]');
+        submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        axios.post('/api/supplier-store', form.serialize())
+            .then(response => {
+                const supplier = response.data;
+                const newOption = new Option(supplier.supplier_name, supplier.id, false, false);
+                
+                // Add the new option and select it
+                $('#supplier').append(newOption).trigger('change');
+                
+                // Set the subText for select2
+                const dataObj = $('#supplier').select2('data')[0];
+                if (dataObj && supplier.supplier_phone) {
+                    dataObj.subText = supplier.supplier_phone;
+                }
+
+                $('#supplier').val(supplier.id).trigger('change');
+
+                // Close modal and reset form
+                $('#createSupplierModal').modal('hide');
+                form[0].reset();
+                
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Supplier Added Successfully!',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            })
+            .catch(error => {
+                let msg = 'Something went wrong';
+                if (error.response && error.response.data && error.response.data.message) {
+                    msg = error.response.data.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: msg,
+                });
+            })
+            .finally(() => {
+                submitBtn.prop('disabled', false).text("{{ __('shopboss::shopboss.save') }}");
+            });
     });
 </script>
 @endpush
